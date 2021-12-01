@@ -20,7 +20,7 @@ defmodule AdventOfCode.Year2019.Day03 do
   """
   @impl AdventOfCode
   def part1 do
-    [wire1, wire2] = input_lists(&parse_path/1) |> Enum.to_list()
+    [wire1, wire2] = input_lists(",", &parse_path/1) |> Enum.to_list()
 
     wire1_points = path_to_points(wire1)
     wire2_points = path_to_points(wire2)
@@ -36,7 +36,7 @@ defmodule AdventOfCode.Year2019.Day03 do
   """
   @impl AdventOfCode
   def part2 do
-    [wire1, wire2] = input_lists(&parse_path/1) |> Enum.to_list()
+    [wire1, wire2] = input_lists(",", &parse_path/1) |> Enum.to_list()
 
     wire1_points = path_to_points(wire1)
     wire2_points = path_to_points(wire2)
