@@ -1,0 +1,16 @@
+defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
+  @moduledoc """
+  https://adventofcode.com/<%= year %>/day/<%= String.to_integer(day) %>
+  """
+  use AdventOfCode, year: <%= year %>, day: <%= day %>
+
+  @impl AdventOfCode
+  def part1 do
+    raise "not implemented"
+  end
+
+  @impl AdventOfCode
+  def part2 do
+    raise "not implemented"
+  end
+end

@@ -3,7 +3,7 @@ defmodule AdventOfCode.MixProject do
 
   def project do
     [
-      app: :aoc,
+      app: :advent_of_code,
       version: "0.1.0",
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
@@ -13,7 +13,7 @@ defmodule AdventOfCode.MixProject do
 
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :eex]
     ]
   end
 

@@ -12,7 +12,11 @@ defmodule AdventOfCode do
 
       @spec input_file() :: String.t()
       def input_file do
-        Path.join([Application.app_dir(:aoc, "priv"), "#{unquote(year)}", "day#{unquote(day)}.in"])
+        Path.join([
+          Application.app_dir(:advent_of_code, "priv"),
+          "#{unquote(year)}",
+          "day#{unquote(day)}.in"
+        ])
       end
 
       @spec input_lines() :: Enumerable.t()
