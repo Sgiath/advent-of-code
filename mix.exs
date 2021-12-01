@@ -21,7 +21,8 @@ defmodule AdventOfCode.MixProject do
     [
       {:flow, "~> 1.1"},
       {:typed_struct, "~> 0.2"},
-      {:libgraph, "~> 0.13"}
+      {:libgraph, "~> 0.13"},
+      {:benchee, "~> 1.0", only: :dev}
     ]
   end
 end
