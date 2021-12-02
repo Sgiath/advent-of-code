@@ -5,9 +5,7 @@ defmodule AdventOfCode.Year2021.Day01 do
   use AdventOfCode, year: 2021, day: 01
 
   @impl AdventOfCode
-  def input do
-    input_numbers()
-  end
+  def input, do: input_numbers()
 
   @impl AdventOfCode
   def part1(input) do
@@ -35,8 +33,11 @@ defmodule AdventOfCode.Year2021.Day01 do
   def count_slide([_ | rest], acc), do: count_slide(rest, acc)
   def count_slide(_, acc), do: acc
 
-  # I find this solutin more appealing but it is slower than my original solution
+  # ===============================================================================================
+  # Other solutions
+  # ===============================================================================================
 
+  # I find this solutin more appealing but it is slower than my original solution
   def part1_chunk(input) do
     input
     |> Stream.chunk_every(2, 1, :discard)
@@ -52,7 +53,6 @@ defmodule AdventOfCode.Year2021.Day01 do
   end
 
   # Benchmarking different solutions
-
   @impl AdventOfCode
   def bench do
     [

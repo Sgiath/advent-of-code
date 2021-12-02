@@ -36,9 +36,10 @@ defmodule Mix.Tasks.AdventOfCode do
   defp run_part(module, part) do
     IO.puts("\n#{IO.ANSI.bright()}#{IO.ANSI.blue()}Part #{part}#{IO.ANSI.reset()}")
 
-    {time, solution} = :timer.tc(fn -> apply(module, :"part#{part}", [module.input()]) end)
+    {time, solution} = :timer.tc(module, :"part#{part}", [module.input()])
 
     if is_binary(solution), do: IO.puts(solution), else: IO.inspect(solution)
-    IO.puts("#{IO.ANSI.light_black()}#{div(time, 1000)} ms#{IO.ANSI.reset()}\n")
+
+    IO.puts("#{IO.ANSI.light_black()}#{time} μs#{IO.ANSI.reset()}\n")
   end
 end

@@ -46,21 +46,15 @@ defmodule AdventOfCode do
       end
 
       @impl AdventOfCode
-      def bench do
-        %{
-          part1: &part1/1,
-          part2: &part2/1
-        }
-      end
-
+      def bench, do: %{part1: &part1/1, part2: &part2/1}
       defoverridable bench: 0
     end
   end
 
-  @callback input :: any()
-  @callback part1(any()) :: any()
-  @callback part2(any()) :: any()
-  @callback bench :: map() | [map()]
+  @callback input :: input :: any()
+  @callback part1(input :: any()) :: output :: any()
+  @callback part2(input :: any()) :: output :: any()
+  @callback bench :: configuration :: map() | [map()]
 
   @doc """
   Get path for input file for specific year and day
