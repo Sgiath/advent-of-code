@@ -23,13 +23,31 @@ defmodule Mix.Tasks.AdventOfCode.Bench do
 
     case Code.ensure_compiled(module) do
       {:module, _} ->
-        Benchee.run(%{
-          part1: &module.part1/0,
-          part2: &module.part2/0
-        })
+        case module.bench() do
+          config when is_map(config) -> do_bench(config, module)
+          config when is_list(config) -> Enum.each(config, &do_bench(&1, module))
+        end
 
       {:error, _} ->
         IO.puts("\n#{IO.ANSI.red()}Year #{year}, day #{day} not implemented!#{IO.ANSI.reset()}")
     end
+  end
+
+  defp do_bench(config, module) do
+    IO.puts("\n#{IO.ANSI.yellow()}Running benchmark...#{IO.ANSI.reset()}")
+
+    Benchee.run(
+      config,
+      time: 10,
+      inputs: %{"base" => module.input()},
+      print: %{
+        benchmarking: false,
+        configuration: false
+      },
+      unit_scaling: :smallest,
+      formatters: [{Benchee.Formatters.Console, extended_statistics: true}]
+    )
+
+    IO.puts("")
   end
 end

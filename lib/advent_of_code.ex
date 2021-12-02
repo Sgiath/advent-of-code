@@ -44,11 +44,23 @@ defmodule AdventOfCode do
       def input_list(splitter \\ ",", mapper \\ &String.to_integer/1) do
         AdventOfCode.input_list(unquote(year), unquote(day), splitter, mapper)
       end
+
+      @impl AdventOfCode
+      def bench do
+        %{
+          part1: &part1/1,
+          part2: &part2/1
+        }
+      end
+
+      defoverridable bench: 0
     end
   end
 
-  @callback part1 :: any()
-  @callback part2 :: any()
+  @callback input :: any()
+  @callback part1(any()) :: any()
+  @callback part2(any()) :: any()
+  @callback bench :: map() | [map()]
 
   @doc """
   Get path for input file for specific year and day

@@ -6,6 +6,9 @@ defmodule AdventOfCode.Year2019.Day09 do
 
   alias AdventOfCode.Year2019.Intcode
 
+  @impl AdventOfCode
+  def input, do: input_list()
+
   defp get_output(output \\ []) do
     receive do
       :halt -> Enum.reverse(output)
@@ -14,8 +17,8 @@ defmodule AdventOfCode.Year2019.Day09 do
   end
 
   @impl AdventOfCode
-  def part1 do
-    pid = input_list() |> Intcode.start_link(self(), self())
+  def part1(input) do
+    pid = Intcode.start_link(input, self(), self())
 
     Intcode.run_program_async(pid)
 
@@ -32,8 +35,8 @@ defmodule AdventOfCode.Year2019.Day09 do
   end
 
   @impl AdventOfCode
-  def part2 do
-    pid = input_list() |> Intcode.start_link(self(), self())
+  def part2(input) do
+    pid = Intcode.start_link(input, self(), self())
 
     Intcode.run_program_async(pid)
 

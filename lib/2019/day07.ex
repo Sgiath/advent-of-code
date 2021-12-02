@@ -6,15 +6,15 @@ defmodule AdventOfCode.Year2019.Day07 do
 
   alias AdventOfCode.Year2019.Intcode
 
-  @doc """
-  question
-  """
   @impl AdventOfCode
-  def part1 do
+  def input, do: input_list()
+
+  @impl AdventOfCode
+  def part1(input) do
     0..4
     |> Enum.to_list()
     |> permutations()
-    |> Enum.map(&run_config(input_list(), &1))
+    |> Enum.map(&run_config(input, &1))
     |> Enum.max()
   end
 
@@ -22,11 +22,11 @@ defmodule AdventOfCode.Year2019.Day07 do
   question
   """
   @impl AdventOfCode
-  def part2 do
+  def part2(input) do
     5..9
     |> Enum.to_list()
     |> permutations()
-    |> Enum.map(&run_config_recursive(input_list(), &1))
+    |> Enum.map(&run_config_recursive(input, &1))
     |> Enum.max()
   end
 

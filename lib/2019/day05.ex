@@ -4,15 +4,13 @@ defmodule AdventOfCode.Year2019.Day05 do
 
   alias AdventOfCode.Year2019.Intcode
 
-  @doc """
-  After providing 1 to the only input instruction and passing all the tests, what diagnostic code
-  does the program produce?
-  """
   @impl AdventOfCode
-  def part1 do
-    pid = input_list() |> Intcode.start_link(self(), self())
-    Intcode.run_program_async(pid)
+  def input, do: input_list()
 
+  @impl AdventOfCode
+  def part1(input) do
+    pid = Intcode.start_link(input, self(), self())
+    Intcode.run_program_async(pid)
     handle_io(pid, 1)
   end
 
@@ -24,8 +22,8 @@ defmodule AdventOfCode.Year2019.Day05 do
   What is the diagnostic code for system ID 5?
   """
   @impl AdventOfCode
-  def part2 do
-    pid = input_list() |> Intcode.start_link(self(), self())
+  def part2(input) do
+    pid = Intcode.start_link(input, self(), self())
 
     Intcode.run_program_async(pid)
 

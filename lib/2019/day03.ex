@@ -15,35 +15,27 @@ defmodule AdventOfCode.Year2019.Day03 do
   def parse_path("D" <> distance), do: {:down, String.to_integer(distance)}
   def parse_path("L" <> distance), do: {:left, String.to_integer(distance)}
 
-  @doc """
-  What is the Manhattan distance from the central port to the closest intersection?
-  """
   @impl AdventOfCode
-  def part1 do
-    [wire1, wire2] = input_lists(",", &parse_path/1) |> Enum.to_list()
+  def input do
+    ","
+    |> input_lists(&parse_path/1)
+    |> Stream.map(&path_to_points/1)
+    |> Enum.to_list()
+  end
 
-    wire1_points = path_to_points(wire1)
-    wire2_points = path_to_points(wire2)
-
-    wire1_points
-    |> select_common(wire2_points)
+  @impl AdventOfCode
+  def part1([wire1, wire2]) do
+    wire1
+    |> select_common(wire2)
     |> Enum.map(&calc_distance/1)
     |> Enum.min()
   end
 
-  @doc """
-  What is the fewest combined steps the wires must take to reach an intersection?
-  """
   @impl AdventOfCode
-  def part2 do
-    [wire1, wire2] = input_lists(",", &parse_path/1) |> Enum.to_list()
-
-    wire1_points = path_to_points(wire1)
-    wire2_points = path_to_points(wire2)
-
-    wire1_points
-    |> select_common(wire2_points)
-    |> Enum.map(&calc_delay(wire1_points, wire2_points, &1))
+  def part2([wire1, wire2]) do
+    wire1
+    |> select_common(wire2)
+    |> Enum.map(&calc_delay(wire1, wire2, &1))
     |> Enum.min()
   end
 

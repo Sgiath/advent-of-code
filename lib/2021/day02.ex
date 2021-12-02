@@ -5,8 +5,11 @@ defmodule AdventOfCode.Year2021.Day02 do
   use AdventOfCode, year: 2021, day: 02
 
   @impl AdventOfCode
-  def part1 do
-    input_lines()
+  def input, do: input_lines()
+
+  @impl AdventOfCode
+  def part1(input) do
+    input
     |> Enum.reduce({0, 0}, &count_reducer/2)
     |> Tuple.product()
   end
@@ -16,8 +19,8 @@ defmodule AdventOfCode.Year2021.Day02 do
   def count_reducer("up " <> val, {h, d}), do: {h, d - String.to_integer(val)}
 
   @impl AdventOfCode
-  def part2 do
-    input_lines()
+  def part2(input) do
+    input
     |> Enum.reduce({0, 0, 0}, &count_aim_reducer/2)
     |> Tuple.delete_at(2)
     |> Tuple.product()

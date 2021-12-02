@@ -8,16 +8,17 @@ defmodule AdventOfCode.Year2019.Day10 do
   @type point() :: {integer(), integer()}
 
   @impl AdventOfCode
-  def part1 do
-    {num, _anchor} = input_chars() |> get_best()
+  def input, do: input_chars()
 
-    num
+  @impl AdventOfCode
+  def part1(input) do
+    input
+    |> get_best()
+    |> elem(0)
   end
 
   @impl AdventOfCode
-  def part2 do
-    input = input_chars()
-
+  def part2(input) do
     {_, anchor} = get_best(input)
 
     {{x, y}, _angle, _distance} =

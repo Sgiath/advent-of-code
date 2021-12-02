@@ -4,7 +4,8 @@ defmodule AdventOfCode.Year2020.Day02 do
   """
   use AdventOfCode, year: 2020, day: 02
 
-  defp input do
+  @impl AdventOfCode
+  def input do
     regex = ~r/(?<min>\d+)-(?<max>\d+) (?<char>[a-z]): (?<pass>[a-z]+)/
 
     input_lines()
@@ -14,8 +15,8 @@ defmodule AdventOfCode.Year2020.Day02 do
   end
 
   @impl AdventOfCode
-  def part1 do
-    input()
+  def part1(input) do
+    input
     |> Stream.filter(&valid_count?/1)
     |> Enum.to_list()
     |> length()
@@ -32,8 +33,8 @@ defmodule AdventOfCode.Year2020.Day02 do
   end
 
   @impl AdventOfCode
-  def part2 do
-    input()
+  def part2(input) do
+    input
     |> Stream.filter(&valid_pos?/1)
     |> Enum.to_list()
     |> length()

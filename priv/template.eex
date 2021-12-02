@@ -5,12 +5,15 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
   use AdventOfCode, year: <%= year %>, day: <%= day %>
 
   @impl AdventOfCode
-  def part1 do
+  def input, do: input_lines()
+
+  @impl AdventOfCode
+  def part1(input) do
     raise "not implemented"
   end
 
   @impl AdventOfCode
-  def part2 do
+  def part2(input) do
     raise "not implemented"
   end
 end

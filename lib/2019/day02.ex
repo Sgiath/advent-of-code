@@ -10,16 +10,12 @@ defmodule AdventOfCode.Year2019.Day02 do
 
   require Logger
 
-  @doc """
-  Once you have a working computer, the first step is to restore the gravity assist program (your
-  puzzle input) to the "1202 program alarm" state it had just before the last computer caught
-  fire. To do this, before running the program, replace position 1 with the value 12 and replace
-  position 2 with the value 2. What value is left at position 0 after the program halts?
-  """
   @impl AdventOfCode
-  def part1 do
-    input_list()
-    |> run_program(12, 2)
+  def input, do: input_list()
+
+  @impl AdventOfCode
+  def part1(input) do
+    run_program(input, 12, 2)
   end
 
   @doc """
@@ -27,8 +23,8 @@ defmodule AdventOfCode.Year2019.Day02 do
   100 * noun + verb? (For example, if noun=12 and verb=2, the answer would be 1202.)
   """
   @impl AdventOfCode
-  def part2 do
-    find_combination(input_list())
+  def part2(input) do
+    find_combination(input)
   end
 
   @doc """

@@ -5,9 +5,10 @@ defmodule AdventOfCode.Year2020.Day03 do
   use AdventOfCode, year: 2020, day: 03
 
   @impl AdventOfCode
-  def part1 do
-    [_ | input] = Enum.to_list(input_lines())
+  def input, do: Enum.to_list(input_lines())
 
+  @impl AdventOfCode
+  def part1([_ | input]) do
     find_slope(input, 3)
   end
 
@@ -27,9 +28,7 @@ defmodule AdventOfCode.Year2020.Day03 do
   end
 
   @impl AdventOfCode
-  def part2 do
-    [_ | input] = Enum.to_list(input_lines())
-
+  def part2([_ | input]) do
     input
     |> find_slope(1)
     |> Kernel.*(find_slope(input, 3))

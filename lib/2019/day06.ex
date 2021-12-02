@@ -4,15 +4,13 @@ defmodule AdventOfCode.Year2019.Day06 do
   """
   use AdventOfCode, year: 2019, day: 06
 
-  @doc """
-  What is the total number of direct and indirect orbits in your map data?
-  """
   @impl AdventOfCode
-  def part1 do
+  def input, do: Stream.map(input_lines(), &String.split(&1, ")"))
+
+  @impl AdventOfCode
+  def part1(input) do
     graph =
-      input_lines()
-      |> Stream.map(&String.split(&1, ")"))
-      |> Enum.reduce(%{}, fn [anchor, orbit], acc ->
+      Enum.reduce(input, %{}, fn [anchor, orbit], acc ->
         Map.update(acc, anchor, [orbit], fn orbits -> [orbit | orbits] end)
       end)
 
@@ -21,15 +19,9 @@ defmodule AdventOfCode.Year2019.Day06 do
     |> compute_orbits(graph, 0)
   end
 
-  @doc """
-  What is the minimum number of orbital transfers required to move from the object YOU are
-  orbiting to the object SAN is orbiting? (Between the objects they are orbiting - not between
-  YOU and SAN.)
-  """
   @impl AdventOfCode
-  def part2 do
-    input_lines()
-    |> Stream.map(&String.split(&1, ")"))
+  def part2(input) do
+    input
     |> Enum.reduce(Graph.new(), fn [anchor, orbit], graph ->
       graph
       |> Graph.add_edge(anchor, orbit)
@@ -40,10 +32,6 @@ defmodule AdventOfCode.Year2019.Day06 do
     |> Kernel.-(3)
   end
 
-  @doc """
-  Compute all direct and indirect orbits
-  """
-  @spec compute_orbits(list() | nil, map(), integer()) :: integer()
   def compute_orbits(nil, _graph, value), do: value
 
   def compute_orbits(orbits, graph, value) do

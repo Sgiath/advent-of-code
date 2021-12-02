@@ -10,11 +10,16 @@ defmodule AdventOfCode.Year2019.Day08 do
   @type image() :: list(layer())
 
   @impl AdventOfCode
-  def part1 do
+  def input do
+    input_line()
+    |> String.graphemes()
+    |> Enum.chunk_every(25 * 6)
+  end
+
+  @impl AdventOfCode
+  def part1(input) do
     {_zeros, list} =
-      input_line()
-      |> String.graphemes()
-      |> Enum.chunk_every(25 * 6)
+      input
       |> Enum.map(fn list -> {Enum.count(list, &(&1 == "0")), list} end)
       |> Enum.min_by(fn {zeros, _list} -> zeros end)
 
@@ -25,12 +30,7 @@ defmodule AdventOfCode.Year2019.Day08 do
   end
 
   @impl AdventOfCode
-  def part2 do
-    input =
-      input_line()
-      |> String.graphemes()
-      |> Enum.chunk_every(25 * 6)
-
+  def part2(input) do
     input
     |> Enum.reduce(List.first(input), &apply_layer/2)
     |> Enum.chunk_every(25)

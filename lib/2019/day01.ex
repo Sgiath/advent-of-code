@@ -4,24 +4,19 @@ defmodule AdventOfCode.Year2019.Day01 do
   """
   use AdventOfCode, year: 2019, day: 01
 
-  @doc """
-  What is the sum of the fuel requirements for all of the modules on your spacecraft?
-  """
   @impl AdventOfCode
-  def part1 do
-    input_numbers()
+  def input, do: input_numbers()
+
+  @impl AdventOfCode
+  def part1(input) do
+    input
     |> Stream.map(&calculate_fuel/1)
     |> Enum.sum()
   end
 
-  @doc """
-  What is the sum of the fuel requirements for all of the modules on your spacecraft when also
-  taking into account the mass of the added fuel? (Calculate the fuel requirements for each
-  module separately, then add them all up at the end.)
-  """
   @impl AdventOfCode
-  def part2 do
-    input_numbers()
+  def part2(input) do
+    input
     |> Stream.map(&calculate_all_fuel/1)
     |> Enum.sum()
   end
