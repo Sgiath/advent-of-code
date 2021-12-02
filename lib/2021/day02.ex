@@ -8,9 +8,9 @@ defmodule AdventOfCode.Year2021.Day02 do
   def input, do: input_lines()
 
   @impl AdventOfCode
-  def part1(input) do
+  def part1(input, reducer \\ &count_reducer/2) do
     input
-    |> Enum.reduce({0, 0}, &count_reducer/2)
+    |> Enum.reduce({0, 0}, reducer)
     |> Tuple.product()
   end
 
@@ -19,9 +19,9 @@ defmodule AdventOfCode.Year2021.Day02 do
   def count_reducer("up " <> val, {h, d}), do: {h, d - String.to_integer(val)}
 
   @impl AdventOfCode
-  def part2(input) do
+  def part2(input, reducer \\ &count_aim_reducer/2) do
     input
-    |> Enum.reduce({0, 0, 0}, &count_aim_reducer/2)
+    |> Enum.reduce({0, 0, 0}, reducer)
     |> Tuple.delete_at(2)
     |> Tuple.product()
   end
@@ -36,31 +36,13 @@ defmodule AdventOfCode.Year2021.Day02 do
   # Other solutions
   # ===============================================================================================
 
-  def part1_1(input) do
-    input
-    |> Enum.reduce({0, 0}, &count_reducer1/2)
-    |> Tuple.product()
-  end
-
   def count_reducer1(<<"forward ", val::8>>, {h, d}), do: {h + (val - ?0), d}
   def count_reducer1(<<"down ", val::8>>, {h, d}), do: {h, d + (val - ?0)}
   def count_reducer1(<<"up ", val::8>>, {h, d}), do: {h, d - (val - ?0)}
 
-  def part1_2(input) do
-    input
-    |> Enum.reduce({0, 0}, &count_reducer2/2)
-    |> Tuple.product()
-  end
-
   def count_reducer2(<<"f", _::56, val::8>>, {h, d}), do: {h + (val - ?0), d}
   def count_reducer2(<<"d", _::32, val::8>>, {h, d}), do: {h, d + (val - ?0)}
   def count_reducer2(<<"u", _::16, val::8>>, {h, d}), do: {h, d - (val - ?0)}
-
-  def part1_3(input) do
-    input
-    |> Enum.reduce({0, 0}, &count_reducer3/2)
-    |> Tuple.product()
-  end
 
   # this seems to be the quickest one
   def count_reducer3(<<_::64, val::8>>, {h, d}), do: {h + (val - ?0), d}
@@ -70,10 +52,10 @@ defmodule AdventOfCode.Year2021.Day02 do
   @impl AdventOfCode
   def bench do
     %{
-      default: &part1/1,
-      version1: &part1_1/1,
-      version2: &part1_2/1,
-      version3: &part1_3/1
+      string_matching: &part1/1,
+      bitstring_matching: fn input -> part1(input, &count_reducer1/2) end,
+      first_letter_matching: fn input -> part1(input, &count_reducer2/2) end,
+      length_matching: fn input -> part1(input, &count_reducer3/2) end
     }
   end
 end
