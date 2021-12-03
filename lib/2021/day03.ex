@@ -18,26 +18,21 @@ defmodule AdventOfCode.Year2021.Day03 do
 
     input
     |> Enum.zip()
-    |> Enum.map(&Tuple.to_list/1)
-    |> Enum.map(&Enum.sum/1)
+    |> Enum.map(&Tuple.sum/1)
     |> Enum.map(&if(&1 > h, do: 1, else: 0))
     |> list_to_integer()
     |> then(&(&1 * bxor(&1, 0b111111111111)))
   end
 
-  @doc """
-  Get half of the length of the list
-  """
-  def half(input), do: div(length(input) + 1, 2)
+  # Get half of the length of the list
+  defp half(input), do: div(length(input) + 1, 2)
 
-  @doc """
-  Convert list of 1 and 0 to integer
-  """
-  def list_to_integer(input) do
+  # Convert list of 1 and 0 to integer
+  defp list_to_integer(input) do
     input
     |> Enum.reverse()
     |> Enum.with_index()
-    |> Enum.reduce(0, &bor(&2, elem(&1, 0) <<< elem(&1, 1)))
+    |> Enum.reduce(0, fn {bit, index}, acc -> bor(acc, bit <<< index) end)
   end
 
   @impl AdventOfCode
@@ -45,11 +40,10 @@ defmodule AdventOfCode.Year2021.Day03 do
     rating(input, &Kernel.==/2) * rating(input, &Kernel.!=/2)
   end
 
-  def rating(input, filter, pos \\ 0)
+  defp rating(input, filter, pos \\ 0)
+  defp rating([result], _filter, _pos), do: list_to_integer(result)
 
-  def rating([result], _filter, _pos), do: list_to_integer(result)
-
-  def rating(input, filter, pos) do
+  defp rating(input, filter, pos) do
     # get most frequent bit for position
     freq =
       input
