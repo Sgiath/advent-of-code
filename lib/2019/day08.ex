@@ -34,8 +34,7 @@ defmodule AdventOfCode.Year2019.Day08 do
     input
     |> Enum.reduce(List.first(input), &apply_layer/2)
     |> Enum.chunk_every(25)
-    |> Enum.map(&Enum.join/1)
-    |> Enum.join("\n")
+    |> Enum.map_join("\n", &Enum.join/1)
     |> String.replace("0", " ")
     |> String.replace("1", <<9_608::utf8>>)
   end

@@ -11,23 +11,17 @@ defmodule AdventOfCode.Year2019.Day04 do
 
   @impl AdventOfCode
   def part1(input) do
-    input
-    |> Enum.filter(&increasing?/1)
-    |> Enum.filter(&same_digits?/1)
-    |> Enum.count()
+    Enum.count(input, &(increasing?(&1) and same_digits?(&1)))
   end
 
   @impl AdventOfCode
   def part2(input) do
-    input
-    |> Enum.filter(&increasing?/1)
-    |> Enum.filter(&one_two_digit_group?/1)
-    |> Enum.count()
+    Enum.count(input, &(increasing?(&1) and one_two_digit_group?(&1)))
   end
 
   def increasing?([dig1, dig2 | rest]) when dig1 <= dig2, do: increasing?([dig2 | rest])
   def increasing?([_single_digit]), do: true
-  def increasing?(_), do: false
+  def increasing?(_digits), do: false
 
   def same_digits?(code), do: Enum.count(Enum.dedup(code)) < 6
 

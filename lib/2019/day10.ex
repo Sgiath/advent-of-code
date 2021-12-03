@@ -26,8 +26,7 @@ defmodule AdventOfCode.Year2019.Day10 do
       |> get_asteroids()
       |> Enum.reverse()
       |> List.delete(anchor)
-      |> Enum.map(&compute_angle(&1, anchor))
-      |> Enum.map(&compute_distance(&1, anchor))
+      |> Enum.map(&(&1 |> compute_angle(anchor) |> compute_distance(anchor)))
       |> Enum.group_by(fn {_point, angle, _distance} -> angle end)
       |> Enum.sort_by(fn {angle, _points} -> angle end)
       |> Enum.map(fn {_angle, points} ->
@@ -46,7 +45,7 @@ defmodule AdventOfCode.Year2019.Day10 do
     |> Enum.reduce([], fn {list, y}, acc ->
       Enum.reduce(list, [], fn
         {"#", x}, acc2 -> [{x, y} | acc2]
-        _, acc2 -> acc2
+        _pos, acc2 -> acc2
       end) ++ acc
     end)
   end
@@ -160,7 +159,7 @@ defmodule AdventOfCode.Year2019.Day10 do
     |> get_hidden(asteroid, {x_length, y_length})
     |> Enum.reduce(map, fn {x, y}, map ->
       List.update_at(map, y, fn row ->
-        List.update_at(row, x, fn _ -> "H" end)
+        List.update_at(row, x, fn _value -> "H" end)
       end)
     end)
   end

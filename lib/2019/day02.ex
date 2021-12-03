@@ -53,7 +53,7 @@ defmodule AdventOfCode.Year2019.Day02 do
     |> Flow.map(fn {noun, verb} -> {run_program(program, noun, verb), 100 * noun + verb} end)
     |> Enum.find_value(fn
       {19_690_720, result} -> result
-      _ -> false
+      _value -> false
     end)
   end
 end

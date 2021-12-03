@@ -8,10 +8,12 @@ defmodule AdventOfCode.Year2020.Day02 do
   def input do
     regex = ~r/(?<min>\d+)-(?<max>\d+) (?<char>[a-z]): (?<pass>[a-z]+)/
 
-    input_lines()
-    |> Enum.map(&Regex.named_captures(regex, &1))
-    |> Enum.map(fn row -> Map.update!(row, "min", &String.to_integer/1) end)
-    |> Enum.map(fn row -> Map.update!(row, "max", &String.to_integer/1) end)
+    Enum.map(input_lines(), fn line ->
+      regex
+      |> Regex.named_captures(line)
+      |> Map.update!("min", &String.to_integer/1)
+      |> Map.update!("max", &String.to_integer/1)
+    end)
   end
 
   @impl AdventOfCode

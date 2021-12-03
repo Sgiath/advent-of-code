@@ -19,7 +19,7 @@ defmodule Mix.Tasks.AdventOfCode.Bench do
     year = Keyword.get(opts, :year, 2021)
     day = opts |> Keyword.get(:day) |> Integer.to_string() |> String.pad_leading(2, "0")
 
-    module = :"Elixir.AdventOfCode.Year#{year}.Day#{day}"
+    module = String.to_existing_atom("Elixir.AdventOfCode.Year#{year}.Day#{day}")
 
     case Code.ensure_compiled(module) do
       {:module, _} ->

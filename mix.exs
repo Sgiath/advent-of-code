@@ -22,7 +22,8 @@ defmodule AdventOfCode.MixProject do
       {:flow, "~> 1.1"},
       {:typed_struct, "~> 0.2"},
       {:libgraph, "~> 0.13"},
-      {:benchee, "~> 1.0", only: :dev}
+      {:benchee, "~> 1.0", only: :dev},
+      {:credo, "~> 1.6", only: :dev, runtime: false}
     ]
   end
 end

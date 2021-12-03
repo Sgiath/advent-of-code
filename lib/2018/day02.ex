@@ -69,7 +69,7 @@ defmodule AdventOfCode.Year2018.Day02 do
         |> List.to_string()
 
       # Everything else is invalid
-      _ ->
+      _value ->
         nil
     end
   end

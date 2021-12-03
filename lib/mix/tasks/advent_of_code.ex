@@ -21,7 +21,7 @@ defmodule Mix.Tasks.AdventOfCode do
     year = Keyword.get(opts, :year, 2021)
     day = opts |> Keyword.get(:day) |> Integer.to_string() |> String.pad_leading(2, "0")
 
-    module = :"Elixir.AdventOfCode.Year#{year}.Day#{day}"
+    module = String.to_existing_atom("Elixir.AdventOfCode.Year#{year}.Day#{day}")
 
     case Code.ensure_compiled(module) do
       {:module, _} ->
@@ -36,8 +36,9 @@ defmodule Mix.Tasks.AdventOfCode do
   defp run_part(module, part) do
     IO.puts("\n#{IO.ANSI.bright()}#{IO.ANSI.blue()}Part #{part}#{IO.ANSI.reset()}")
 
-    {time, solution} = :timer.tc(module, :"part#{part}", [module.input()])
+    {time, solution} = :timer.tc(module, String.to_existing_atom("part#{part}"), [module.input()])
 
+    # credo:disable-for-next-line
     if is_binary(solution), do: IO.puts(solution), else: IO.inspect(solution)
 
     IO.puts("#{IO.ANSI.light_black()}#{time} μs#{IO.ANSI.reset()}\n")

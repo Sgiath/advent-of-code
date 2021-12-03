@@ -109,8 +109,7 @@ defmodule AdventOfCode do
   @spec input_lists(integer(), integer(), String.t(), function()) :: Enumerable.t()
   def input_lists(year, day, splitter \\ ",", mapper \\ &String.to_integer/1) do
     input_lines(year, day)
-    |> Enum.map(&String.split(&1, splitter))
-    |> Enum.map(&Enum.map(&1, mapper))
+    |> Enum.map(&(&1 |> String.split(splitter) |> Enum.map(mapper)))
   end
 
   @doc """

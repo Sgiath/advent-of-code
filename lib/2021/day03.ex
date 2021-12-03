@@ -7,9 +7,7 @@ defmodule AdventOfCode.Year2021.Day03 do
 
   @impl AdventOfCode
   def input do
-    input_lines()
-    |> Enum.map(&String.to_charlist/1)
-    |> Enum.map(fn row -> Enum.map(row, &(&1 - ?0)) end)
+    Enum.map(input_lines(), &(&1 |> String.to_charlist() |> Enum.map(fn x -> x - ?0 end)))
   end
 
   @impl AdventOfCode
@@ -18,8 +16,7 @@ defmodule AdventOfCode.Year2021.Day03 do
 
     input
     |> Enum.zip()
-    |> Enum.map(&Tuple.sum/1)
-    |> Enum.map(&if(&1 > h, do: 1, else: 0))
+    |> Enum.map(&if(Tuple.sum(&1) > h, do: 1, else: 0))
     |> list_to_integer()
     |> then(&(&1 * bxor(&1, 0b111111111111)))
   end
