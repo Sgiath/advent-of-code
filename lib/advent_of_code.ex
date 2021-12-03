@@ -70,8 +70,8 @@ defmodule AdventOfCode do
   @spec input_lines(year :: non_neg_integer(), day :: non_neg_integer()) :: Enumerable.t()
   def input_lines(year, day) do
     input_file(year, day)
-    |> File.stream!()
-    |> Stream.map(&String.trim/1)
+    |> File.read!()
+    |> String.split("\n", trim: true)
   end
 
   @doc """
@@ -79,9 +79,8 @@ defmodule AdventOfCode do
   """
   @spec input_line(year :: non_neg_integer(), day :: non_neg_integer()) :: String.t()
   def input_line(year, day) do
-    input_lines(year, day)
-    |> Stream.take(1)
-    |> Enum.to_list()
+    year
+    |> input_lines(day)
     |> List.first()
   end
 
@@ -90,8 +89,9 @@ defmodule AdventOfCode do
   """
   @spec input_numbers(year :: non_neg_integer(), day :: non_neg_integer()) :: Enumerable.t()
   def input_numbers(year, day) do
-    input_lines(year, day)
-    |> Stream.map(&String.to_integer/1)
+    year
+    |> input_lines(day)
+    |> Enum.map(&String.to_integer/1)
   end
 
   @doc """
@@ -100,7 +100,7 @@ defmodule AdventOfCode do
   @spec input_chars(year :: non_neg_integer(), day :: non_neg_integer()) :: Enumerable.t()
   def input_chars(year, day) do
     input_lines(year, day)
-    |> Stream.map(&String.graphemes/1)
+    |> Enum.map(&String.graphemes/1)
   end
 
   @doc """
@@ -109,8 +109,8 @@ defmodule AdventOfCode do
   @spec input_lists(integer(), integer(), String.t(), function()) :: Enumerable.t()
   def input_lists(year, day, splitter \\ ",", mapper \\ &String.to_integer/1) do
     input_lines(year, day)
-    |> Stream.map(&String.split(&1, splitter))
-    |> Stream.map(&Enum.map(&1, mapper))
+    |> Enum.map(&String.split(&1, splitter))
+    |> Enum.map(&Enum.map(&1, mapper))
   end
 
   @doc """
@@ -119,8 +119,6 @@ defmodule AdventOfCode do
   @spec input_list(integer(), integer(), String.t(), function()) :: []
   def input_list(year, day, splitter \\ ",", mapper \\ &String.to_integer/1) do
     input_lists(year, day, splitter, mapper)
-    |> Stream.take(1)
-    |> Enum.to_list()
     |> List.first()
   end
 

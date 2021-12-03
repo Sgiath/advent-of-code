@@ -19,8 +19,7 @@ defmodule AdventOfCode.Year2019.Day03 do
   def input do
     ","
     |> input_lists(&parse_path/1)
-    |> Stream.map(&path_to_points/1)
-    |> Enum.to_list()
+    |> Enum.map(&path_to_points/1)
   end
 
   @impl AdventOfCode

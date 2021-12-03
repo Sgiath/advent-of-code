@@ -5,7 +5,7 @@ defmodule AdventOfCode.Year2020.Day03 do
   use AdventOfCode, year: 2020, day: 03
 
   @impl AdventOfCode
-  def input, do: Enum.to_list(input_lines())
+  def input, do: input_lines()
 
   @impl AdventOfCode
   def part1([_ | input]) do

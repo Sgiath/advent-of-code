@@ -6,22 +6,22 @@ defmodule AdventOfCode.Year2019.Day04 do
 
   @impl AdventOfCode
   def input do
-    Stream.map(168_630..718_098, &Integer.to_charlist/1)
+    Enum.map(168_630..718_098, &Integer.to_charlist/1)
   end
 
   @impl AdventOfCode
   def part1(input) do
     input
-    |> Stream.filter(&increasing?/1)
-    |> Stream.filter(&same_digits?/1)
+    |> Enum.filter(&increasing?/1)
+    |> Enum.filter(&same_digits?/1)
     |> Enum.count()
   end
 
   @impl AdventOfCode
   def part2(input) do
     input
-    |> Stream.filter(&increasing?/1)
-    |> Stream.filter(&one_two_digit_group?/1)
+    |> Enum.filter(&increasing?/1)
+    |> Enum.filter(&one_two_digit_group?/1)
     |> Enum.count()
   end
 

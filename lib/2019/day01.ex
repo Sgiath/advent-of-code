@@ -10,14 +10,14 @@ defmodule AdventOfCode.Year2019.Day01 do
   @impl AdventOfCode
   def part1(input) do
     input
-    |> Stream.map(&calculate_fuel/1)
+    |> Enum.map(&calculate_fuel/1)
     |> Enum.sum()
   end
 
   @impl AdventOfCode
   def part2(input) do
     input
-    |> Stream.map(&calculate_all_fuel/1)
+    |> Enum.map(&calculate_all_fuel/1)
     |> Enum.sum()
   end
 

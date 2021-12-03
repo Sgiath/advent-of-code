@@ -9,16 +9,15 @@ defmodule AdventOfCode.Year2020.Day02 do
     regex = ~r/(?<min>\d+)-(?<max>\d+) (?<char>[a-z]): (?<pass>[a-z]+)/
 
     input_lines()
-    |> Stream.map(&Regex.named_captures(regex, &1))
-    |> Stream.map(fn row -> Map.update!(row, "min", &String.to_integer/1) end)
-    |> Stream.map(fn row -> Map.update!(row, "max", &String.to_integer/1) end)
+    |> Enum.map(&Regex.named_captures(regex, &1))
+    |> Enum.map(fn row -> Map.update!(row, "min", &String.to_integer/1) end)
+    |> Enum.map(fn row -> Map.update!(row, "max", &String.to_integer/1) end)
   end
 
   @impl AdventOfCode
   def part1(input) do
     input
-    |> Stream.filter(&valid_count?/1)
-    |> Enum.to_list()
+    |> Enum.filter(&valid_count?/1)
     |> length()
   end
 
@@ -35,8 +34,7 @@ defmodule AdventOfCode.Year2020.Day02 do
   @impl AdventOfCode
   def part2(input) do
     input
-    |> Stream.filter(&valid_pos?/1)
-    |> Enum.to_list()
+    |> Enum.filter(&valid_pos?/1)
     |> length()
   end
 

@@ -5,7 +5,7 @@ defmodule AdventOfCode.Year2019.Day06 do
   use AdventOfCode, year: 2019, day: 06
 
   @impl AdventOfCode
-  def input, do: Stream.map(input_lines(), &String.split(&1, ")"))
+  def input, do: Enum.map(input_lines(), &String.split(&1, ")"))
 
   @impl AdventOfCode
   def part1(input) do
