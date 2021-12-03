@@ -50,23 +50,16 @@ defmodule AdventOfCode.Year2021.Day03 do
   def rating([result], _filter, _pos), do: list_to_integer(result)
 
   def rating(input, filter, pos) do
-    f = freq(input, pos)
+    # get most frequent bit for position
+    freq =
+      input
+      |> Enum.map(&Enum.at(&1, pos))
+      |> Enum.sum()
+      |> then(&if &1 >= half(input), do: 1, else: 0)
 
+    # filter out not matching inputs
     input
-    |> Enum.filter(&filter.(Enum.at(&1, pos), f))
+    |> Enum.filter(&filter.(Enum.at(&1, pos), freq))
     |> rating(filter, pos + 1)
-  end
-
-  @doc """
-  Get frequency for given input and postion
-
-  Returns most common bit
-  """
-  @spec freq([[1 | 0]], non_neg_integer()) :: 1 | 0
-  def freq(input, pos) do
-    input
-    |> Enum.map(&Enum.at(&1, pos))
-    |> Enum.sum()
-    |> then(&if &1 >= half(input), do: 1, else: 0)
   end
 end
