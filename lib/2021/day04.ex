@@ -97,16 +97,19 @@ defmodule AdventOfCode.Year2021.Day04 do
   @doc """
   Check if board is finished
   """
-  def bingo?([nil, nil, nil, nil, nil | _rest]), do: true
-  def bingo?([_, _, _, _, _, nil, nil, nil, nil, nil | _rest]), do: true
-  def bingo?([_, _, _, _, _, _, _, _, _, _, nil, nil, nil, nil, nil | _rest]), do: true
-  def bingo?([_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, nil, nil, nil, nil, nil | _rest]), do: true
+  # bingo in rows
+  def bingo?([nil, nil, nil, nil, nil, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]), do: true
+  def bingo?([_, _, _, _, _, nil, nil, nil, nil, nil, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]), do: true
+  def bingo?([_, _, _, _, _, _, _, _, _, _, nil, nil, nil, nil, nil, _, _, _, _, _, _, _, _, _, _]), do: true
+  def bingo?([_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, nil, nil, nil, nil, nil, _, _, _, _, _]), do: true
   def bingo?([_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, nil, nil, nil, nil, nil]), do: true
+  # bingo in cols
   def bingo?([nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _]), do: true
   def bingo?([_, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _]), do: true
   def bingo?([_, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _]), do: true
   def bingo?([_, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _]), do: true
   def bingo?([_, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil]), do: true
+  # no bingo
   def bingo?(_board), do: false
 
   @doc """
