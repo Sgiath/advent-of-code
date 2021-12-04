@@ -72,7 +72,6 @@
           {Credo.Check.Warning.BoolOperationOnSameValues, []},
           {Credo.Check.Warning.ExpensiveEmptyEnumCheck, []},
           {Credo.Check.Warning.IExPry, []},
-          {Credo.Check.Warning.IoInspect, []},
           {Credo.Check.Warning.OperationOnSameValues, []},
           {Credo.Check.Warning.OperationWithConstantResult, []},
           {Credo.Check.Warning.RaiseInsideRescue, []},
@@ -105,13 +104,14 @@
           {Credo.Check.Refactor.MapMap, []},
           {Credo.Check.Refactor.NegatedIsNil, []},
           {Credo.Check.Refactor.RejectFilter, []},
-          {Credo.Check.Refactor.VariableRebinding, []},
           {Credo.Check.Warning.LeakyEnvironment, []},
           {Credo.Check.Warning.MapGetUnsafePass, []},
           {Credo.Check.Warning.MixEnv, []},
           {Credo.Check.Warning.UnsafeToAtom, []}
         ],
         disabled: [
+          {Credo.Check.Refactor.VariableRebinding, []},
+          {Credo.Check.Warning.IoInspect, []},
           {Credo.Check.Warning.LazyLogging, []},
           {Credo.Check.Readability.BlockPipe, []},
           {Credo.Check.Readability.SinglePipe, []},

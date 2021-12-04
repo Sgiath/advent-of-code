@@ -38,8 +38,9 @@ defmodule Mix.Tasks.AdventOfCode do
 
     {time, solution} = :timer.tc(module, String.to_existing_atom("part#{part}"), [module.input()])
 
-    # credo:disable-for-next-line
-    if is_binary(solution), do: IO.puts(solution), else: IO.inspect(solution)
+    if is_binary(solution),
+      do: IO.puts(solution),
+      else: IO.inspect(solution, charlists: :as_lists, pretty: true)
 
     IO.puts("#{IO.ANSI.light_black()}#{time} μs#{IO.ANSI.reset()}\n")
   end
