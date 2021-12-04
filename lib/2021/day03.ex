@@ -5,10 +5,18 @@ defmodule AdventOfCode.Year2021.Day03 do
   use AdventOfCode, year: 2021, day: 03
   use Bitwise
 
+  # ===============================================================================================
+  # Input
+  # ===============================================================================================
+
   @impl AdventOfCode
   def input do
     Enum.map(input_lines(), &(&1 |> String.to_charlist() |> Enum.map(fn x -> x - ?0 end)))
   end
+
+  # ===============================================================================================
+  # Part 1
+  # ===============================================================================================
 
   @impl AdventOfCode
   def part1(input) do
@@ -21,16 +29,9 @@ defmodule AdventOfCode.Year2021.Day03 do
     |> then(&(&1 * bxor(&1, 0b111111111111)))
   end
 
-  # Get half of the length of the list
-  defp half(input), do: div(length(input) + 1, 2)
-
-  # Convert list of 1 and 0 to integer
-  defp list_to_integer(input) do
-    input
-    |> Enum.reverse()
-    |> Enum.with_index()
-    |> Enum.reduce(0, fn {bit, index}, acc -> bor(acc, bit <<< index) end)
-  end
+  # ===============================================================================================
+  # Part 2
+  # ===============================================================================================
 
   @impl AdventOfCode
   def part2(input) do
@@ -52,5 +53,20 @@ defmodule AdventOfCode.Year2021.Day03 do
     input
     |> Enum.filter(&filter.(Enum.at(&1, pos), freq))
     |> rating(filter, pos + 1)
+  end
+
+  # ===============================================================================================
+  # Utils
+  # ===============================================================================================
+
+  # Get half of the length of the list
+  defp half(input), do: div(length(input) + 1, 2)
+
+  # Convert list of 1 and 0 to integer
+  defp list_to_integer(input) do
+    input
+    |> Enum.reverse()
+    |> Enum.with_index()
+    |> Enum.reduce(0, fn {bit, index}, acc -> bor(acc, bit <<< index) end)
   end
 end

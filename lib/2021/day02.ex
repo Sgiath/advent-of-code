@@ -4,8 +4,16 @@ defmodule AdventOfCode.Year2021.Day02 do
   """
   use AdventOfCode, year: 2021, day: 02
 
+  # ===============================================================================================
+  # Input
+  # ===============================================================================================
+
   @impl AdventOfCode
   def input, do: input_lines()
+
+  # ===============================================================================================
+  # Part 1
+  # ===============================================================================================
 
   @impl AdventOfCode
   def part1(input, reducer \\ &count_reducer/2) do
@@ -17,6 +25,10 @@ defmodule AdventOfCode.Year2021.Day02 do
   def count_reducer("forward " <> val, {h, d}), do: {h + String.to_integer(val), d}
   def count_reducer("down " <> val, {h, d}), do: {h, d + String.to_integer(val)}
   def count_reducer("up " <> val, {h, d}), do: {h, d - String.to_integer(val)}
+
+  # ===============================================================================================
+  # Part 2
+  # ===============================================================================================
 
   @impl AdventOfCode
   def part2(input, reducer \\ &count_aim_reducer/2) do
@@ -48,6 +60,10 @@ defmodule AdventOfCode.Year2021.Day02 do
   def count_reducer3(<<_::64, val::8>>, {h, d}), do: {h + (val - ?0), d}
   def count_reducer3(<<_::40, val::8>>, {h, d}), do: {h, d + (val - ?0)}
   def count_reducer3(<<_::24, val::8>>, {h, d}), do: {h, d - (val - ?0)}
+
+  # ===============================================================================================
+  # Benchmarks
+  # ===============================================================================================
 
   @impl AdventOfCode
   def bench do
