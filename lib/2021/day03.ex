@@ -19,14 +19,14 @@ defmodule AdventOfCode.Year2021.Day03 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def part1(input) do
+  def part1([sample | _rest] = input) do
     h = half(input)
 
     input
     |> Enum.zip()
     |> Enum.map(&if(Tuple.sum(&1) > h, do: 1, else: 0))
     |> list_to_integer()
-    |> then(&(&1 * bxor(&1, 0b111111111111)))
+    |> then(&(&1 * bxor(&1, 2 ** length(sample) - 1)))
   end
 
   # ===============================================================================================
