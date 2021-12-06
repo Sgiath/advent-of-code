@@ -4,6 +4,7 @@ defmodule AdventOfCode.Year2019.Day02 do
   """
   use AdventOfCode, year: 2019, day: 02
 
+  alias AdventOfCode.Parser
   alias AdventOfCode.Year2019.Intcode
   alias AdventOfCode.Year2019.Intcode.Memory
   alias AdventOfCode.Year2019.Intcode.State
@@ -11,7 +12,7 @@ defmodule AdventOfCode.Year2019.Day02 do
   require Logger
 
   @impl AdventOfCode
-  def input, do: input_list()
+  def input, do: Parser.intcode(input_data())
 
   @impl AdventOfCode
   def part1(input) do

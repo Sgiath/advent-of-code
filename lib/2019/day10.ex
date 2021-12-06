@@ -4,11 +4,13 @@ defmodule AdventOfCode.Year2019.Day10 do
   """
   use AdventOfCode, year: 2019, day: 10
 
+  alias AdventOfCode.Parser
+
   @type asteroid_map() :: list(list(char()))
   @type point() :: {integer(), integer()}
 
   @impl AdventOfCode
-  def input, do: input_chars()
+  def input, do: Parser.lines(input_data(), "\n", &String.graphemes/1)
 
   @impl AdventOfCode
   def part1(input) do

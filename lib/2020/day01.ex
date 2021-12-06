@@ -4,8 +4,10 @@ defmodule AdventOfCode.Year2020.Day01 do
   """
   use AdventOfCode, year: 2020, day: 01
 
+  alias AdventOfCode.Parser
+
   @impl AdventOfCode
-  def input, do: Enum.sort(input_numbers())
+  def input, do: input_data() |> Parser.lines() |> Enum.sort()
 
   @impl AdventOfCode
   def part1([f | _] = sorted) do

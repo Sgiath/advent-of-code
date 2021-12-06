@@ -4,10 +4,11 @@ defmodule AdventOfCode.Year2019.Day09 do
   """
   use AdventOfCode, year: 2019, day: 09
 
+  alias AdventOfCode.Parser
   alias AdventOfCode.Year2019.Intcode
 
   @impl AdventOfCode
-  def input, do: input_list()
+  def input, do: Parser.intcode(input_data())
 
   defp get_output(output \\ []) do
     receive do

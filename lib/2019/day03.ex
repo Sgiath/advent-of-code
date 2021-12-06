@@ -4,39 +4,33 @@ defmodule AdventOfCode.Year2019.Day03 do
   """
   use AdventOfCode, year: 2019, day: 03
 
+  alias AdventOfCode.Parser
+
   require Logger
 
   @type direction() :: {:up | :left | :down | :right, integer()}
   @type path() :: list(direction())
   @type point() :: {integer(), integer()}
 
+  # ===============================================================================================
+  # Input
+  # ===============================================================================================
+
+  @impl AdventOfCode
+  def input do
+    Parser.lines(input_data(), "\n", fn line ->
+      line
+      |> String.split(",", trim: true)
+      |> Enum.map(&parse_path/1)
+      |> path_to_points()
+    end)
+  end
+
+  @spec parse_path(String.t()) :: direction()
   def parse_path("U" <> distance), do: {:up, String.to_integer(distance)}
   def parse_path("R" <> distance), do: {:right, String.to_integer(distance)}
   def parse_path("D" <> distance), do: {:down, String.to_integer(distance)}
   def parse_path("L" <> distance), do: {:left, String.to_integer(distance)}
-
-  @impl AdventOfCode
-  def input do
-    ","
-    |> input_lists(&parse_path/1)
-    |> Enum.map(&path_to_points/1)
-  end
-
-  @impl AdventOfCode
-  def part1([wire1, wire2]) do
-    wire1
-    |> select_common(wire2)
-    |> Enum.map(&calc_distance/1)
-    |> Enum.min()
-  end
-
-  @impl AdventOfCode
-  def part2([wire1, wire2]) do
-    wire1
-    |> select_common(wire2)
-    |> Enum.map(&calc_delay(wire1, wire2, &1))
-    |> Enum.min()
-  end
 
   @doc """
   Convert path description to the list of points
@@ -61,6 +55,34 @@ defmodule AdventOfCode.Year2019.Day03 do
 
     Enum.reverse(wire_points)
   end
+
+  # ===============================================================================================
+  # Part 1
+  # ===============================================================================================
+
+  @impl AdventOfCode
+  def part1([wire1, wire2]) do
+    wire1
+    |> select_common(wire2)
+    |> Enum.map(&calc_distance/1)
+    |> Enum.min()
+  end
+
+  # ===============================================================================================
+  # Part 2
+  # ===============================================================================================
+
+  @impl AdventOfCode
+  def part2([wire1, wire2]) do
+    wire1
+    |> select_common(wire2)
+    |> Enum.map(&calc_delay(wire1, wire2, &1))
+    |> Enum.min()
+  end
+
+  # ===============================================================================================
+  # Utils
+  # ===============================================================================================
 
   @doc """
   Function for reducer to generate all points for one instruction

@@ -10,7 +10,7 @@ defmodule AdventOfCode.Year2021.Day04 do
 
   @impl AdventOfCode
   def input do
-    [draw | boards] = String.split(input_file(), ["\n", " "], trim: true)
+    [draw | boards] = String.split(input_data(), ["\n", " "], trim: true)
 
     {parse_draw_nums(draw), parse_boards(boards)}
   end

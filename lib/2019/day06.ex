@@ -5,7 +5,11 @@ defmodule AdventOfCode.Year2019.Day06 do
   use AdventOfCode, year: 2019, day: 06
 
   @impl AdventOfCode
-  def input, do: Enum.map(input_lines(), &String.split(&1, ")"))
+  def input do
+    input_data()
+    |> String.split(["\n", ")"], trim: true)
+    |> Enum.chunk_every(2)
+  end
 
   @impl AdventOfCode
   def part1(input) do

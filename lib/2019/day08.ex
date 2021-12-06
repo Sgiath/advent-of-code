@@ -4,6 +4,8 @@ defmodule AdventOfCode.Year2019.Day08 do
   """
   use AdventOfCode, year: 2019, day: 08
 
+  alias AdventOfCode.Parser
+
   @type pixel() :: char()
   @type line() :: list(pixel())
   @type layer() :: list(line())
@@ -11,8 +13,8 @@ defmodule AdventOfCode.Year2019.Day08 do
 
   @impl AdventOfCode
   def input do
-    input_line()
-    |> String.graphemes()
+    input_data()
+    |> Parser.lines("\n", &String.graphemes/1)
     |> Enum.chunk_every(25 * 6)
   end
 

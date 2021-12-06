@@ -5,13 +5,19 @@ defmodule AdventOfCode.Year2021.Day03 do
   use AdventOfCode, year: 2021, day: 03
   use Bitwise
 
+  alias AdventOfCode.Parser
+
   # ===============================================================================================
   # Input
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input do
-    Enum.map(input_lines(), &(&1 |> String.to_charlist() |> Enum.map(fn x -> x - ?0 end)))
+  def input, do: Parser.lines(input_data(), "\n", &parse_line/1)
+
+  def parse_line(line) do
+    line
+    |> String.to_charlist()
+    |> Enum.map(fn x -> x - ?0 end)
   end
 
   # ===============================================================================================

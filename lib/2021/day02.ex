@@ -9,7 +9,7 @@ defmodule AdventOfCode.Year2021.Day02 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input, do: input_lines()
+  def input, do: String.split(input_data(), "\n", trim: true)
 
   # ===============================================================================================
   # Part 1

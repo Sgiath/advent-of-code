@@ -4,15 +4,16 @@ defmodule AdventOfCode.Year2021.Day06 do
   """
   use AdventOfCode, year: 2021, day: 06
 
+  alias AdventOfCode.Parser
+
   # ===============================================================================================
   # Input
   # ===============================================================================================
 
   @impl AdventOfCode
   def input do
-    input_file()
-    |> String.split([",", "\n"], trim: true)
-    |> Enum.map(&String.to_integer/1)
+    input_data()
+    |> Parser.lines([",", "\n"])
     |> Enum.frequencies()
   end
 

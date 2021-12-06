@@ -5,7 +5,7 @@ defmodule AdventOfCode.Year2018.Day02 do
   use AdventOfCode, year: 2018, day: 02
 
   @impl AdventOfCode
-  def input, do: input_lines()
+  def input, do: String.split(input_data(), "\n", trim: true)
 
   @impl AdventOfCode
   def part1(input) do

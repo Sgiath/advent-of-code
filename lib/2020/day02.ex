@@ -4,16 +4,20 @@ defmodule AdventOfCode.Year2020.Day02 do
   """
   use AdventOfCode, year: 2020, day: 02
 
+  alias AdventOfCode.Parser
+
   @impl AdventOfCode
   def input do
+    Parser.lines(input_data(), "\n", &parse_line/1)
+  end
+
+  def parse_line(line) do
     regex = ~r/(?<min>\d+)-(?<max>\d+) (?<char>[a-z]): (?<pass>[a-z]+)/
 
-    Enum.map(input_lines(), fn line ->
-      regex
-      |> Regex.named_captures(line)
-      |> Map.update!("min", &String.to_integer/1)
-      |> Map.update!("max", &String.to_integer/1)
-    end)
+    regex
+    |> Regex.named_captures(line)
+    |> Map.update!("min", &String.to_integer/1)
+    |> Map.update!("max", &String.to_integer/1)
   end
 
   @impl AdventOfCode
