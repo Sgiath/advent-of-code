@@ -3,6 +3,15 @@ defmodule Mix.Tasks.AdventOfCode.Init do
   @moduledoc """
   Runs solution for particular day of Advent of Code challenge
 
+  This script requires correct session cookie in `priv/COOKIE` file. You can obtain it by going to
+  https://aventofcode.com, logging in and than press F12 to open devtools. Than go to "Application"
+  tab, expand "Cookies" menu on the left and click on "https://adventofcode.com". Here you should
+  see cookie with name "session", copy the value and paste it to the `priv/COOKIE` file.
+
+  The cookie should be valid for about a month so you have to do this just once in a year. Do not
+  commit the cookie since it basically acts as your login information for the site (much safer but
+  still - do not share it).
+
   ## Command line options
 
     * `--year / -y <NUM>` - which year to run (default 2021)
@@ -10,30 +19,38 @@ defmodule Mix.Tasks.AdventOfCode.Init do
   """
   use Mix.Task
 
+  alias AdventOfCode.Utils
+
   @strict [year: :integer, day: :integer]
   @aliases [y: :year, d: :day]
 
+  @default_year 2021
+  @template_path Path.join([File.cwd!(), "priv", "template.eex"])
+
   @impl Mix.Task
   def run(args) do
-    {opts, [], []} = OptionParser.parse(args, strict: @strict, aliases: @aliases)
-    year = opts |> Keyword.get(:year, 2021) |> Integer.to_string()
-    day = opts |> Keyword.get(:day) |> Integer.to_string() |> String.pad_leading(2, "0")
+    {year, day} =
+      args
+      |> OptionParser.parse(strict: @strict, aliases: @aliases)
+      |> elem(0)
+      |> parse_args()
 
-    template = Path.join([File.cwd!(), "priv", "template.eex"])
-    cookie = Path.join([File.cwd!(), "priv", "COOKIE"])
-    script = Path.join([File.cwd!(), "lib", year, "day#{day}.ex"])
-    input = Path.join([File.cwd!(), "priv", year, "day#{day}.in"])
+    # write file with script template
+    [File.cwd!(), "lib", year, "day#{day}.ex"]
+    |> Path.join()
+    |> File.open(
+      [:write, :utf8],
+      &IO.write(&1, EEx.eval_file(@template_path, year: year, day: day))
+    )
 
-    content = EEx.eval_file(template, year: year, day: day)
+    # write file with input data
+    Utils.save_input(year, day)
+  end
 
-    File.open(script, [:write, :utf8], &IO.write(&1, content))
+  defp parse_args(args) do
+    year = args |> Keyword.get(:year, @default_year) |> Integer.to_string()
+    day = args |> Keyword.get(:day) |> Integer.to_string() |> String.pad_leading(2, "0")
 
-    input_url = "http://adventofcode.com/#{year}/day/#{String.to_integer(day)}/input"
-    cookie = String.to_charlist("session=#{File.read!(cookie)}")
-
-    {:ok, {_status, _headers, input_data}} =
-      :httpc.request(:get, {input_url, [{'Cookie', cookie}]}, [], [])
-
-    File.open(input, [:write, :utf8], &IO.write(&1, input_data))
+    {year, day}
   end
 end
