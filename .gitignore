@@ -26,3 +26,6 @@ advent_of_code-*.tar
 /tmp/
 
 /.elixir_ls/
+
+# Advent of Code cookie
+/priv/COOKIE
