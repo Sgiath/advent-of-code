@@ -35,7 +35,7 @@ defmodule AdventOfCode.Year2021.Day01 do
   # Enum soultion
   # ===============================================================================================
 
-  # I find this solutin more appealing but it is much slower than my original solution
+  # I find this solutin more appealing but it is much slower than my original solution (8 μs vs 150 μs)
   def part1_chunk(input) do
     input
     |> Enum.chunk_every(2, 1, :discard)

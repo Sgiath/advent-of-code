@@ -9,12 +9,11 @@ defmodule AdventOfCode.Year2021.Day05 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input, do: Enum.map(input_lines(), &parse_line/1)
-
-  def parse_line(line) do
-    line
-    |> String.split([",", " -> "])
+  def input do
+    input_file()
+    |> String.split([",", " -> ", "\n"], trim: true)
     |> Enum.map(&String.to_integer/1)
+    |> Enum.chunk_every(4)
   end
 
   # ===============================================================================================

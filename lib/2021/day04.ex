@@ -10,7 +10,7 @@ defmodule AdventOfCode.Year2021.Day04 do
 
   @impl AdventOfCode
   def input do
-    [draw | boards] = input_lines()
+    [draw | boards] = String.split(input_file(), ["\n", " "], trim: true)
 
     {parse_draw_nums(draw), parse_boards(boards)}
   end
@@ -23,13 +23,8 @@ defmodule AdventOfCode.Year2021.Day04 do
 
   def parse_boards(boards) do
     boards
-    |> Enum.map(fn line ->
-      line
-      |> String.split(" ", trim: true)
-      |> Enum.map(&String.to_integer/1)
-    end)
-    |> Enum.chunk_every(5)
-    |> Enum.map(&List.flatten/1)
+    |> Enum.map(&String.to_integer/1)
+    |> Enum.chunk_every(25)
   end
 
   # ===============================================================================================
@@ -98,17 +93,37 @@ defmodule AdventOfCode.Year2021.Day04 do
   Check if board is finished
   """
   # bingo in rows
-  def bingo?([nil, nil, nil, nil, nil, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]), do: true
-  def bingo?([_, _, _, _, _, nil, nil, nil, nil, nil, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]), do: true
-  def bingo?([_, _, _, _, _, _, _, _, _, _, nil, nil, nil, nil, nil, _, _, _, _, _, _, _, _, _, _]), do: true
-  def bingo?([_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, nil, nil, nil, nil, nil, _, _, _, _, _]), do: true
-  def bingo?([_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, nil, nil, nil, nil, nil]), do: true
+  def bingo?([nil, nil, nil, nil, nil, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]),
+      do: true
+
+  def bingo?([_, _, _, _, _, nil, nil, nil, nil, nil, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _]),
+      do: true
+
+  def bingo?([_, _, _, _, _, _, _, _, _, _, nil, nil, nil, nil, nil, _, _, _, _, _, _, _, _, _, _]),
+      do: true
+
+  def bingo?([_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, nil, nil, nil, nil, nil, _, _, _, _, _]),
+      do: true
+
+  def bingo?([_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, nil, nil, nil, nil, nil]),
+      do: true
+
   # bingo in cols
-  def bingo?([nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _]), do: true
-  def bingo?([_, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _]), do: true
-  def bingo?([_, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _]), do: true
-  def bingo?([_, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _]), do: true
-  def bingo?([_, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil]), do: true
+  def bingo?([nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _]),
+      do: true
+
+  def bingo?([_, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _]),
+      do: true
+
+  def bingo?([_, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _]),
+      do: true
+
+  def bingo?([_, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _]),
+      do: true
+
+  def bingo?([_, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil, _, _, _, _, nil]),
+      do: true
+
   # no bingo
   def bingo?(_board), do: false
 

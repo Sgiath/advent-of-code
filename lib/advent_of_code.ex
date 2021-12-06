@@ -61,7 +61,9 @@ defmodule AdventOfCode do
   """
   @spec input_file(year :: non_neg_integer(), day :: non_neg_integer()) :: String.t()
   def input_file(year, day) do
-    Path.join([Application.app_dir(:advent_of_code, "priv"), format(year, day, "in")])
+    [Application.app_dir(:advent_of_code, "priv"), format(year, day, "in")]
+    |> Path.join()
+    |> File.read!()
   end
 
   @doc """
@@ -70,7 +72,6 @@ defmodule AdventOfCode do
   @spec input_lines(year :: non_neg_integer(), day :: non_neg_integer()) :: Enumerable.t()
   def input_lines(year, day) do
     input_file(year, day)
-    |> File.read!()
     |> String.split("\n", trim: true)
   end
 
