@@ -21,35 +21,37 @@ defmodule AdventOfCode.Year2019.Day10 do
 
   @impl AdventOfCode
   def part2(input) do
-    {_, anchor} = get_best(input)
+    anchor = input |> get_best() |> elem(1)
 
-    {{x, y}, _angle, _distance} =
-      input
-      |> get_asteroids()
-      |> Enum.reverse()
-      |> List.delete(anchor)
-      |> Enum.map(&(&1 |> compute_angle(anchor) |> compute_distance(anchor)))
-      |> Enum.group_by(fn {_point, angle, _distance} -> angle end)
-      |> Enum.sort_by(fn {angle, _points} -> angle end)
-      |> Enum.map(fn {_angle, points} ->
-        Enum.min_by(points, fn {_point, _angle, distance} -> distance end)
-      end)
-      |> Enum.at(199)
+    input
+    |> get_asteroids()
+    |> List.delete(anchor)
+    |> get_min(anchor)
+    |> Enum.at(199)
+    |> elem(0)
+    |> then(&(elem(&1, 0) * 100 + elem(&1, 1)))
+  end
 
-    x * 100 + y
+  def get_min(asteroids, anchor) do
+    asteroids
+    |> Enum.map(&(&1 |> compute_angle(anchor) |> compute_distance(anchor)))
+    |> Enum.group_by(&elem(&1, 1))
+    |> Enum.sort_by(&elem(&1, 0))
+    |> Enum.map(fn {_angle, points} -> Enum.min_by(points, &elem(&1, 2)) end)
   end
 
   @spec get_asteroids(Enumerable.t()) :: list(point())
   def get_asteroids(asteroid_map) do
     asteroid_map
-    |> Stream.map(&Enum.with_index(&1, 0))
-    |> Stream.with_index(0)
+    |> Enum.map(&Enum.with_index/1)
+    |> Enum.with_index()
     |> Enum.reduce([], fn {list, y}, acc ->
       Enum.reduce(list, [], fn
         {"#", x}, acc2 -> [{x, y} | acc2]
         _pos, acc2 -> acc2
       end) ++ acc
     end)
+    |> Enum.reverse()
   end
 
   @spec compute_angle(point(), point()) :: {point(), number()}
@@ -159,11 +161,7 @@ defmodule AdventOfCode.Year2019.Day10 do
 
     anchor
     |> get_hidden(asteroid, {x_length, y_length})
-    |> Enum.reduce(map, fn {x, y}, map ->
-      List.update_at(map, y, fn row ->
-        List.update_at(row, x, fn _value -> "H" end)
-      end)
-    end)
+    |> Enum.reduce(map, fn {x, y}, acc -> put_in(acc, [Access.at(y), Access.at(x)], "H") end)
   end
 
   @doc """

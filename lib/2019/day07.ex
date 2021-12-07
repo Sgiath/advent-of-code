@@ -37,24 +37,28 @@ defmodule AdventOfCode.Year2019.Day07 do
     for(elem <- list, rest <- permutations(list -- [elem]), do: [elem | rest])
   end
 
-  defp run_config(memory, [p1, p2, p3, p4, p5]) do
-    pid5 = Intcode.start_link(memory, self(), self())
-    pid4 = Intcode.start_link(memory, self(), pid5)
-    pid3 = Intcode.start_link(memory, self(), pid4)
-    pid2 = Intcode.start_link(memory, self(), pid3)
-    pid1 = Intcode.start_link(memory, self(), pid2)
+  def start(memory, num, acc \\ [])
 
-    Intcode.run_program_async(pid1)
-    Intcode.run_program_async(pid2)
-    Intcode.run_program_async(pid3)
-    Intcode.run_program_async(pid4)
-    Intcode.run_program_async(pid5)
+  def start(_memory, 0, acc), do: acc
 
-    send(pid1, p1)
-    send(pid2, p2)
-    send(pid3, p3)
-    send(pid4, p4)
-    send(pid5, p5)
+  def start(memory, num, []) do
+    start(memory, num - 1, [Intcode.start_link(memory, self(), self())])
+  end
+
+  def start(memory, num, [pid | _rest] = acc) do
+    start(memory, num - 1, [Intcode.start_link(memory, self(), pid) | acc])
+  end
+
+  defp run_config(memory, p) do
+    [pid1 | _rest] = pids = start(memory, 5)
+
+    pids
+    |> Enum.zip(p)
+    |> Enum.each(fn {pid, p} ->
+      Intcode.run_program_async(pid)
+      send(pid, p)
+    end)
+
     send(pid1, 0)
 
     receive do

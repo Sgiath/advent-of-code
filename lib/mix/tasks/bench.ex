@@ -15,11 +15,7 @@ defmodule Mix.Tasks.AdventOfCode.Bench do
 
   @impl Mix.Task
   def run(args) do
-    {opts, [], []} = OptionParser.parse(args, strict: @strict, aliases: @aliases)
-    year = Keyword.get(opts, :year, 2021)
-    day = opts |> Keyword.get(:day) |> Integer.to_string() |> String.pad_leading(2, "0")
-
-    module = String.to_existing_atom("Elixir.AdventOfCode.Year#{year}.Day#{day}")
+    {year, day, module} = parse_args(args)
 
     case Code.ensure_compiled(module) do
       {:module, _} ->
@@ -31,6 +27,15 @@ defmodule Mix.Tasks.AdventOfCode.Bench do
       {:error, _} ->
         IO.puts("\n#{IO.ANSI.red()}Year #{year}, day #{day} not implemented!#{IO.ANSI.reset()}")
     end
+  end
+
+  def parse_args(args) do
+    opts = args |> OptionParser.parse(strict: @strict, aliases: @aliases) |> elem(0)
+
+    year = Keyword.get(opts, :year, 2021)
+    day = opts |> Keyword.get(:day) |> Integer.to_string() |> String.pad_leading(2, "0")
+
+    {year, day, String.to_existing_atom("Elixir.AdventOfCode.Year#{year}.Day#{day}")}
   end
 
   defp do_bench(config, module) do

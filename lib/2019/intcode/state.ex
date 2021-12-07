@@ -144,19 +144,19 @@ defmodule AdventOfCode.Year2019.Intcode.State do
     memory
     |> Memory.get_value(ip)
     |> rem(100)
-    |> case do
-      1 -> :add
-      2 -> :multiply
-      3 -> :input
-      4 -> :output
-      5 -> :jump_true
-      6 -> :jump_false
-      7 -> :less_then
-      8 -> :equals
-      9 -> :adjust_rb
-      99 -> :halt
-    end
+    |> opcode_decode()
   end
+
+  defp opcode_decode(1), do: :add
+  defp opcode_decode(2), do: :multiply
+  defp opcode_decode(3), do: :input
+  defp opcode_decode(4), do: :output
+  defp opcode_decode(5), do: :jump_true
+  defp opcode_decode(6), do: :jump_false
+  defp opcode_decode(7), do: :less_then
+  defp opcode_decode(8), do: :equals
+  defp opcode_decode(9), do: :adjust_rb
+  defp opcode_decode(99), do: :halt
 
   defp get_modes(memory, ip) do
     memory

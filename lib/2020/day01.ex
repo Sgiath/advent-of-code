@@ -40,11 +40,15 @@ defmodule AdventOfCode.Year2020.Day01 do
   def find_sum_three([_, f | first], [s | _], [s | _]),
     do: find_sum_three([f | first], first, Enum.reverse(first))
 
-  def find_sum_three([f | first], [s | second], [t | third]) do
-    cond do
-      f + s + t > 2020 -> find_sum_three([f | first], [s | second], third)
-      f + s + t < 2020 -> find_sum_three([f | first], second, [t | third])
-      f + s + t == 2020 -> f * s * t
-    end
+  def find_sum_three([f | first], [s | second], [t | third]) when f + s + t > 2020 do
+    find_sum_three([f | first], [s | second], third)
+  end
+
+  def find_sum_three([f | first], [s | second], [t | third]) when f + s + t < 2020 do
+    find_sum_three([f | first], second, [t | third])
+  end
+
+  def find_sum_three([f | _first], [s | _second], [t | _third]) when f + s + t == 2020 do
+    f * s * t
   end
 end
