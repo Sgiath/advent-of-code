@@ -4,12 +4,19 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
   """
   use AdventOfCode, year: <%= year %>, day: <%= day %>
 
+  alias AdventOfCode.Parser
+
   # ===============================================================================================
   # Input
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input, do: input_lines()
+  def input do
+    """
+    """
+    # input_data()
+    |> Parser.lines()
+  end
 
   # ===============================================================================================
   # Part 1
@@ -17,7 +24,7 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
 
   @impl AdventOfCode
   def part1(input) do
-    raise "not implemented"
+    input
   end
 
   # ===============================================================================================
@@ -26,7 +33,7 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
 
   @impl AdventOfCode
   def part2(input) do
-    raise "not implemented"
+    input
   end
 
   # ===============================================================================================
