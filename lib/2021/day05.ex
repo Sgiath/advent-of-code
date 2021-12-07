@@ -25,9 +25,8 @@ defmodule AdventOfCode.Year2021.Day05 do
   def part1(input) do
     input
     |> get_straight_lines()
-    |> get_points()
+    |> Enum.flat_map(&get_points/1)
     |> get_intersections()
-    |> Enum.count()
   end
 
   # ===============================================================================================
@@ -37,9 +36,8 @@ defmodule AdventOfCode.Year2021.Day05 do
   @impl AdventOfCode
   def part2(input) do
     input
-    |> get_points()
+    |> Enum.flat_map(&get_points/1)
     |> get_intersections()
-    |> Enum.count()
   end
 
   # ===============================================================================================
@@ -60,17 +58,9 @@ defmodule AdventOfCode.Year2021.Day05 do
   @doc """
   Get individual points from list of coordinates
   """
-  # Get points for individual coordinates
   def get_points([x, y1, x, y2]), do: Enum.map(y1..y2, &{x, &1})
   def get_points([x1, y, x2, y]), do: Enum.map(x1..x2, &{&1, y})
   def get_points([x1, y1, x2, y2]), do: Enum.zip(x1..x2, y1..y2)
-
-  # Get points for list of coordinates
-  def get_points(coordinates) do
-    coordinates
-    |> Enum.map(&get_points/1)
-    |> List.flatten()
-  end
 
   @doc """
   Get just duplicate elements
@@ -78,6 +68,6 @@ defmodule AdventOfCode.Year2021.Day05 do
   def get_intersections(points) do
     points
     |> Enum.frequencies()
-    |> Enum.filter(&(elem(&1, 1) > 1))
+    |> Enum.count(&(elem(&1, 1) > 1))
   end
 end
