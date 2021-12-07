@@ -1,0 +1,39 @@
+# Year 2021, Day 06
+
+## Section
+
+https://adventofcode.com/2021/day/6
+
+## Input
+
+```elixir
+alias AdventOfCode.Year2021.Day06
+
+test_input = """
+3,4,3,1,2
+"""
+
+task_input = File.read!("priv/2021/day06.in")
+
+input =
+  task_input
+  |> String.split([",", "\n"], trim: true)
+  |> Enum.map(&String.to_integer/1)
+  |> Enum.frequencies()
+```
+
+## Part 1
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day06.part1(input)
+```
+
+## Part 2
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day06.part2(input)
+```

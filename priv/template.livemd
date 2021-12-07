@@ -1,0 +1,36 @@
+# Year <%= year %>, Day <%= day %>
+
+https://adventofcode.com/<%= year %>/day/<%= String.to_integer(day) %>
+
+## Input
+
+```elixir
+alias AdventOfCode.Year<%= year %>.Day<%= day %>
+
+test_input = """
+
+"""
+
+task_input = File.read!("priv/<%= year %>/day<%= day %>.in")
+
+input =
+  test_input
+  |> String.split("\n", trim: true)
+  |> Enum.map(&String.to_integer/1)
+```
+
+## Part 1
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input
+```
+
+## Part 2
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+input
+```

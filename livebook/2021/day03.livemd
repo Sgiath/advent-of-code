@@ -1,0 +1,49 @@
+# Year 2021, Day 03
+
+## Section
+
+https://adventofcode.com/2021/day/3
+
+## Input
+
+```elixir
+alias AdventOfCode.Year2021.Day03
+
+test_input = """
+00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010
+"""
+
+task_input = File.read!("priv/2021/day03.in")
+
+input =
+  task_input
+  |> String.split("\n", trim: true)
+  |> Enum.map(&Day03.parse_line/1)
+```
+
+## Part 1
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day03.part1(input)
+```
+
+## Part 2
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day03.part2(input)
+```

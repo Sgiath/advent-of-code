@@ -12,9 +12,7 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
 
   @impl AdventOfCode
   def input do
-    """
-    """
-    # input_data()
+    input_data()
     |> Parser.lines()
   end
 

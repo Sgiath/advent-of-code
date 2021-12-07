@@ -26,6 +26,7 @@ defmodule Mix.Tasks.AdventOfCode.Init do
 
   @default_year 2021
   @template_path Path.join([File.cwd!(), "priv", "template.eex"])
+  @livebook_path Path.join([File.cwd!(), "priv", "template.livemd"])
 
   @impl Mix.Task
   def run(args) do
@@ -36,12 +37,8 @@ defmodule Mix.Tasks.AdventOfCode.Init do
       |> parse_args()
 
     # write file with script template
-    [File.cwd!(), "lib", year, "day#{day}.ex"]
-    |> Path.join()
-    |> File.open(
-      [:write, :utf8],
-      &IO.write(&1, EEx.eval_file(@template_path, year: year, day: day))
-    )
+    generate_file([File.cwd!(), "lib", year, "day#{day}.ex"], @template_path, year, day)
+    generate_file([File.cwd!(), "livebook", year, "day#{day}.livemd"], @livebook_path, year, day)
 
     # write file with input data
     Utils.save_input(year, day)
@@ -52,5 +49,16 @@ defmodule Mix.Tasks.AdventOfCode.Init do
     day = args |> Keyword.get(:day) |> Integer.to_string() |> String.pad_leading(2, "0")
 
     {year, day}
+  end
+
+  defp generate_file(path, template, year, day) do
+    unless File.exists?(path) do
+      path
+      |> Path.join()
+      |> File.open(
+        [:write, :utf8],
+        &IO.write(&1, EEx.eval_file(template, year: year, day: day))
+      )
+    end
   end
 end

@@ -1,0 +1,40 @@
+# Year 2021, Day 02
+
+## Section
+
+https://adventofcode.com/2021/day/2
+
+## Input
+
+```elixir
+alias AdventOfCode.Year2021.Day02
+
+test_input = """
+forward 5
+down 5
+forward 8
+up 3
+down 8
+forward 2
+"""
+
+task_input = File.read!("priv/2021/day02.in")
+
+input = String.split(task_input, "\n", trim: true)
+```
+
+## Part 1
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day02.part1(input)
+```
+
+## Part 2
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day02.part2(input)
+```
