@@ -4,10 +4,6 @@
 
 https://adventofcode.com/2021/day/8
 
-```elixir
-alias AdventOfCode.Year2021.Day08
-```
-
 ## Input
 
 ```elixir
@@ -62,15 +58,11 @@ input =
 
 Get just the outputs in one flat list
 
-<!-- livebook:{"reevaluate_automatically":true} -->
-
 ```elixir
-part1 = Enum.flat_map(input, fn {_signal, output} -> output end)
+part1 = Enum.flat_map(input, &elem(&1, 1))
 ```
 
 Count just outputs with specified lengths
-
-<!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
 Enum.count(part1, &(length(&1) in [2, 3, 4, 7]))
@@ -144,54 +136,70 @@ defmodule Display do
 end
 ```
 
-Convert signal data to mapping data
-
-<!-- livebook:{"reevaluate_automatically":true} -->
+Split input to singnals and outputs
 
 ```elixir
-part2 =
-  Enum.map(input, fn {signal, output} ->
-    {Enum.reduce(signal, %{}, &Display.find_digit/2), output}
+[signals, outputs] =
+  Enum.reduce(input, [[], []], fn {s, o}, [sig, out] ->
+    [[s | sig], [o | out]]
   end)
 ```
 
-Reverse the mapping key and value so we can easily use it later
-and covert the number to string so we can join it
-
-<!-- livebook:{"reevaluate_automatically":true} -->
+Convert signal data to mapping data
 
 ```elixir
-part2 =
-  Enum.map(
-    part2,
-    &{Enum.into(elem(&1, 0), %{}, fn {key, val} ->
-       {val, Integer.to_string(key)}
-     end), elem(&1, 1)}
-  )
+mappings =
+  Enum.map(signals, fn signal ->
+    Enum.reduce(signal, %{}, &Display.find_digit/2)
+  end)
 ```
 
-Apply the mapping to the output and join the output digits
+Reverse the mapping key and value
 
-<!-- livebook:{"reevaluate_automatically":true} -->
+```elixir
+mappings = Enum.map(mappings, &Enum.map(&1, fn {k, v} -> {v, k} end))
+```
+
+Covert the number to string so we can join it easily later
+
+```elixir
+mappings = Enum.map(mappings, &Enum.map(&1, fn {k, v} -> {k, Integer.to_string(v)} end))
+```
+
+Convert mapping back to map
+
+```elixir
+mappings = Enum.map(mappings, &Enum.into(&1, %{}))
+```
+
+Zip the mappings and outputs back together
+
+```elixir
+part2 = Enum.zip(mappings, outputs)
+```
+
+Apply the mapping to the output
 
 ```elixir
 part2 =
   Enum.map(part2, fn {mapping, output} ->
-    Enum.map_join(output, &Map.get(mapping, &1))
+    Enum.map(output, &Map.get(mapping, &1))
   end)
 ```
 
-Convert the output from string to integer
+Join the numbers to single string
 
-<!-- livebook:{"reevaluate_automatically":true} -->
+```elixir
+part2 = Enum.map(part2, &Enum.join/1)
+```
+
+Convert the output from string to integer
 
 ```elixir
 part2 = Enum.map(part2, &String.to_integer/1)
 ```
 
 Sum the outputs to get the final answer
-
-<!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
 Enum.sum(part2)
