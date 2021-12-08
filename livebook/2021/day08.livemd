@@ -4,12 +4,14 @@
 
 https://adventofcode.com/2021/day/8
 
+```elixir
+alias AdventOfCode.Year2021.Day08
+```
+
 ## Input
 
 ```elixir
-alias AdventOfCode.Year2021.Day08
-
-test_input = """
+input = """
 be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
 edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc
 fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg
@@ -21,46 +23,176 @@ bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd | ed bcgafe cdgba cbg
 egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb
 gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 """
+```
 
-task_input = File.read!("priv/2021/day08.in")
+Split to individual codes
 
+```elixir
+input = String.split(input, [" ", " | ", "\n"], trim: true)
+```
+
+Split every code to characters and sort it so it is easier to work with
+
+```elixir
+input = Enum.map(input, &(&1 |> String.graphemes() |> Enum.sort()))
+```
+
+Split it to the original lines (10 signals + 4 output = 14)
+
+```elixir
+input = Enum.chunk_every(input, 14)
+```
+
+Split every line to signal and output
+
+```elixir
+input = Enum.map(input, &Enum.chunk_every(&1, 10))
+```
+
+Sort signals by length and output as Tuple instead of list
+
+```elixir
 input =
-  test_input
-  |> String.split([" ", " | ", "\n"], trim: true)
-  |> Enum.map(&(&1 |> String.graphemes() |> Enum.sort()))
-  |> Enum.chunk_every(14)
-  |> Enum.map(&Enum.chunk_every(&1, 10))
-  |> Enum.map(fn [signal, output] ->
+  Enum.map(input, fn [signal, output] ->
     {Enum.sort_by(signal, &length/1), output}
   end)
 ```
 
 ## Part 1
 
+Get just the outputs in one flat list
+
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-input
-|> Enum.flat_map(fn {_signal, output} -> output end)
-|> Enum.count(&(length(&1) in [2, 3, 4, 7]))
+part1 = Enum.flat_map(input, fn {_signal, output} -> output end)
+```
+
+Count just outputs with specified lengths
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Enum.count(part1, &(length(&1) in [2, 3, 4, 7]))
 ```
 
 ## Part 2
 
+Parse signal to determine mapping of digits. These are the rules:
+
+* 2 segments is one
+* 3 segments is seven
+* 4 segments is four
+* 5 segments is two, three or five
+  * three contains all segments from one
+  * two has exactly 2 segments from four
+  * five has exactly 3 segments from four
+* 6 segments is zero, six or nine
+  * nine has all segments from four
+  * zero has all segments from one
+  * six doesn't match any of previous rules
+* 7 segments is eight
+
+Produces map with shape:
+
+```
+%{
+  1 => 'ab',
+  2 => '...',
+  ...
+}
+```
+
+```elixir
+defmodule Display do
+  def find_digit(data, acc) when length(data) == 2, do: Map.put(acc, 1, data)
+  def find_digit(data, acc) when length(data) == 3, do: Map.put(acc, 7, data)
+  def find_digit(data, acc) when length(data) == 4, do: Map.put(acc, 4, data)
+  def find_digit(data, acc) when length(data) == 7, do: Map.put(acc, 8, data)
+
+  def find_digit(data, %{1 => one, 4 => four} = acc) when length(data) == 5 do
+    cond do
+      # three contains all segments of one
+      Enum.all?(one, &(&1 in data)) ->
+        Map.put(acc, 3, data)
+
+      # two contains 2 segments from four
+      Enum.count(data, &(&1 in four)) == 2 ->
+        Map.put(acc, 2, data)
+
+      # five contains 3 segments from four
+      :otherwise ->
+        Map.put(acc, 5, data)
+    end
+  end
+
+  def find_digit(data, %{1 => one, 4 => four} = acc) when length(data) == 6 do
+    cond do
+      # nine contains all segments from four
+      Enum.all?(four, &(&1 in data)) ->
+        Map.put(acc, 9, data)
+
+      # zero contains all segments from one
+      Enum.all?(one, &(&1 in data)) ->
+        Map.put(acc, 0, data)
+
+      # six is the only 6 segment number left
+      :otherwise ->
+        Map.put(acc, 6, data)
+    end
+  end
+end
+```
+
+Convert signal data to mapping data
+
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-input
-|> Enum.map(fn {signal, output} ->
-  signal
-  |> Enum.reduce(%{}, &Day08.find_digits/2)
-  |> Enum.into(%{}, fn {key, val} -> {val, Integer.to_string(key)} end)
-  |> then(&{&1, output})
-end)
-|> Enum.map(fn {mapping, output} ->
-  output
-  |> Enum.map_join(&Map.get(mapping, &1))
-  |> String.to_integer()
-end)
-|> Enum.sum()
+part2 =
+  Enum.map(input, fn {signal, output} ->
+    {Enum.reduce(signal, %{}, &Display.find_digit/2), output}
+  end)
+```
+
+Reverse the mapping key and value so we can easily use it later
+and covert the number to string so we can join it
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+part2 =
+  Enum.map(
+    part2,
+    &{Enum.into(elem(&1, 0), %{}, fn {key, val} ->
+       {val, Integer.to_string(key)}
+     end), elem(&1, 1)}
+  )
+```
+
+Apply the mapping to the output and join the output digits
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+part2 =
+  Enum.map(part2, fn {mapping, output} ->
+    Enum.map_join(output, &Map.get(mapping, &1))
+  end)
+```
+
+Convert the output from string to integer
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+part2 = Enum.map(part2, &String.to_integer/1)
+```
+
+Sum the outputs to get the final answer
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Enum.sum(part2)
 ```
