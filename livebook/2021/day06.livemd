@@ -37,3 +37,75 @@ Day06.part1(input)
 ```elixir
 Day06.part2(input)
 ```
+
+## Matrix
+
+The problem can also be solved mathematically by solving this matrix which will give
+us matrix containing number of fish for each timer at last day of simulation. The
+final solution is to just sum the whole matrix.
+
+<!-- livebook:{"break_markdown":true} -->
+
+$$
+\begin{bmatrix}
+  0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 \\
+  1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0
+\end{bmatrix}^{days - 1} \cdot \begin{bmatrix}
+  0 & timer 1 & timer 2 & timer 3 & timer 4 & timer 5 & 0 & 0 & 0
+\end{bmatrix}
+
+<!-- livebook:{"break_markdown":true} -->
+
+So for the example input the matrix will look like this
+
+<!-- livebook:{"break_markdown":true} -->
+
+$$
+\begin{bmatrix}
+  0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 \\
+  1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+  0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0
+\end{bmatrix}^{255} \cdot \begin{bmatrix}0 & 1 & 1 & 2 & 1 & 0 & 0 & 0 & 0\end{bmatrix}
+$$
+
+<!-- livebook:{"break_markdown":true} -->
+
+Here is the describet operation implemented with `Nx`:
+
+```elixir
+import Nx, only: :sigils
+
+day = ~M"""
+0 0 0 0 0 0 1 0 1
+1 0 0 0 0 0 0 0 0
+0 1 0 0 0 0 0 0 0
+0 0 1 0 0 0 0 0 0
+0 0 0 1 0 0 0 0 0
+0 0 0 0 1 0 0 0 0
+0 0 0 0 0 1 0 0 0
+0 0 0 0 0 0 1 0 0
+0 0 0 0 0 0 0 1 0
+"""
+
+# Nx doesn't have matrix power function yet
+simulation = Enum.reduce(1..255, day, fn _index, acc -> Nx.dot(acc, day) end)
+
+[0, 1, 1, 2, 1, 0, 0, 0, 0]
+|> Nx.tensor()
+|> Nx.dot(simulation)
+|> Nx.sum()
+|> Nx.to_number()
+```

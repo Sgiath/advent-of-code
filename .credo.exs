@@ -95,7 +95,6 @@
           {Credo.Check.Readability.MultiAlias, []},
           {Credo.Check.Readability.SeparateAliasRequire, []},
           {Credo.Check.Readability.SingleFunctionToBlockPipe, []},
-          {Credo.Check.Readability.StrictModuleLayout, []},
           {Credo.Check.Readability.WithCustomTaggedTuple, []},
           {Credo.Check.Refactor.ABCSize, []},
           {Credo.Check.Refactor.AppendSingleItem, []},
@@ -110,6 +109,7 @@
           {Credo.Check.Warning.UnsafeToAtom, []}
         ],
         disabled: [
+          {Credo.Check.Readability.StrictModuleLayout, []},
           {Credo.Check.Refactor.VariableRebinding, []},
           {Credo.Check.Warning.IoInspect, []},
           {Credo.Check.Warning.LazyLogging, []},

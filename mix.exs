@@ -23,6 +23,8 @@ defmodule AdventOfCode.MixProject do
       {:typed_struct, "~> 0.2"},
       {:libgraph, "~> 0.13"},
       {:statistics, "~> 0.6"},
+      {:nx, github: "elixir-nx/nx", sparse: "nx", override: true},
+      {:exla, github: "elixir-nx/nx", sparse: "exla"},
       {:benchee, "~> 1.0", only: :dev},
       {:credo, "~> 1.6", only: :dev, runtime: false}
     ]

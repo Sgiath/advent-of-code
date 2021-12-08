@@ -77,4 +77,69 @@ defmodule AdventOfCode.Year2021.Day06 do
     |> Map.values()
     |> Enum.sum()
   end
+
+  # ===============================================================================================
+  # Mathematical solution
+  # ===============================================================================================
+
+  import Nx, only: :sigils
+
+  # matrice for 1 day
+  @transform ~M"""
+  0 0 0 0 0 0 1 0 1
+  1 0 0 0 0 0 0 0 0
+  0 1 0 0 0 0 0 0 0
+  0 0 1 0 0 0 0 0 0
+  0 0 0 1 0 0 0 0 0
+  0 0 0 0 1 0 0 0 0
+  0 0 0 0 0 1 0 0 0
+  0 0 0 0 0 0 1 0 0
+  0 0 0 0 0 0 0 1 0
+  """
+
+  # precomputed matrice for 80 days
+  @matrix_80 1..79
+             |> Enum.reduce(@transform, fn _index, acc -> Nx.dot(acc, @transform) end)
+             |> Nx.sum(axes: [1])
+             |> Nx.slice([0], [6])
+
+  def matrix_80(input) do
+    0..5
+    |> Enum.map(&(input[&1] || 0))
+    |> Nx.tensor()
+    |> Nx.dot(@matrix_80)
+    |> Nx.to_number()
+  end
+
+  # precomputed matrice for 256 days
+  @matrix_256 1..255
+              |> Enum.reduce(@transform, fn _index, acc -> Nx.dot(acc, @transform) end)
+              |> Nx.sum(axes: [1])
+              |> Nx.slice([0], [6])
+
+  def matrix_256(input) do
+    0..5
+    |> Enum.map(&(input[&1] || 0))
+    |> Nx.tensor()
+    |> Nx.dot(@matrix_256)
+    |> Nx.to_number()
+  end
+
+  # ===============================================================================================
+  # Benchmark
+  # ===============================================================================================
+
+  @impl AdventOfCode
+  def bench do
+    [
+      %{
+        recursion: &part1/1,
+        matrix: &matrix_80/1
+      },
+      %{
+        recursion: &part2/1,
+        matrix: &matrix_256/1
+      }
+    ]
+  end
 end

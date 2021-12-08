@@ -1,3 +1,5 @@
+<!-- vim: syntax=markdown -->
+
 # Year <%= year %>, Day <%= day %>
 
 https://adventofcode.com/<%= year %>/day/<%= String.to_integer(day) %>
