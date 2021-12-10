@@ -4,16 +4,16 @@
 
 https://adventofcode.com/<%= year %>/day/<%= String.to_integer(day) %>
 
+```elixir
+alias AdventOfCode.Year<%= year %>.Day<%= day %>
+```
+
 ## Input
 
 ```elixir
-alias AdventOfCode.Year<%= year %>.Day<%= day %>
-
 test_input = """
 
 """
-
-task_input = File.read!("priv/<%= year %>/day<%= day %>.in")
 
 input =
   test_input
@@ -26,7 +26,7 @@ input =
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-input
+part1 = input
 ```
 
 ## Part 2
@@ -34,5 +34,5 @@ input
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-input
+part2 = input
 ```

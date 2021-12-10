@@ -4,8 +4,6 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
   """
   use AdventOfCode, year: <%= year %>, day: <%= day %>
 
-  alias AdventOfCode.Parser
-
   # ===============================================================================================
   # Input
   # ===============================================================================================
@@ -13,7 +11,8 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
   @impl AdventOfCode
   def input do
     input_data()
-    |> Parser.lines()
+    |> String.split("\n", trim: true)
+    |> Enum.map(&String.graphemes/1)
   end
 
   # ===============================================================================================

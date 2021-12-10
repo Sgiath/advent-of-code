@@ -4,11 +4,13 @@
 
 https://adventofcode.com/2021/day/1
 
+```elixir
+alias AdventOfCode.Year2021.Day01
+```
+
 ## Input
 
 ```elixir
-alias AdventOfCode.Year2021.Day01
-
 test_input = """
 199
 200
@@ -21,8 +23,6 @@ test_input = """
 260
 263
 """
-
-task_input = File.read!("priv/2021/day01.in")
 
 input =
   task_input

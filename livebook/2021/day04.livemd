@@ -6,11 +6,13 @@
 
 https://adventofcode.com/2021/day/4
 
+```elixir
+alias AdventOfCode.Year2021.Day04
+```
+
 ## Input
 
 ```elixir
-alias AdventOfCode.Year2021.Day04
-
 test_input = """
 7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
 
@@ -32,8 +34,6 @@ test_input = """
 22 11 13  6  5
  2  0 12  3  7
 """
-
-task_input = File.read!("priv/2021/day04.in")
 
 [draw | boards] = String.split(task_input, ["\n", " "], trim: true)
 
