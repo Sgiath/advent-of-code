@@ -4,19 +4,12 @@ defmodule AdventOfCode.Year2021.Day08 do
   """
   use AdventOfCode, year: 2021, day: 08
 
-  alias AdventOfCode.Parser
-
   # ===============================================================================================
   # Input
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input do
-    input_data()
-    |> Parser.lines([" ", " | ", "\n"], &(&1 |> String.graphemes() |> Enum.sort()))
-    |> Enum.chunk_every(14)
-    |> Enum.map(&parse_line/1)
-  end
+  def input, do: input_data()
 
   def parse_line(data) do
     data
@@ -33,6 +26,10 @@ defmodule AdventOfCode.Year2021.Day08 do
   @impl AdventOfCode
   def part1(input) do
     input
+    |> String.split([" ", " | ", "\n"], trim: true)
+    |> Enum.map(&(&1 |> String.graphemes() |> Enum.sort()))
+    |> Enum.chunk_every(14)
+    |> Enum.map(&parse_line/1)
     |> Enum.flat_map(&elem(&1, 1))
     |> Enum.count(&(length(&1) in [2, 3, 4, 7]))
   end
@@ -44,6 +41,10 @@ defmodule AdventOfCode.Year2021.Day08 do
   @impl AdventOfCode
   def part2(input) do
     input
+    |> String.split([" ", " | ", "\n"], trim: true)
+    |> Enum.map(&(&1 |> String.graphemes() |> Enum.sort()))
+    |> Enum.chunk_every(14)
+    |> Enum.map(&parse_line/1)
     |> Enum.map(fn {signal, output} ->
       mapping = compute_mapping(signal)
 

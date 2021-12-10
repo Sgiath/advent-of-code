@@ -4,16 +4,12 @@ defmodule AdventOfCode.Year2021.Day07 do
   """
   use AdventOfCode, year: 2021, day: 07
 
-  alias AdventOfCode.Parser
-
   # ===============================================================================================
   # Input
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input do
-    Parser.line(input_data())
-  end
+  def input, do: input_data()
 
   # ===============================================================================================
   # Part 1
@@ -21,6 +17,11 @@ defmodule AdventOfCode.Year2021.Day07 do
 
   @impl AdventOfCode
   def part1(input) do
+    input =
+      input
+      |> String.split([",", "\n"], trim: true)
+      |> Enum.map(&String.to_integer/1)
+
     fuel_linear(input, round(Statistics.median(input)))
   end
 
@@ -34,6 +35,11 @@ defmodule AdventOfCode.Year2021.Day07 do
 
   @impl AdventOfCode
   def part2(input) do
+    input =
+      input
+      |> String.split([",", "\n"], trim: true)
+      |> Enum.map(&String.to_integer/1)
+
     mean = Statistics.mean(input)
 
     Enum.min([fuel_quadratic(input, floor(mean)), fuel_quadratic(input, ceil(mean))])

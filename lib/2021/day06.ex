@@ -4,18 +4,12 @@ defmodule AdventOfCode.Year2021.Day06 do
   """
   use AdventOfCode, year: 2021, day: 06
 
-  alias AdventOfCode.Parser
-
   # ===============================================================================================
   # Input
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input do
-    input_data()
-    |> Parser.lines([",", "\n"])
-    |> Enum.frequencies()
-  end
+  def input, do: input_data()
 
   # ===============================================================================================
   # Part 1
@@ -24,6 +18,9 @@ defmodule AdventOfCode.Year2021.Day06 do
   @impl AdventOfCode
   def part1(input) do
     input
+    |> String.split([",", "\n"], trim: true)
+    |> Enum.map(&String.to_integer/1)
+    |> Enum.frequencies()
     |> simulate(80)
     |> count_fish()
   end
@@ -35,6 +32,9 @@ defmodule AdventOfCode.Year2021.Day06 do
   @impl AdventOfCode
   def part2(input) do
     input
+    |> String.split([",", "\n"], trim: true)
+    |> Enum.map(&String.to_integer/1)
+    |> Enum.frequencies()
     |> simulate(256)
     |> count_fish()
   end
@@ -104,6 +104,12 @@ defmodule AdventOfCode.Year2021.Day06 do
              |> Nx.slice([0], [6])
 
   def matrix_80(input) do
+    input =
+      input
+      |> String.split([",", "\n"], trim: true)
+      |> Enum.map(&String.to_integer/1)
+      |> Enum.frequencies()
+
     0..5
     |> Enum.map(&(input[&1] || 0))
     |> Nx.tensor()
@@ -118,6 +124,12 @@ defmodule AdventOfCode.Year2021.Day06 do
               |> Nx.slice([0], [6])
 
   def matrix_256(input) do
+    input =
+      input
+      |> String.split([",", "\n"], trim: true)
+      |> Enum.map(&String.to_integer/1)
+      |> Enum.frequencies()
+
     0..5
     |> Enum.map(&(input[&1] || 0))
     |> Nx.tensor()

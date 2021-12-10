@@ -9,7 +9,7 @@ defmodule AdventOfCode.Year2021.Day02 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input, do: String.split(input_data(), "\n", trim: true)
+  def input, do: input_data()
 
   # ===============================================================================================
   # Part 1
@@ -18,6 +18,7 @@ defmodule AdventOfCode.Year2021.Day02 do
   @impl AdventOfCode
   def part1(input, reducer \\ &count_reducer/2) do
     input
+    |> String.split(["\n"], trim: true)
     |> Enum.reduce({0, 0}, reducer)
     |> Tuple.product()
   end
@@ -33,6 +34,7 @@ defmodule AdventOfCode.Year2021.Day02 do
   @impl AdventOfCode
   def part2(input, reducer \\ &count_aim_reducer/2) do
     input
+    |> String.split(["\n"], trim: true)
     |> Enum.reduce({0, 0, 0}, reducer)
     |> Tuple.delete_at(2)
     |> Tuple.product()

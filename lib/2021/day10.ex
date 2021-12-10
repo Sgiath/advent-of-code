@@ -9,11 +9,7 @@ defmodule AdventOfCode.Year2021.Day10 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input do
-    input_data()
-    |> String.split("\n", trim: true)
-    |> Enum.map(&String.graphemes/1)
-  end
+  def input, do: input_data()
 
   # ===============================================================================================
   # Part 1
@@ -22,6 +18,8 @@ defmodule AdventOfCode.Year2021.Day10 do
   @impl AdventOfCode
   def part1(input) do
     input
+    |> String.split("\n", trim: true)
+    |> Enum.map(&String.graphemes/1)
     |> Enum.map(&check_syntax/1)
     |> Enum.reduce(0, &score_syntax/2)
   end
@@ -39,6 +37,8 @@ defmodule AdventOfCode.Year2021.Day10 do
   @impl AdventOfCode
   def part2(input) do
     input
+    |> String.split("\n", trim: true)
+    |> Enum.map(&String.graphemes/1)
     |> Enum.map(&check_syntax/1)
     |> Enum.filter(&(elem(&1, 0) == :incomplete))
     |> Enum.map(&score_completion/1)

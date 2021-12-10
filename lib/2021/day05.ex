@@ -4,18 +4,12 @@ defmodule AdventOfCode.Year2021.Day05 do
   """
   use AdventOfCode, year: 2021, day: 05
 
-  alias AdventOfCode.Parser
-
   # ===============================================================================================
   # Input
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input do
-    input_data()
-    |> Parser.lines([",", " -> ", "\n"])
-    |> Enum.chunk_every(4)
-  end
+  def input, do: input_data()
 
   # ===============================================================================================
   # Part 1
@@ -24,6 +18,9 @@ defmodule AdventOfCode.Year2021.Day05 do
   @impl AdventOfCode
   def part1(input) do
     input
+    |> String.split([",", " -> ", "\n"], trim: true)
+    |> Enum.map(&String.to_integer/1)
+    |> Enum.chunk_every(4)
     |> get_straight_lines()
     |> Enum.flat_map(&get_points/1)
     |> get_intersections()
@@ -36,6 +33,9 @@ defmodule AdventOfCode.Year2021.Day05 do
   @impl AdventOfCode
   def part2(input) do
     input
+    |> String.split([",", " -> ", "\n"], trim: true)
+    |> Enum.map(&String.to_integer/1)
+    |> Enum.chunk_every(4)
     |> Enum.flat_map(&get_points/1)
     |> get_intersections()
   end

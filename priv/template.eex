@@ -9,11 +9,7 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input do
-    input_data()
-    |> String.split("\n", trim: true)
-    |> Enum.map(&String.graphemes/1)
-  end
+  def input, do: input_data()
 
   # ===============================================================================================
   # Part 1
@@ -22,6 +18,8 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
   @impl AdventOfCode
   def part1(input) do
     input
+    |> String.split(["\n"], trim: true)
+    |> Enum.map(&String.graphemes/1)
   end
 
   # ===============================================================================================
@@ -31,6 +29,8 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
   @impl AdventOfCode
   def part2(input) do
     input
+    |> String.split(["\n"], trim: true)
+    |> Enum.map(&String.graphemes/1)
   end
 
   # ===============================================================================================

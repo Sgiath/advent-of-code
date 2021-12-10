@@ -5,14 +5,12 @@ defmodule AdventOfCode.Year2021.Day03 do
   use AdventOfCode, year: 2021, day: 03
   use Bitwise
 
-  alias AdventOfCode.Parser
-
   # ===============================================================================================
   # Input
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input, do: Parser.lines(input_data(), "\n", &parse_line/1)
+  def input, do: input_data()
 
   def parse_line(line) do
     line
@@ -25,7 +23,13 @@ defmodule AdventOfCode.Year2021.Day03 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def part1([sample | _rest] = input) do
+  def part1(input) do
+    [sample | _rest] =
+      input =
+      input
+      |> String.split(["\n"], trim: true)
+      |> Enum.map(&parse_line/1)
+
     h = half(input)
 
     input
@@ -41,6 +45,11 @@ defmodule AdventOfCode.Year2021.Day03 do
 
   @impl AdventOfCode
   def part2(input) do
+    input =
+      input
+      |> String.split(["\n"], trim: true)
+      |> Enum.map(&parse_line/1)
+
     rating(input, &Kernel.==/2) * rating(input, &Kernel.!=/2)
   end
 

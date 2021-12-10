@@ -4,21 +4,25 @@ defmodule AdventOfCode.Year2021.Day01 do
   """
   use AdventOfCode, year: 2021, day: 01
 
-  alias AdventOfCode.Parser
-
   # ===============================================================================================
   # Input
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input, do: Parser.lines(input_data())
+  def input, do: input_data()
 
   # ===============================================================================================
   # Part 1
   # ===============================================================================================
 
   @impl AdventOfCode
-  def part1(input, acc \\ 0)
+  def part1(input) do
+    input
+    |> String.split(["\n"], trim: true)
+    |> Enum.map(&String.to_integer/1)
+    |> part1(0)
+  end
+
   def part1([a, b | rest], acc) when a < b, do: part1([b | rest], acc + 1)
   def part1([_a | rest], acc), do: part1(rest, acc)
   def part1(_measurements, acc), do: acc
@@ -28,7 +32,13 @@ defmodule AdventOfCode.Year2021.Day01 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def part2(input, acc \\ 0)
+  def part2(input) do
+    input
+    |> String.split(["\n"], trim: true)
+    |> Enum.map(&String.to_integer/1)
+    |> part2(0)
+  end
+
   def part2([a, b, c, d | rest], acc) when a < d, do: part2([b, c, d | rest], acc + 1)
   def part2([_a | rest], acc), do: part2(rest, acc)
   def part2(_measurements, acc), do: acc
@@ -41,12 +51,16 @@ defmodule AdventOfCode.Year2021.Day01 do
   # 150 μs)
   def part1_chunk(input) do
     input
+    |> String.split(["\n"], trim: true)
+    |> Enum.map(&String.to_integer/1)
     |> Enum.chunk_every(2, 1, :discard)
     |> Enum.count(fn [a, b] -> a < b end)
   end
 
   def part2_chunk(input) do
     input
+    |> String.split(["\n"], trim: true)
+    |> Enum.map(&String.to_integer/1)
     |> Enum.chunk_every(3, 1, :discard)
     |> Enum.map(&Enum.sum/1)
     |> Enum.chunk_every(2, 1, :discard)

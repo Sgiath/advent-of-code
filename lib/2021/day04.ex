@@ -9,11 +9,7 @@ defmodule AdventOfCode.Year2021.Day04 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input do
-    [draw | boards] = String.split(input_data(), ["\n", " "], trim: true)
-
-    {parse_draw_nums(draw), parse_boards(boards)}
-  end
+  def input, do: input_data()
 
   def parse_draw_nums(draw) do
     draw
@@ -32,7 +28,12 @@ defmodule AdventOfCode.Year2021.Day04 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def part1({draw, boards}) do
+  def part1(input) do
+    [draw | boards] = String.split(input, ["\n", " "], trim: true)
+
+    draw = parse_draw_nums(draw)
+    boards = parse_boards(boards)
+
     Enum.reduce_while(draw, boards, &draw_reducer_first/2)
   end
 
@@ -54,7 +55,11 @@ defmodule AdventOfCode.Year2021.Day04 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def part2({draw, boards}) do
+  def part2(input) do
+    [draw | boards] = String.split(input, ["\n", " "], trim: true)
+
+    draw = parse_draw_nums(draw)
+    boards = parse_boards(boards)
     Enum.reduce_while(draw, boards, &draw_reducer_last/2)
   end
 
