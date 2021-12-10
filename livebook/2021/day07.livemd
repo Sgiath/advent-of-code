@@ -16,11 +16,6 @@ alias AdventOfCode.Year2021.Day07
 test_input = """
 16,1,2,0,4,2,7,1,2,14
 """
-
-input =
-  task_input
-  |> String.split([",", "\n"], trim: true)
-  |> Enum.map(&String.to_integer/1)
 ```
 
 ## Part 1
@@ -28,7 +23,7 @@ input =
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day07.part1(input)
+Day07.part1(test_input)
 ```
 
 ## Part 2
@@ -36,5 +31,5 @@ Day07.part1(input)
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day07.part2(input)
+Day07.part2(test_input)
 ```

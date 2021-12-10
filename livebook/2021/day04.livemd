@@ -34,10 +34,6 @@ test_input = """
 22 11 13  6  5
  2  0 12  3  7
 """
-
-[draw | boards] = String.split(task_input, ["\n", " "], trim: true)
-
-input = {Day04.parse_draw_nums(draw), Day04.parse_boards(boards)}
 ```
 
 ## Part 1
@@ -45,7 +41,7 @@ input = {Day04.parse_draw_nums(draw), Day04.parse_boards(boards)}
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day04.part1(input)
+Day04.part1(test_input)
 ```
 
 ## Part 2
@@ -53,5 +49,5 @@ Day04.part1(input)
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day04.part2(input)
+Day04.part2(test_input)
 ```

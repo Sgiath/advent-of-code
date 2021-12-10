@@ -23,11 +23,6 @@ test_input = """
 260
 263
 """
-
-input =
-  task_input
-  |> String.split("\n", trim: true)
-  |> Enum.map(&String.to_integer/1)
 ```
 
 ## Part 1
@@ -35,7 +30,7 @@ input =
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day01.part1(input)
+Day01.part1(test_input)
 ```
 
 ## Part 2
@@ -43,5 +38,5 @@ Day01.part1(input)
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day01.part2(input)
+Day01.part2(test_input)
 ```

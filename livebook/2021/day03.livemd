@@ -27,11 +27,6 @@ test_input = """
 00010
 01010
 """
-
-input =
-  task_input
-  |> String.split("\n", trim: true)
-  |> Enum.map(&Day03.parse_line/1)
 ```
 
 ## Part 1
@@ -39,7 +34,7 @@ input =
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day03.part1(input)
+Day03.part1(test_input)
 ```
 
 ## Part 2
@@ -47,5 +42,5 @@ Day03.part1(input)
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day03.part2(input)
+Day03.part2(test_input)
 ```

@@ -16,12 +16,6 @@ alias AdventOfCode.Year2021.Day06
 test_input = """
 3,4,3,1,2
 """
-
-input =
-  task_input
-  |> String.split([",", "\n"], trim: true)
-  |> Enum.map(&String.to_integer/1)
-  |> Enum.frequencies()
 ```
 
 ## Part 1
@@ -29,7 +23,7 @@ input =
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day06.part1(input)
+Day06.part1(test_input)
 ```
 
 ## Part 2
@@ -37,7 +31,7 @@ Day06.part1(input)
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day06.part2(input)
+Day06.part2(test_input)
 ```
 
 ## Matrix
@@ -85,12 +79,14 @@ $$
 
 <!-- livebook:{"break_markdown":true} -->
 
-Here is the describet operation implemented with `Nx`:
+Here is the described operation implemented with `Nx`:
 
 ```elixir
 import Nx, only: :sigils
 
-day = ~M"""
+input_data = Nx.tensor([0, 1, 1, 2, 1, 0, 0, 0, 0])
+
+day_matrice = ~M"""
 0 0 0 0 0 0 1 0 1
 1 0 0 0 0 0 0 0 0
 0 1 0 0 0 0 0 0 0
@@ -103,11 +99,43 @@ day = ~M"""
 """
 
 # Nx doesn't have matrix power function yet
-simulation = Enum.reduce(1..255, day, fn _index, acc -> Nx.dot(acc, day) end)
+simulation_matrice =
+  Enum.reduce(1..255, day_matrice, fn _index, acc ->
+    Nx.dot(acc, day_matrice)
+  end)
+```
 
-[0, 1, 1, 2, 1, 0, 0, 0, 0]
-|> Nx.tensor()
-|> Nx.dot(simulation)
-|> Nx.sum()
-|> Nx.to_number()
+We can also precompute the sum of the days before we apply final dot product
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+simulation_matrice = Nx.sum(simulation_matrice, axes: [1])
+```
+
+Also the input data doesn't contain any fish with timer 0, 6, 7 or 8 so we can ignore
+those values from both matrices to speed-up the computation
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+simulation_matrice = Nx.slice(simulation_matrice, [1], [5]) |> IO.inspect()
+
+input_data = Nx.slice(input_data, [1], [5])
+```
+
+Than we can do the final dot product
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+result = Nx.dot(input_data, simulation_matrice)
+```
+
+And convert it to the number from the tensor
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Nx.to_number(result)
 ```

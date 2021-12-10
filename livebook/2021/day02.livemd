@@ -21,8 +21,6 @@ up 3
 down 8
 forward 2
 """
-
-input = String.split(task_input, "\n", trim: true)
 ```
 
 ## Part 1
@@ -30,7 +28,7 @@ input = String.split(task_input, "\n", trim: true)
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day02.part1(input)
+Day02.part1(test_input)
 ```
 
 ## Part 2
@@ -38,5 +36,5 @@ Day02.part1(input)
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day02.part2(input)
+Day02.part2(test_input)
 ```

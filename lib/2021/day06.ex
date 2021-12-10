@@ -101,7 +101,7 @@ defmodule AdventOfCode.Year2021.Day06 do
   @matrix_80 1..79
              |> Enum.reduce(@transform, fn _index, acc -> Nx.dot(acc, @transform) end)
              |> Nx.sum(axes: [1])
-             |> Nx.slice([0], [6])
+             |> Nx.slice([1], [5])
 
   def matrix_80(input) do
     input =
@@ -110,7 +110,7 @@ defmodule AdventOfCode.Year2021.Day06 do
       |> Enum.map(&String.to_integer/1)
       |> Enum.frequencies()
 
-    0..5
+    1..5
     |> Enum.map(&(input[&1] || 0))
     |> Nx.tensor()
     |> Nx.dot(@matrix_80)
@@ -121,7 +121,7 @@ defmodule AdventOfCode.Year2021.Day06 do
   @matrix_256 1..255
               |> Enum.reduce(@transform, fn _index, acc -> Nx.dot(acc, @transform) end)
               |> Nx.sum(axes: [1])
-              |> Nx.slice([0], [6])
+              |> Nx.slice([1], [5])
 
   def matrix_256(input) do
     input =
@@ -130,7 +130,7 @@ defmodule AdventOfCode.Year2021.Day06 do
       |> Enum.map(&String.to_integer/1)
       |> Enum.frequencies()
 
-    0..5
+    1..5
     |> Enum.map(&(input[&1] || 0))
     |> Nx.tensor()
     |> Nx.dot(@matrix_256)
