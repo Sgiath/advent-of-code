@@ -13,9 +13,7 @@ alias AdventOfCode.Year2021.Day06
 ## Input
 
 ```elixir
-test_input = """
-3,4,3,1,2
-"""
+input = Day06.test_input()
 ```
 
 ## Part 1
@@ -23,7 +21,7 @@ test_input = """
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day06.part1(test_input)
+Day06.part1(input)
 ```
 
 ## Part 2
@@ -31,7 +29,7 @@ Day06.part1(test_input)
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day06.part2(test_input)
+Day06.part2(input)
 ```
 
 ## Matrix
@@ -75,7 +73,6 @@ $$
   0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
   0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0
 \end{bmatrix}^{255} \cdot \begin{bmatrix}0 & 1 & 1 & 2 & 1 & 0 & 0 & 0 & 0\end{bmatrix}
-$$
 
 <!-- livebook:{"break_markdown":true} -->
 

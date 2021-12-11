@@ -11,18 +11,7 @@ alias AdventOfCode.Year2021.Day01
 ## Input
 
 ```elixir
-test_input = """
-199
-200
-208
-210
-200
-207
-240
-269
-260
-263
-"""
+input = Day01.test_input()
 ```
 
 ## Part 1
@@ -30,7 +19,7 @@ test_input = """
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day01.part1(test_input)
+Day01.part1(input)
 ```
 
 ## Part 2
@@ -38,5 +27,5 @@ Day01.part1(test_input)
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-Day01.part2(test_input)
+Day01.part2(input)
 ```
