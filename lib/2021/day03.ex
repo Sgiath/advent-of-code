@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2021.Day03 do
   @moduledoc """
   https://adventofcode.com/2021/day/3
   """
-  use AdventOfCode, year: 2021, day: 03
+  use AdventOfCode
   use Bitwise
 
   # ===============================================================================================
@@ -10,7 +10,29 @@ defmodule AdventOfCode.Year2021.Day03 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input, do: input_data()
+  def test_input do
+    """
+    00100
+    11110
+    10110
+    10111
+    10101
+    01111
+    00111
+    11100
+    10000
+    11001
+    00010
+    01010
+    """
+  end
+
+  @impl AdventOfCode
+  def input do
+    :advent_of_code
+    |> Application.app_dir(["priv", "2021", "day03.in"])
+    |> File.read!()
+  end
 
   def parse_line(line) do
     line

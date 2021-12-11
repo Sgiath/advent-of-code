@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2019.Day10 do
   @moduledoc """
   https://adventofcode.com/2019/day/10
   """
-  use AdventOfCode, year: 2019, day: 10
+  use AdventOfCode
 
   alias AdventOfCode.Parser
 
@@ -10,17 +10,50 @@ defmodule AdventOfCode.Year2019.Day10 do
   @type point() :: {integer(), integer()}
 
   @impl AdventOfCode
-  def input, do: Parser.lines(input_data(), "\n", &String.graphemes/1)
+  def test_input do
+    """
+    .#..##.###...#######
+    ##.############..##.
+    .#.######.########.#
+    .###.#######.####.#.
+    #####.##.#.##.###.##
+    ..#####..#.#########
+    ####################
+    #.####....###.#.#.##
+    ##.#################
+    #####.##.###..####..
+    ..######..##.#######
+    ####.##.####...##..#
+    .#####..#.######.###
+    ##...#.##########...
+    #.##########.#######
+    .####.#.###.###.#.##
+    ....##.##.###..#####
+    .#.#.###########.###
+    #.#.#.#####.####.###
+    ###.##.####.##.#..##
+    """
+  end
+
+  @impl AdventOfCode
+  def input do
+    :advent_of_code
+    |> Application.app_dir(["priv", "2019", "day10.in"])
+    |> File.read!()
+  end
 
   @impl AdventOfCode
   def part1(input) do
     input
+    |> Parser.lines(["\n"], &String.graphemes/1)
     |> get_best()
     |> elem(0)
   end
 
   @impl AdventOfCode
   def part2(input) do
+    input = Parser.lines(input, ["\n"], &String.graphemes/1)
+
     anchor = input |> get_best() |> elem(1)
 
     input

@@ -11,12 +11,8 @@ alias AdventOfCode.Year<%= year %>.Day<%= day %>
 ## Input
 
 ```elixir
-test_input = """
-
-"""
-
 input =
-  test_input
+  Day<%= day %>.test_input()
   |> String.split("\n", trim: true)
   |> Enum.map(&String.to_integer/1)
 ```

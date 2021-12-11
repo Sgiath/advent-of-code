@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2019.Day02 do
   @moduledoc """
   https://adventofcode.com/2019/day/2
   """
-  use AdventOfCode, year: 2019, day: 02
+  use AdventOfCode
 
   alias AdventOfCode.Parser
   alias AdventOfCode.Year2019.Intcode
@@ -12,11 +12,24 @@ defmodule AdventOfCode.Year2019.Day02 do
   require Logger
 
   @impl AdventOfCode
-  def input, do: Parser.intcode(input_data())
+  def test_input do
+    """
+    1,1,1,4,99,5,6,0,99
+    """
+  end
+
+  @impl AdventOfCode
+  def input do
+    :advent_of_code
+    |> Application.app_dir(["priv", "2019", "day02.in"])
+    |> File.read!()
+  end
 
   @impl AdventOfCode
   def part1(input) do
-    run_program(input, 12, 2)
+    input
+    |> Parser.intcode()
+    |> run_program(12, 2)
   end
 
   @doc """
@@ -25,7 +38,9 @@ defmodule AdventOfCode.Year2019.Day02 do
   """
   @impl AdventOfCode
   def part2(input) do
-    find_combination(input)
+    input
+    |> Parser.intcode()
+    |> find_combination()
   end
 
   @doc """

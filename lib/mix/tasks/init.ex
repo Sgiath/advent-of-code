@@ -37,6 +37,11 @@ defmodule Mix.Tasks.AdventOfCode.Init do
       |> elem(0)
       |> parse_args()
 
+    # create folders
+    File.mkdir_p!(Path.join([File.cwd!(), "lib", year]))
+    File.mkdir_p!(Path.join([File.cwd!(), "test", year]))
+    File.mkdir_p!(Path.join([File.cwd!(), "livebook", year]))
+
     # write file with script template
     generate_file([File.cwd!(), "lib", year, "day#{day}.ex"], @template_path, year, day)
     generate_file([File.cwd!(), "test", year, "day#{day}_test.exs"], @test_path, year, day)

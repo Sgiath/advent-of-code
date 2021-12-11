@@ -2,17 +2,39 @@ defmodule AdventOfCode.Year2020.Day01 do
   @moduledoc """
   https://adventofcode.com/2020/day/1
   """
-  use AdventOfCode, year: 2020, day: 01
+  use AdventOfCode
 
   alias AdventOfCode.Parser
 
   @impl AdventOfCode
-  def input, do: input_data() |> Parser.lines() |> Enum.sort()
+  def test_input do
+    """
+    1721
+    979
+    366
+    299
+    675
+    1456
+    """
+  end
 
   @impl AdventOfCode
-  def part1([f | _] = sorted) do
+  def input do
+    :advent_of_code
+    |> Application.app_dir(["priv", "2020", "day01.in"])
+    |> File.read!()
+  end
+
+  @impl AdventOfCode
+  def part1(input) do
+    [f | _] =
+      sorted =
+      input
+      |> Parser.lines()
+      |> Enum.sort()
+
     # filter out obviously too big values
-    filtered = Enum.filter(sorted, &(&1 < 2020 - f))
+    filtered = Enum.filter(sorted, &(&1 <= 2020 - f))
     # get reversed input
     reversed = Enum.reverse(filtered)
 
@@ -28,7 +50,13 @@ defmodule AdventOfCode.Year2020.Day01 do
   end
 
   @impl AdventOfCode
-  def part2([f, s | _] = sorted) do
+  def part2(input) do
+    [f, s | _] =
+      sorted =
+      input
+      |> Parser.lines()
+      |> Enum.sort()
+
     # filter out obviously too big values
     [_ | third] = filtered = Enum.filter(sorted, &(&1 < 2020 - (f + s)))
     # get reversed input

@@ -2,13 +2,36 @@ defmodule AdventOfCode.Year2020.Day03 do
   @moduledoc """
   https://adventofcode.com/2020/day/3
   """
-  use AdventOfCode, year: 2020, day: 03
+  use AdventOfCode
 
   @impl AdventOfCode
-  def input, do: String.split(input_data(), "\n", trim: true)
+  def test_input do
+    """
+    ..##.......
+    #...#...#..
+    .#....#..#.
+    ..#.#...#.#
+    .#...##..#.
+    ..#.##.....
+    .#.#.#....#
+    .#........#
+    #.##...#...
+    #...##....#
+    .#..#...#.#
+    """
+  end
 
   @impl AdventOfCode
-  def part1([_ | input]) do
+  def input do
+    :advent_of_code
+    |> Application.app_dir(["priv", "2020", "day03.in"])
+    |> File.read!()
+  end
+
+  @impl AdventOfCode
+  def part1(input) do
+    [_ | input] = input |> String.split(["\n"], trim: true)
+
     find_slope(input, 3)
   end
 
@@ -28,7 +51,9 @@ defmodule AdventOfCode.Year2020.Day03 do
   end
 
   @impl AdventOfCode
-  def part2([_ | input]) do
+  def part2(input) do
+    [_ | input] = String.split(input, ["\n"], trim: true)
+
     input
     |> find_slope(1)
     |> Kernel.*(find_slope(input, 3))

@@ -2,13 +2,24 @@ defmodule AdventOfCode.Year2020.Day02 do
   @moduledoc """
   https://adventofcode.com/2020/day/2
   """
-  use AdventOfCode, year: 2020, day: 02
+  use AdventOfCode
 
   alias AdventOfCode.Parser
 
   @impl AdventOfCode
+  def test_input do
+    """
+    1-3 a: abcde
+    1-3 b: cdefg
+    2-9 c: ccccccccc
+    """
+  end
+
+  @impl AdventOfCode
   def input do
-    Parser.lines(input_data(), "\n", &parse_line/1)
+    :advent_of_code
+    |> Application.app_dir(["priv", "2020", "day02.in"])
+    |> File.read!()
   end
 
   def parse_line(line) do
@@ -23,6 +34,7 @@ defmodule AdventOfCode.Year2020.Day02 do
   @impl AdventOfCode
   def part1(input) do
     input
+    |> Parser.lines(["\n"], &parse_line/1)
     |> Enum.filter(&valid_count?/1)
     |> length()
   end
@@ -40,6 +52,7 @@ defmodule AdventOfCode.Year2020.Day02 do
   @impl AdventOfCode
   def part2(input) do
     input
+    |> Parser.lines(["\n"], &parse_line/1)
     |> Enum.filter(&valid_pos?/1)
     |> length()
   end

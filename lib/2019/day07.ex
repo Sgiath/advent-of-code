@@ -2,20 +2,31 @@ defmodule AdventOfCode.Year2019.Day07 do
   @moduledoc """
   https://adventofcode.com/2019/day/7
   """
-  use AdventOfCode, year: 2019, day: 07
+  use AdventOfCode
 
   alias AdventOfCode.Parser
   alias AdventOfCode.Year2019.Intcode
 
   @impl AdventOfCode
-  def input, do: Parser.intcode(input_data())
+  def test_input do
+    """
+    3,31,3,32,1002,32,10,32,1001,31,-2,31,1007,31,0,33,1002,33,7,33,1,33,31,31,1,32,31,31,4,31,99,0,0,0
+    """
+  end
+
+  @impl AdventOfCode
+  def input do
+    :advent_of_code
+    |> Application.app_dir(["priv", "2019", "day07.in"])
+    |> File.read!()
+  end
 
   @impl AdventOfCode
   def part1(input) do
     0..4
     |> Enum.to_list()
     |> permutations()
-    |> Enum.map(&run_config(input, &1))
+    |> Enum.map(&run_config(Parser.intcode(input), &1))
     |> Enum.max()
   end
 
@@ -27,7 +38,7 @@ defmodule AdventOfCode.Year2019.Day07 do
     5..9
     |> Enum.to_list()
     |> permutations()
-    |> Enum.map(&run_config_recursive(input, &1))
+    |> Enum.map(&run_config_recursive(Parser.intcode(input), &1))
     |> Enum.max()
   end
 

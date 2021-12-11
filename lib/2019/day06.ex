@@ -2,20 +2,40 @@ defmodule AdventOfCode.Year2019.Day06 do
   @moduledoc """
   https://adventofcode.com/2019/day/6
   """
-  use AdventOfCode, year: 2019, day: 06
+  use AdventOfCode
+
+  @impl AdventOfCode
+  def test_input do
+    """
+    COM)B
+    B)C
+    C)D
+    D)E
+    E)F
+    B)G
+    G)H
+    D)I
+    E)J
+    J)K
+    K)L
+    """
+  end
 
   @impl AdventOfCode
   def input do
-    input_data()
-    |> String.split(["\n", ")"], trim: true)
-    |> Enum.chunk_every(2)
+    :advent_of_code
+    |> Application.app_dir(["priv", "2019", "day06.in"])
+    |> File.read!()
   end
 
   @impl AdventOfCode
   def part1(input) do
     graph =
-      Enum.reduce(input, %{}, fn [anchor, orbit], acc ->
-        Map.update(acc, anchor, [orbit], fn orbits -> [orbit | orbits] end)
+      input
+      |> String.split(["\n", ")"], trim: true)
+      |> Enum.chunk_every(2)
+      |> Enum.reduce(%{}, fn [anchor, orbit], acc ->
+        Map.update(acc, anchor, [orbit], &[orbit | &1])
       end)
 
     graph
@@ -26,6 +46,8 @@ defmodule AdventOfCode.Year2019.Day06 do
   @impl AdventOfCode
   def part2(input) do
     input
+    |> String.split(["\n", ")"], trim: true)
+    |> Enum.chunk_every(2)
     |> Enum.reduce(Graph.new(), fn [anchor, orbit], graph ->
       graph
       |> Graph.add_edge(anchor, orbit)

@@ -2,14 +2,34 @@ defmodule AdventOfCode.Year2021.Day01 do
   @moduledoc """
   https://adventofcode.com/2021/day/1
   """
-  use AdventOfCode, year: 2021, day: 01
+  use AdventOfCode
 
   # ===============================================================================================
   # Input
   # ===============================================================================================
 
   @impl AdventOfCode
-  def input, do: input_data()
+  def test_input do
+    """
+    199
+    200
+    208
+    210
+    200
+    207
+    240
+    269
+    260
+    263
+    """
+  end
+
+  @impl AdventOfCode
+  def input do
+    :advent_of_code
+    |> Application.app_dir(["priv", "2021", "day01.in"])
+    |> File.read!()
+  end
 
   # ===============================================================================================
   # Part 1

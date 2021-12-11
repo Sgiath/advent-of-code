@@ -2,9 +2,7 @@ defmodule AdventOfCode.Year2019.Day03 do
   @moduledoc """
   https://adventofcode.com/2019/day/3
   """
-  use AdventOfCode, year: 2019, day: 03
-
-  alias AdventOfCode.Parser
+  use AdventOfCode
 
   require Logger
 
@@ -17,13 +15,25 @@ defmodule AdventOfCode.Year2019.Day03 do
   # ===============================================================================================
 
   @impl AdventOfCode
+  def test_input do
+    """
+    R75,D30,R83,U83,L12,D49,R71,U7,L72
+    U62,R66,U55,R34,D71,R55,D58,R83
+    """
+  end
+
+  @impl AdventOfCode
   def input do
-    Parser.lines(input_data(), "\n", fn line ->
-      line
-      |> String.split(",", trim: true)
-      |> Enum.map(&parse_path/1)
-      |> path_to_points()
-    end)
+    :advent_of_code
+    |> Application.app_dir(["priv", "2019", "day03.in"])
+    |> File.read!()
+  end
+
+  def parse_line(line) do
+    line
+    |> String.split(",", trim: true)
+    |> Enum.map(&parse_path/1)
+    |> path_to_points()
   end
 
   @spec parse_path(String.t()) :: direction()
@@ -61,9 +71,11 @@ defmodule AdventOfCode.Year2019.Day03 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def part1([wire1, wire2]) do
-    wire1
-    |> select_common(wire2)
+  def part1(input) do
+    input
+    |> String.split(["\n"], trim: true)
+    |> Enum.map(&parse_line/1)
+    |> select_common()
     |> Enum.map(&calc_distance/1)
     |> Enum.min()
   end
@@ -73,9 +85,15 @@ defmodule AdventOfCode.Year2019.Day03 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def part2([wire1, wire2]) do
-    wire1
-    |> select_common(wire2)
+  def part2(input) do
+    [wire1, wire2] =
+      wires =
+      input
+      |> String.split(["\n"], trim: true)
+      |> Enum.map(&parse_line/1)
+
+    wires
+    |> select_common()
     |> Enum.map(&calc_delay(wire1, wire2, &1))
     |> Enum.min()
   end
@@ -111,11 +129,11 @@ defmodule AdventOfCode.Year2019.Day03 do
 
   # Examples
 
-  iex> AdventOfCode.Year2019.Day03.select_common([{1, 1}, {2, 1}], [{3, 1}, {1, 1}])
+  iex> AdventOfCode.Year2019.Day03.select_common([[{1, 1}, {2, 1}], [{3, 1}, {1, 1}]])
   [{1, 1}]
   """
-  @spec select_common(wire1 :: list(point()), wire2 :: list(point())) :: list(point())
-  def select_common(wire1, wire2) do
+  @spec select_common([[point()]]) :: list(point())
+  def select_common([wire1, wire2]) do
     MapSet.to_list(MapSet.intersection(MapSet.new(wire1), MapSet.new(wire2)))
   end
 

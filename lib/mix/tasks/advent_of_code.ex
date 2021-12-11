@@ -12,31 +12,33 @@ defmodule Mix.Tasks.AdventOfCode do
   """
   use Mix.Task
 
-  @strict [year: :integer, day: :integer, part1: :boolean, part2: :boolean]
-  @aliases [y: :year, d: :day]
+  @strict [year: :integer, day: :integer, part1: :boolean, part2: :boolean, test: :boolean]
+  @aliases [y: :year, d: :day, t: :test]
 
   @impl Mix.Task
   def run(args) do
     {opts, [], []} = OptionParser.parse(args, strict: @strict, aliases: @aliases)
-    year = Keyword.get(opts, :year, 2021)
-    day = opts |> Keyword.get(:day) |> Integer.to_string() |> String.pad_leading(2, "0")
+    {year, opts} = Keyword.pop(opts, :year, 2021)
+    {day, opts} = Keyword.pop!(opts, :day)
+    day = day |> Integer.to_string() |> String.pad_leading(2, "0")
 
     module = String.to_existing_atom("Elixir.AdventOfCode.Year#{year}.Day#{day}")
 
     case Code.ensure_compiled(module) do
       {:module, _} ->
-        if Keyword.get(opts, :part1, false), do: run_part(module, 1)
-        if Keyword.get(opts, :part2, false), do: run_part(module, 2)
+        if Keyword.get(opts, :part1, false), do: run_part(module, 1, opts)
+        if Keyword.get(opts, :part2, false), do: run_part(module, 2, opts)
 
       {:error, _} ->
         IO.puts("\n#{IO.ANSI.red()}Year #{year}, day #{day} not implemented!#{IO.ANSI.reset()}")
     end
   end
 
-  defp run_part(module, part) do
+  defp run_part(module, part, opts) do
     IO.puts("\n#{IO.ANSI.bright()}#{IO.ANSI.blue()}Part #{part}#{IO.ANSI.reset()}")
+    input = if Keyword.get(opts, :test, false), do: module.test_input(), else: module.input()
 
-    {time, solution} = :timer.tc(module, String.to_existing_atom("part#{part}"), [module.input()])
+    {time, solution} = :timer.tc(module, String.to_existing_atom("part#{part}"), [input])
 
     if is_binary(solution),
       do: IO.puts(solution),

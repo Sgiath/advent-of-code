@@ -2,16 +2,35 @@ defmodule AdventOfCode.Year2018.Day02 do
   @moduledoc """
   https://adventofcode.com/2018/day/2
   """
-  use AdventOfCode, year: 2018, day: 02
+  use AdventOfCode
 
   @impl AdventOfCode
-  def input, do: String.split(input_data(), "\n", trim: true)
+  def test_input do
+    """
+    abcdef
+    bababc
+    abbcde
+    abcccd
+    aabcdd
+    abcdee
+    ababab
+    """
+  end
+
+  @impl AdventOfCode
+  def input do
+    :advent_of_code
+    |> Application.app_dir(["priv", "2018", "day02.in"])
+    |> File.read!()
+  end
 
   @impl AdventOfCode
   def part1(input) do
     # Compute number of words containing pairs and triples
     {pairs, triples} =
-      Enum.reduce(input, {0, 0}, fn id, {pairs, triples} ->
+      input
+      |> String.split(["\n"], trim: true)
+      |> Enum.reduce({0, 0}, fn id, {pairs, triples} ->
         # Get pair and triple for one word
         {pair, triple} = get_pair_and_triple(id)
 
@@ -43,6 +62,7 @@ defmodule AdventOfCode.Year2018.Day02 do
   @impl AdventOfCode
   def part2(input) do
     input
+    |> String.split(["\n"], trim: true)
     # Convert to actual list and also every string ID to charlist
     |> Enum.map(&String.to_charlist/1)
     |> boxes()

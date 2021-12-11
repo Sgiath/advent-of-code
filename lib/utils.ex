@@ -9,7 +9,10 @@ defmodule AdventOfCode.Utils do
   Download input file and save it as file
   """
   def save_input(year, day) do
-    [File.cwd!(), "priv", year, "day#{day}.in"]
+    dir = Path.join([File.cwd!(), "priv", year])
+    File.mkdir_p!(dir)
+
+    [dir, "day#{day}.in"]
     |> Path.join()
     |> File.open([:write, :utf8], &IO.write(&1, get_input(year, day)))
   end

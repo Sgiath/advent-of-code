@@ -2,21 +2,38 @@ defmodule AdventOfCode.Year2019.Day04 do
   @moduledoc """
   https://adventofcode.com/2019/day/4
   """
-  use AdventOfCode, year: 2019, day: 04
+  use AdventOfCode
+
+  @impl AdventOfCode
+  def test_input do
+    raise "No test input"
+  end
 
   @impl AdventOfCode
   def input do
-    Enum.map(168_630..718_098, &Integer.to_charlist/1)
+    :advent_of_code
+    |> Application.app_dir(["priv", "2019", "day04.in"])
+    |> File.read!()
   end
 
   @impl AdventOfCode
   def part1(input) do
-    Enum.count(input, &(increasing?(&1) and same_digits?(&1)))
+    input
+    |> String.split(["\n", "-"], trim: true)
+    |> Enum.map(&String.to_integer/1)
+    |> then(&Range.new(List.first(&1), List.last(&1)))
+    |> Enum.map(&Integer.to_charlist/1)
+    |> Enum.count(&(increasing?(&1) and same_digits?(&1)))
   end
 
   @impl AdventOfCode
   def part2(input) do
-    Enum.count(input, &(increasing?(&1) and one_two_digit_group?(&1)))
+    input
+    |> String.split(["\n", "-"], trim: true)
+    |> Enum.map(&String.to_integer/1)
+    |> then(&Range.new(List.first(&1), List.last(&1)))
+    |> Enum.map(&Integer.to_charlist/1)
+    |> Enum.count(&(increasing?(&1) and one_two_digit_group?(&1)))
   end
 
   def increasing?([dig1, dig2 | rest]) when dig1 <= dig2, do: increasing?([dig2 | rest])

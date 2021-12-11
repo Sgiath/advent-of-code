@@ -1,30 +1,17 @@
 defmodule AdventOfCode.Year2021.Day05.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias AdventOfCode.Year2021.Day05
 
   doctest AdventOfCode.Year2021.Day05
 
-  @test_input """
-  0,9 -> 5,9
-  8,0 -> 0,8
-  9,4 -> 3,4
-  2,2 -> 2,1
-  7,0 -> 7,4
-  6,4 -> 2,0
-  0,9 -> 2,9
-  3,4 -> 1,4
-  0,0 -> 8,8
-  5,5 -> 8,2
-  """
-
   test "part 1" do
-    assert Day05.part1(@test_input) == 5
+    assert Day05.part1(Day05.test_input()) == 5
     assert Day05.part1(Day05.input()) == 7297
   end
 
   test "part 2" do
-    assert Day05.part2(@test_input) == 12
+    assert Day05.part2(Day05.test_input()) == 12
     assert Day05.part2(Day05.input()) == 21038
   end
 end
