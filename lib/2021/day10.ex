@@ -67,10 +67,10 @@ defmodule AdventOfCode.Year2021.Day10 do
   def score_completion(result, acc \\ 0)
   def score_completion({:error, _char}, 0), do: nil
   def score_completion({:incomplete, stack}, 0), do: score_completion(stack, 0)
-  def score_completion([?( | stack], acc), do: score_completion(stack, acc * 5 + 1)
-  def score_completion([?[ | stack], acc), do: score_completion(stack, acc * 5 + 2)
-  def score_completion([?{ | stack], acc), do: score_completion(stack, acc * 5 + 3)
-  def score_completion([?< | stack], acc), do: score_completion(stack, acc * 5 + 4)
+  def score_completion([?) | stack], acc), do: score_completion(stack, acc * 5 + 1)
+  def score_completion([?] | stack], acc), do: score_completion(stack, acc * 5 + 2)
+  def score_completion([?} | stack], acc), do: score_completion(stack, acc * 5 + 3)
+  def score_completion([?> | stack], acc), do: score_completion(stack, acc * 5 + 4)
   def score_completion([], acc), do: acc
 
   # ===============================================================================================
@@ -78,57 +78,25 @@ defmodule AdventOfCode.Year2021.Day10 do
   # ===============================================================================================
 
   @doc """
-  Check if bracket is starting one
-  """
-  defguard is_starting(a) when a in '([{<'
-
-  @doc """
-  Check if two brackets are simple bracket pair
-  """
-  defguard is_simple(a, b) when a == ?( and b == ?)
-
-  @doc """
-  Check if two brackets are square bracket pair
-  """
-  defguard is_square(a, b) when a == ?[ and b == ?]
-
-  @doc """
-  Check if two brackets are curly bracket pair
-  """
-  defguard is_curly(a, b) when a == ?{ and b == ?}
-
-  @doc """
-  Check if two brackets are pointy bracket pair
-  """
-  defguard is_pointy(a, b) when a == ?< and b == ?>
-
-  @doc """
-  Check if two brackets are any bracket pair
-  """
-  defguard is_pair(a, b)
-           when is_simple(a, b) or is_square(a, b) or is_curly(a, b) or is_pointy(a, b)
-
-  @doc """
   Check syntax of the line
 
   Returns:
     - `{:error, bracket}` where `bracket` is the first corrupted bracket on the line
     - `{:incomplete, stack}` where `stack` is list of unclosed brackets
-    - `:success` if the line is completed (shouldn't happen)
+    - `:ok` if the line is completed (shouldn't happen)
   """
   def check_syntax(line, stack \\ [])
   # add starting bracket to stack
-  def check_syntax(<<a::8, rest::binary>>, stack) when is_starting(a),
-    do: check_syntax(rest, [a | stack])
-
+  def check_syntax(<<?(, rest::binary>>, stack), do: check_syntax(rest, [?) | stack])
+  def check_syntax(<<?[, rest::binary>>, stack), do: check_syntax(rest, [?] | stack])
+  def check_syntax(<<?{, rest::binary>>, stack), do: check_syntax(rest, [?} | stack])
+  def check_syntax(<<?<, rest::binary>>, stack), do: check_syntax(rest, [?> | stack])
   # remove bracket from stack on complete pair
-  def check_syntax(<<a::8, rest::binary>>, [b | stack]) when is_pair(b, a),
-    do: check_syntax(rest, stack)
-
+  def check_syntax(<<char::8, rest::binary>>, [char | stack]), do: check_syntax(rest, stack)
   # return error when bracket is not in pair with bracket on stack
-  def check_syntax(<<a::8, _rest::binary>>, _stack), do: {:error, a}
-  # return incomplete when we are at the end but stack is not empty
-  def check_syntax(<<>>, stack) when length(stack) > 0, do: {:incomplete, stack}
+  def check_syntax(<<char::8, _rest::binary>>, _stack), do: {:error, char}
   # return success when we are at the end of line and stack is empty
-  def check_syntax(<<>>, []), do: :success
+  def check_syntax(<<>>, []), do: :ok
+  # return incomplete when we are at the end but stack is not empty
+  def check_syntax(<<>>, stack), do: {:incomplete, stack}
 end
