@@ -53,7 +53,7 @@ defmodule AdventOfCode.Year2021.Day12 do
 
   def find_paths(graph, [point | _rest] = path) do
     graph[point]
-    |> Enum.reject(&(&1 == "start" or is_small(&1, path)))
+    |> Enum.reject(&is_small(&1, path))
     |> Enum.map(&find_paths(graph, [&1 | path]))
   end
 
@@ -76,14 +76,27 @@ defmodule AdventOfCode.Year2021.Day12 do
 
   def find_paths2(graph, [point | _rest] = path, double) do
     graph[point]
-    |> Enum.reject(&(&1 == "start" or (double and is_small(&1, path))))
-    |> Enum.map(&find_paths2(graph, [&1 | path], double or is_small(&1, path)))
+    |> Enum.reject(&is_small(&1, path, double))
+    |> Enum.map(&find_paths2(graph, [&1 | path], double or is_small(&1, path, true)))
   end
 
   # ===============================================================================================
   # Utils
   # ===============================================================================================
 
+  @doc """
+  Construct map with vertices as keys and list of neighbor vertecies as values
+
+  ## Examples
+
+      iex> paths = [["a", "b"], ["a", "c"]]
+      iex> AdventOfCode.Year2021.Day12.neighbors(paths)
+      %{
+        "a" => ["c", "b"],
+        "b" => ["a"],
+        "c" => ["a"]
+      }
+  """
   def neighbors(paths, neigh \\ %{})
 
   def neighbors([[a, b] | paths], neigh) do
@@ -95,7 +108,32 @@ defmodule AdventOfCode.Year2021.Day12 do
 
   def neighbors([], neigh), do: neigh
 
-  def is_small(point, path) do
-    String.downcase(point) == point and point in path
-  end
+  @doc """
+  Return true if cave is small and already visited, otherwise false
+
+  Needs to work for one or two chars long caves. Assumes both letters are either downcase or
+  lowercase mixed chars doesn't make sense so it is checking only the first letter.
+
+  If third argument if `false` always returns `false` (unless point is `"start"`)
+
+  ## Examples
+
+      iex> AdventOfCode.Year2021.Day12.is_small("a", ["a", "b"])
+      true
+      iex> AdventOfCode.Year2021.Day12.is_small("a", ["c", "b"])
+      false
+      iex> AdventOfCode.Year2021.Day12.is_small("ab", ["ab", "bb"])
+      true
+      iex> AdventOfCode.Year2021.Day12.is_small("ab", ["aa", "bb"])
+      false
+      iex> AdventOfCode.Year2021.Day12.is_small("A", ["A", "aa"])
+      false
+      iex> AdventOfCode.Year2021.Day12.is_small("AB", ["AB", "aa"])
+      false
+  """
+  def is_small(point, path, double \\ true)
+  def is_small("start", _path, _double), do: true
+  def is_small(<<a::8>> = point, path, true) when a >= ?a and a <= ?z, do: point in path
+  def is_small(<<a::8, _b::8>> = point, path, true) when a >= ?a and a <= ?z, do: point in path
+  def is_small(_point, _path, _double), do: false
 end
