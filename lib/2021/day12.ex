@@ -48,15 +48,6 @@ defmodule AdventOfCode.Year2021.Day12 do
     |> length()
   end
 
-  def find_paths(graph, path \\ ["start"])
-  def find_paths(_graph, ["end" | _path]), do: :ok
-
-  def find_paths(graph, [point | _rest] = path) do
-    graph[point]
-    |> Enum.reject(&is_small(&1, path))
-    |> Enum.map(&find_paths(graph, [&1 | path]))
-  end
-
   # ===============================================================================================
   # Part 2
   # ===============================================================================================
@@ -66,18 +57,24 @@ defmodule AdventOfCode.Year2021.Day12 do
     input
     |> parse()
     |> neighbors()
-    |> find_paths2()
+    |> find_paths(false)
     |> List.flatten()
     |> length()
   end
 
-  def find_paths2(graph, path \\ ["start"], double \\ false)
-  def find_paths2(_graph, ["end" | _path], _double), do: :ok
+  @doc """
+  Find all paths in graph
 
-  def find_paths2(graph, [point | _rest] = path, double) do
+  Second argument indicates if the small cave was already used twice (defualt is `true` which means
+  it will not go twice to any small cave)
+  """
+  def find_paths(graph, twice? \\ true, path \\ ["start"])
+  def find_paths(_graph, _twice?, ["end" | _path]), do: :ok
+
+  def find_paths(graph, twice?, [point | _rest] = path) do
     graph[point]
-    |> Enum.reject(&is_small(&1, path, double))
-    |> Enum.map(&find_paths2(graph, [&1 | path], double or is_small(&1, path, true)))
+    |> Enum.reject(&avoid?(&1, path, twice?))
+    |> Enum.map(&find_paths(graph, twice? or avoid?(&1, path, true), [&1 | path]))
   end
 
   # ===============================================================================================
@@ -118,22 +115,22 @@ defmodule AdventOfCode.Year2021.Day12 do
 
   ## Examples
 
-      iex> AdventOfCode.Year2021.Day12.is_small("a", ["a", "b"])
+      iex> AdventOfCode.Year2021.Day12.avoid?("a", ["a", "b"])
       true
-      iex> AdventOfCode.Year2021.Day12.is_small("a", ["c", "b"])
+      iex> AdventOfCode.Year2021.Day12.avoid?("a", ["c", "b"])
       false
-      iex> AdventOfCode.Year2021.Day12.is_small("ab", ["ab", "bb"])
+      iex> AdventOfCode.Year2021.Day12.avoid?("ab", ["ab", "bb"])
       true
-      iex> AdventOfCode.Year2021.Day12.is_small("ab", ["aa", "bb"])
+      iex> AdventOfCode.Year2021.Day12.avoid?("ab", ["aa", "bb"])
       false
-      iex> AdventOfCode.Year2021.Day12.is_small("A", ["A", "aa"])
+      iex> AdventOfCode.Year2021.Day12.avoid?("A", ["A", "aa"])
       false
-      iex> AdventOfCode.Year2021.Day12.is_small("AB", ["AB", "aa"])
+      iex> AdventOfCode.Year2021.Day12.avoid?("AB", ["AB", "aa"])
       false
   """
-  def is_small(point, path, double \\ true)
-  def is_small("start", _path, _double), do: true
-  def is_small(<<a::8>> = point, path, true) when a >= ?a and a <= ?z, do: point in path
-  def is_small(<<a::8, _b::8>> = point, path, true) when a >= ?a and a <= ?z, do: point in path
-  def is_small(_point, _path, _double), do: false
+  def avoid?(point, path, double \\ true)
+  def avoid?("start", _path, _double), do: true
+  def avoid?(<<a::8>> = point, path, true) when a >= ?a and a <= ?z, do: point in path
+  def avoid?(<<a::8, _b::8>> = point, path, true) when a >= ?a and a <= ?z, do: point in path
+  def avoid?(_point, _path, _double), do: false
 end
