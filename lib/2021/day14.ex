@@ -52,10 +52,15 @@ defmodule AdventOfCode.Year2021.Day14 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def part1(input) do
+  def part1(input), do: naive(input)
+
+  @doc """
+  Naive solution with specified number of steps
+  """
+  def naive(input, steps \\ 10) do
     {template, pairs} = parse(input)
 
-    1..10
+    1..steps
     |> Enum.reduce(template, fn _i, template -> step_naive(template, pairs) end)
     |> Enum.frequencies()
     |> Enum.map(&elem(&1, 1))
@@ -84,7 +89,12 @@ defmodule AdventOfCode.Year2021.Day14 do
   # ===============================================================================================
 
   @impl AdventOfCode
-  def part2(input) do
+  def part2(input), do: optimized(input)
+
+  @doc """
+  Optimized solution with specified number of steps
+  """
+  def optimized(input, steps \\ 40) do
     {template, pairs} = parse(input)
 
     # get frequencies for initial template
@@ -93,7 +103,7 @@ defmodule AdventOfCode.Year2021.Day14 do
       |> Enum.chunk_every(2, 1, :discard)
       |> Enum.frequencies()
 
-    1..40
+    1..steps
     # update frequencies with step function 40 times
     |> Enum.reduce(freq, fn _i, freq -> step(freq, pairs) end)
     # get values for individual letters
@@ -122,5 +132,17 @@ defmodule AdventOfCode.Year2021.Day14 do
       |> Map.update([a, middle], value, &(&1 + value))
       |> Map.update([middle, b], value, &(&1 + value))
     end)
+  end
+
+  # ===============================================================================================
+  # Benchmark
+  # ===============================================================================================
+
+  def bench do
+    %{
+      "naive 10": &naive/1,
+      "optimized 10": &optimized(&1, 10),
+      "optimized 40": &optimized/1
+    }
   end
 end

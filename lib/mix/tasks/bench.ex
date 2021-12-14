@@ -44,15 +44,12 @@ defmodule Mix.Tasks.AdventOfCode.Bench do
     Benchee.run(
       config,
       time: 10,
-      inputs: %{"base" => module.input()},
+      inputs: %{"test" => module.test_input(), "task" => module.input()},
       print: %{
         benchmarking: false,
         configuration: false
       },
-      unit_scaling: :smallest,
-      formatters: [{Benchee.Formatters.Console, extended_statistics: true}]
+      unit_scaling: :smallest
     )
-
-    IO.puts("")
   end
 end
