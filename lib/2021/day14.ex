@@ -106,15 +106,13 @@ defmodule AdventOfCode.Year2021.Day14 do
     1..steps
     # update frequencies with step function 40 times
     |> Enum.reduce(freq, fn _i, freq -> step(freq, pairs) end)
-    # get values for individual letters
-    |> Enum.reduce(%{}, fn {[a, b], value}, acc ->
-      acc
-      |> Map.update(a, value, &(&1 + value))
-      |> Map.update(b, value, &(&1 + value))
-    end)
-    # divide the values by 2 (because every letter is included in two pairs)
-    |> Enum.map(fn {_letter, value} -> ceil(value / 2) end)
+    # get values for individual letters (count only the second one)
+    |> Enum.reduce(%{}, fn {[_a, b], value}, acc -> Map.update(acc, b, value, &(&1 + value)) end)
+    # get just values (we no longer care about associated letters)
+    |> Enum.map(&elem(&1, 1))
+    # get min and max values
     |> Enum.min_max()
+    # compute final result
     |> then(&(elem(&1, 1) - elem(&1, 0)))
   end
 
