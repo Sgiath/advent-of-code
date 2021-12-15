@@ -11,7 +11,7 @@ defmodule AdventOfCode.Year2021.Day08.Test do
   end
 
   test "part 2" do
-    assert Day08.part2(Day08.test_input()) == 61229
+    assert Day08.part2(Day08.test_input()) == 61_229
     assert Day08.part2(Day08.input()) == 989_396
   end
 end

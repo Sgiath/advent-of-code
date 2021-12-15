@@ -64,8 +64,9 @@ defmodule AdventOfCode.Year2021.Day08 do
     |> String.split([" ", " | ", "\n"], trim: true)
     |> Enum.map(&(&1 |> String.graphemes() |> Enum.sort()))
     |> Enum.chunk_every(14)
-    |> Enum.map(&parse_line/1)
-    |> Enum.map(fn {signal, output} ->
+    |> Enum.map(fn input ->
+      {signal, output} = parse_line(input)
+
       mapping = compute_mapping(signal)
 
       output

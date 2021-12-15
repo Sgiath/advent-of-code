@@ -45,7 +45,7 @@ defmodule AdventOfCode.Year2021.Day10 do
   def score_syntax({:error, ?)}), do: 3
   def score_syntax({:error, ?]}), do: 57
   def score_syntax({:error, ?}}), do: 1197
-  def score_syntax({:error, ?>}), do: 25137
+  def score_syntax({:error, ?>}), do: 25_137
   def score_syntax({:incomplete, _completion}), do: 0
 
   # ===============================================================================================

@@ -25,7 +25,7 @@ defmodule AdventOfCode.MixProject do
       {:statistics, "~> 0.6"},
       {:nx, github: "elixir-nx/nx", sparse: "nx", override: true},
       {:exla, github: "elixir-nx/nx", sparse: "exla"},
-      {:benchee, "~> 1.0", only: :dev},
+      {:benchee, "~> 1.0", only: [:dev, :test]},
       {:credo, "~> 1.6", only: :dev, runtime: false}
     ]
   end
