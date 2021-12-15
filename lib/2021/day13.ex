@@ -47,7 +47,7 @@ defmodule AdventOfCode.Year2021.Day13 do
     |> String.split(["\n", ","], trim: true)
     |> Enum.map(&String.to_integer/1)
     |> Enum.chunk_every(2)
-    |> Enum.map(&List.to_tuple/1)
+    |> Enum.into(MapSet.new(), &List.to_tuple/1)
   end
 
   def parse_folds(folds) do
@@ -75,7 +75,7 @@ defmodule AdventOfCode.Year2021.Day13 do
 
     fold
     |> fold_paper(dots)
-    |> Enum.count()
+    |> MapSet.size()
   end
 
   # ===============================================================================================
@@ -98,12 +98,13 @@ defmodule AdventOfCode.Year2021.Day13 do
   Uses "█" (<<9_608::utf8>>) for full square and " " (space) for blank square
   """
   def construct_image(dots) do
-    {max_x, _y} = Enum.max_by(dots, &elem(&1, 0))
-    {_x, max_y} = Enum.max_by(dots, &elem(&1, 1))
+    # get image dimensions
+    {max_x, max_y} =
+      Enum.reduce(dots, {0, 0}, fn {x, y}, {m_x, m_y} -> {max(x, m_x), max(y, m_y)} end)
 
     for y <- 0..max_y do
       for x <- 0..max_x do
-        if Enum.member?(dots, {x, y}), do: '█', else: ' '
+        if MapSet.member?(dots, {x, y}), do: '██', else: '  '
       end
     end
     |> Enum.intersperse("\n")
@@ -118,20 +119,16 @@ defmodule AdventOfCode.Year2021.Day13 do
   Folds the dots along the line
   """
   def fold_paper({?x, line}, dots) do
-    dots
-    |> Enum.map(fn
-      {x, y} when x > line -> {line - (x - line), y}
-      point -> point
+    Enum.reduce(dots, MapSet.new(), fn
+      {x, y}, acc when x > line -> MapSet.put(acc, {line - (x - line), y})
+      point, acc -> MapSet.put(acc, point)
     end)
-    |> Enum.uniq()
   end
 
   def fold_paper({?y, line}, dots) do
-    dots
-    |> Enum.map(fn
-      {x, y} when y > line -> {x, line - (y - line)}
-      point -> point
+    Enum.reduce(dots, MapSet.new(), fn
+      {x, y}, acc when y > line -> MapSet.put(acc, {x, line - (y - line)})
+      point, acc -> MapSet.put(acc, point)
     end)
-    |> Enum.uniq()
   end
 end

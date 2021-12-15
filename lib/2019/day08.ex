@@ -4,11 +4,6 @@ defmodule AdventOfCode.Year2019.Day08 do
   """
   use AdventOfCode
 
-  @type pixel() :: char()
-  @type line() :: list(pixel())
-  @type layer() :: list(line())
-  @type image() :: list(layer())
-
   @impl AdventOfCode
   def test_input, do: raise("no test data")
 
@@ -19,39 +14,31 @@ defmodule AdventOfCode.Year2019.Day08 do
     |> File.read!()
   end
 
+  def parse(input) do
+    input
+    |> String.trim_trailing("\n")
+    |> String.to_charlist()
+    |> Enum.chunk_every(25 * 6)
+  end
+
   @impl AdventOfCode
   def part1(input) do
-    {_zeros, list} =
+    layer =
       input
-      |> String.trim_trailing("\n")
-      |> String.to_charlist()
-      |> Enum.chunk_every(25 * 6)
-      |> Enum.map(fn list -> {Enum.count(list, &(&1 == ?0)), list} end)
-      |> Enum.min_by(&elem(&1, 0))
+      |> parse()
+      |> Enum.min_by(fn layer -> Enum.count(layer, &(&1 == ?0)) end)
 
-    ones = Enum.count(list, &(&1 == ?1))
-    twos = Enum.count(list, &(&1 == ?2))
-
-    ones * twos
+    Enum.count(layer, &(&1 == ?1)) * Enum.count(layer, &(&1 == ?2))
   end
 
   @impl AdventOfCode
   def part2(input) do
-    input =
-      input
-      |> String.trim_trailing("\n")
-      |> String.to_charlist()
-      |> Enum.chunk_every(25 * 6)
-
     input
+    |> parse()
     |> Enum.reduce(&apply_layer/2)
-    |> Enum.chunk_every(25)
-    |> Enum.join("\n")
-    |> String.replace("0", " ")
-    |> String.replace("1", <<9_608::utf8>>)
+    |> construct_image()
   end
 
-  @spec apply_layer(layer(), layer()) :: layer()
   def apply_layer(layer, image) do
     image
     |> Enum.zip(layer)
@@ -59,5 +46,16 @@ defmodule AdventOfCode.Year2019.Day08 do
       {?2, layer_pixel} -> layer_pixel
       {image_pixel, _layer_pixel} -> image_pixel
     end)
+  end
+
+  def construct_image(image) do
+    image
+    |> Enum.map(fn
+      ?0 -> '  '
+      ?1 -> '██'
+    end)
+    |> Enum.chunk_every(25)
+    |> Enum.intersperse("\n")
+    |> IO.chardata_to_string()
   end
 end
