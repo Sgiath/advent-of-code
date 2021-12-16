@@ -3,7 +3,7 @@ defmodule AdventOfCode.Utils do
   Util functions around interacting with Advent of Code API
   """
 
-  @cookie_path Path.join([File.cwd!(), "priv", "COOKIE"])
+  @session_id Application.get_env(:advent_of_code, :session_id)
 
   @doc """
   Download input file and save it as file
@@ -21,8 +21,7 @@ defmodule AdventOfCode.Utils do
   Download input file and return it as string
   """
   def get_input(year, day) do
-    cookie = String.to_charlist("session=#{File.read!(@cookie_path)}")
-    request = {input_url(year, day), [{'Cookie', cookie}]}
+    request = {input_url(year, day), [{'Cookie', String.to_charlist("session=#{@session_id}")}]}
 
     {:ok, {_status, _headers, input_data}} = :httpc.request(:get, request, [], [])
 

@@ -3,8 +3,16 @@
 This are my Elixir solutions for Advent of Code.
 
 If you wanna use them for your inputs (do not recommend it, solve it yourself!)
-you can create file `/priv/COOKIE` and save there your session cookie from
-Advent of Code website. Than you can run
+you can create file `/config/secret.exs` and save there your session cookie from
+Advent of Code website like this:
+
+```elixir
+import Config
+
+config :advent_of_code, :session_id, "<your-session-here>"
+```
+
+Than you can run
 
 ```bash
 mix advent_of_code.refresh_inputs
