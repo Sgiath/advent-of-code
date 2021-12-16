@@ -127,7 +127,7 @@ defmodule AdventOfCode.Year2021.Day15 do
   Find the shortest path for the points
   """
   def find_path(points) do
-    Graph.new()
+    Graph.new(vertex_identifier: & &1)
     |> Graph.add_edges(edges(points))
     |> Graph.get_shortest_path({0, 0}, end_point(points))
     # compute the danger score from the path

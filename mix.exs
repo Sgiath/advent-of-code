@@ -21,7 +21,7 @@ defmodule AdventOfCode.MixProject do
     [
       {:flow, "~> 1.1"},
       {:typed_struct, "~> 0.2"},
-      {:libgraph, "~> 0.13"},
+      {:libgraph, github: "bitwalker/libgraph"},
       {:statistics, "~> 0.6"},
       {:nx, github: "elixir-nx/nx", sparse: "nx", override: true},
       {:exla, github: "elixir-nx/nx", sparse: "exla"},
