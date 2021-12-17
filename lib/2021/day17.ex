@@ -41,9 +41,14 @@ defmodule AdventOfCode.Year2021.Day17 do
   def part1(input) do
     input
     |> parse()
-    |> search_space()
-    |> Enum.reject(&(&1 == :miss))
-    |> Enum.max()
+    |> max_height()
+  end
+
+  def max_height({_x_range, {y_min, _y_max}}) do
+    y_min
+    |> abs()
+    |> then(&(&1 * (&1 - 1)))
+    |> div(2)
   end
 
   # ===============================================================================================
@@ -55,7 +60,6 @@ defmodule AdventOfCode.Year2021.Day17 do
     input
     |> parse()
     |> search_space()
-    |> Enum.count(&(&1 != :miss))
   end
 
   # ===============================================================================================
@@ -66,29 +70,68 @@ defmodule AdventOfCode.Year2021.Day17 do
   Search whole space of possible solutions
   """
   def search_space({{_x_min, x_max}, {y_min, _y_max}} = target) do
-    for x <- 1..x_max, y <- -y_min..y_min do
-      calculate_height(target, {x, y})
+    for x <- floor(:math.sqrt(x_max))..x_max, y <- -y_min..y_min, reduce: 0 do
+      count -> count + hit_or_miss(target, {x, y})
     end
   end
 
   @doc """
   Calculate max height for the initial velocity
   """
-  def calculate_height(target, velocity, path \\ {0, 0}, height \\ 0)
+  def hit_or_miss(target, velocity, path \\ {0, 0})
 
   # too low or too far right - we missed the target
-  def calculate_height({{_x_min, x_max}, {y_min, _y_max}}, _velocity, {x, y}, _height)
+  def hit_or_miss({{_x_min, x_max}, {y_min, _y_max}}, _velocity, {x, y})
       when x > x_max or y < y_min,
-      do: :miss
+      do: 0
 
   # we are on target
-  def calculate_height({{x_min, x_max}, {y_min, y_max}}, _velocity, {x, y}, height)
-      when x >= x_min and x <= x_max and y >= y_min and y <= y_max do
-    height
-  end
+  def hit_or_miss({{x_min, x_max}, {y_min, y_max}}, _velocity, {x, y})
+      when x >= x_min and x <= x_max and y >= y_min and y <= y_max,
+      do: 1
 
   # next position
-  def calculate_height(target, {x_v, y_v}, {x, y}, height) do
-    calculate_height(target, {max(0, x_v - 1), y_v - 1}, {x + x_v, y + y_v}, max(height, y + y_v))
+  def hit_or_miss(target, {x_v, y_v}, {x, y}) do
+    hit_or_miss(target, {max(0, x_v - 1), y_v - 1}, {x + x_v, y + y_v})
+  end
+
+  # ===============================================================================================
+  # Other solutions
+  # ===============================================================================================
+
+  def search_space_flow({{_x_min, x_max}, {y_min, _y_max}} = target) do
+    for x <- floor(:math.sqrt(x_max))..x_max, y <- -y_min..y_min do
+      {x, y}
+    end
+    |> Flow.from_enumerable()
+    |> Flow.partition()
+    |> Flow.reduce(fn -> 0 end, &(hit_or_miss(target, &1) + &2))
+    |> Flow.departition(fn -> 0 end, &Kernel.+/2, & &1)
+    |> Enum.to_list()
+    |> List.first()
+  end
+
+  def search_space_task({{_x_min, x_max}, {y_min, _y_max}} = target) do
+    for x <- floor(:math.sqrt(x_max))..x_max do
+      Task.async(fn ->
+        for y <- -y_min..y_min, reduce: 0 do
+          count -> count + hit_or_miss(target, {x, y})
+        end
+      end)
+    end
+    |> Task.await_many()
+    |> Enum.sum()
+  end
+
+  # ===============================================================================================
+  # Benchmark
+  # ===============================================================================================
+
+  def bench do
+    %{
+      sequential: &(&1 |> parse() |> search_space()),
+      flow: &(&1 |> parse() |> search_space_flow()),
+      parallel: &(&1 |> parse() |> search_space_task())
+    }
   end
 end
