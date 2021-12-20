@@ -11,10 +11,7 @@ alias AdventOfCode.Year<%= year %>.Day<%= day %>
 ## Input
 
 ```elixir
-input =
-  Day<%= day %>.test_input()
-  |> String.split("\n", trim: true)
-  |> Enum.map(&String.to_integer/1)
+input = Day<%= day %>.test_input()
 ```
 
 ## Part 1
@@ -22,7 +19,7 @@ input =
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-part1 = input
+Day<%= day %>.part1(input)
 ```
 
 ## Part 2
@@ -30,5 +27,5 @@ part1 = input
 <!-- livebook:{"reevaluate_automatically":true} -->
 
 ```elixir
-part2 = input
+Day<%= day %>.part2(input)
 ```

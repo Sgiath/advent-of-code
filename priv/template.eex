@@ -21,6 +21,12 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
     |> File.read!()
   end
 
+  def parse(input) do
+    input
+    |> String.split(["\n"], trim: true)
+    |> Enum.map(&String.graphemes/1)
+  end
+
   # ===============================================================================================
   # Part 1
   # ===============================================================================================
@@ -28,8 +34,7 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
   @impl AdventOfCode
   def part1(input) do
     input
-    |> String.split(["\n"], trim: true)
-    |> Enum.map(&String.graphemes/1)
+    |> parse()
   end
 
   # ===============================================================================================
@@ -39,8 +44,7 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %> do
   @impl AdventOfCode
   def part2(input) do
     input
-    |> String.split(["\n"], trim: true)
-    |> Enum.map(&String.graphemes/1)
+    |> parse()
   end
 
   # ===============================================================================================
