@@ -83,53 +83,67 @@ defmodule AdventOfCode.Year2021.Day21 do
   def part2(input) do
     [pos1, pos2] = parse(input)
 
-    find_winners(%{{{pos1, 0}, {pos2, 0}, true} => 1})
+    find_winners({%{{{pos1, 0}, {pos2, 0}, true, false} => 1}, 0, 0})
   end
 
-  def find_winners({win1, win2}), do: max(win1, win2)
-
-  def find_winners(%{} = state) do
+  @doc """
+  Run the steps until all universes reach win
+  """
+  def find_winners({state, win1, win2}) do
     state
-    |> step()
+    |> Enum.reduce({%{}, win1, win2}, &update_state/2)
     |> check_wins()
-    |> find_winners()
   end
 
-  def check_wins(state) do
-    if Enum.all?(state, &win?/1), do: count_wins(state), else: state
+  @doc """
+  Check if any undecided universe is left and return the winner, otherwise run the next step
+  """
+  def check_wins({state, w1, w2}) do
+    if Enum.empty?(state), do: max(w1, w2), else: find_winners({state, w1, w2})
   end
 
-  def count_wins(state) do
-    Enum.reduce(state, {0, 0}, fn {{{_p1, score1}, {_p2, _score2}, _step}, count}, {w1, w2} ->
-      if score1 >= 21, do: {w1 + count, w2}, else: {w1, w2 + count}
-    end)
+  @doc """
+  Update the state of the multiverse
+  """
+
+  # universe is decided
+  def update_state({{{_p1, s1}, _p2, _step, true}, universes}, {new_state, w1, w2}) do
+    if s1 >= 21, do: {new_state, w1 + universes, w2}, else: {new_state, w1, w2 + universes}
   end
 
-  def win?({{{_p1, score1}, {_p2, score2}, _step}, _count}) do
-    score1 >= 21 or score2 >= 21
+  # undecided, player 1 turn
+  def update_state({{{pos1, score1}, p2, true, false}, universes}, {state, w1, w2}) do
+    new_state =
+      Enum.reduce(@base, state, fn {roll, freq}, new_state ->
+        pos1 = pos(pos1, roll)
+        score1 = score1 + pos1
+
+        Map.update(
+          new_state,
+          {{pos1, score1}, p2, false, score1 >= 21},
+          freq * universes,
+          &(&1 + freq * universes)
+        )
+      end)
+
+    {new_state, w1, w2}
   end
 
-  def step(state) do
-    Enum.reduce(state, %{}, &update_state/2)
-  end
+  # undecided, player 2 turn
+  def update_state({{p1, {pos2, score2}, false, false}, universes}, {state, w1, w2}) do
+    new_state =
+      Enum.reduce(@base, state, fn {roll, freq}, new_state ->
+        pos2 = pos(pos2, roll)
+        score2 = score2 + pos2
 
-  def update_state({{{_p1, score1}, {_p2, score2}, _step} = state, universes}, new_state)
-      when score1 >= 21 or score2 >= 21 do
-    Map.update(new_state, state, universes, &(&1 + universes))
-  end
+        Map.update(
+          new_state,
+          {p1, {pos2, score2}, true, score2 >= 21},
+          freq * universes,
+          &(&1 + freq * universes)
+        )
+      end)
 
-  def update_state({{{pos1, score1}, {pos2, score2}, step}, universes}, new_state) do
-    Enum.reduce(@base, new_state, fn {roll, freq}, new_state ->
-      state =
-        if step do
-          pos1 = pos(pos1, roll)
-          {{pos1, score1 + pos1}, {pos2, score2}, false}
-        else
-          pos2 = pos(pos2, roll)
-          {{pos1, score1}, {pos2, score2 + pos2}, true}
-        end
-
-      Map.update(new_state, state, freq * universes, &(&1 + freq * universes))
-    end)
+    {new_state, w1, w2}
   end
 end
