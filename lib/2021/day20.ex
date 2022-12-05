@@ -3,7 +3,8 @@ defmodule AdventOfCode.Year2021.Day20 do
   https://adventofcode.com/2021/day/20
   """
   use AdventOfCode
-  use Bitwise
+
+  import Bitwise
 
   # ===============================================================================================
   # Input

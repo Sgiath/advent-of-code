@@ -1,6 +1,6 @@
 defmodule Mix.Tasks.AdventOfCode do
-  @shortdoc "Execute Advent of Code excercise"
-  @moduledoc """
+  @shortdoc "Execute Advent of Code exercise"
+  @moduledoc ~S"""
   Runs solution for particular day of Advent of Code challenge
 
   ## Command line options
@@ -15,10 +15,12 @@ defmodule Mix.Tasks.AdventOfCode do
   @strict [year: :integer, day: :integer, part1: :boolean, part2: :boolean, test: :boolean]
   @aliases [y: :year, d: :day, t: :test]
 
+  @default_year 2022
+
   @impl Mix.Task
   def run(args) do
     {opts, [], []} = OptionParser.parse(args, strict: @strict, aliases: @aliases)
-    {year, opts} = Keyword.pop(opts, :year, 2021)
+    {year, opts} = Keyword.pop(opts, :year, @default_year)
     {day, opts} = Keyword.pop!(opts, :day)
     day = day |> Integer.to_string() |> String.pad_leading(2, "0")
 

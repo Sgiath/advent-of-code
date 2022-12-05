@@ -1,11 +1,11 @@
 defmodule AdventOfCode.Utils do
-  @moduledoc """
+  @moduledoc ~S"""
   Util functions around interacting with Advent of Code API
   """
 
-  @session_id Application.get_env(:advent_of_code, :session_id)
+  @session_id Application.compile_env(:advent_of_code, :session_id)
 
-  @doc """
+  @doc ~S"""
   Download input file and save it as file
   """
   def save_input(year, day) do
@@ -17,7 +17,7 @@ defmodule AdventOfCode.Utils do
     |> File.open([:write, :utf8], &IO.write(&1, get_input(year, day)))
   end
 
-  @doc """
+  @doc ~S"""
   Download input file and return it as string
   """
   def get_input(year, day) do
@@ -28,7 +28,7 @@ defmodule AdventOfCode.Utils do
     input_data
   end
 
-  @doc """
+  @doc ~S"""
   Format input URL
   """
   def input_url(year, day) do

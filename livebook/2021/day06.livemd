@@ -4,7 +4,7 @@
 
 ## Section
 
-https://adventofcode.com/2021/day/6
+<https://adventofcode.com/2021/day/6>
 
 ```elixir
 alias AdventOfCode.Year2021.Day06

@@ -1,5 +1,5 @@
 defmodule AdventOfCode do
-  @moduledoc """
+  @moduledoc ~S"""
   Behaviour and helper functions for Advent of Code day solutions
   """
 

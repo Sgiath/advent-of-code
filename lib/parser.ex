@@ -1,9 +1,9 @@
 defmodule AdventOfCode.Parser do
-  @moduledoc """
+  @moduledoc ~S"""
   Groups all parsing functions in one place
   """
 
-  @doc """
+  @doc ~S"""
   Split to lines and run parser on each line
   """
   @spec lines(String.t(), String.t() | [String.t()], fun()) :: []
@@ -13,13 +13,13 @@ defmodule AdventOfCode.Parser do
     |> Enum.map(parser)
   end
 
-  @doc """
+  @doc ~S"""
   First line as numbers
   """
   @spec line(String.t()) :: [integer()]
   def line(data), do: lines(data, [",", "\n"])
 
-  @doc """
+  @doc ~S"""
   Custom function for Intcode input data
   """
   @spec intcode(String.t()) :: [integer()]

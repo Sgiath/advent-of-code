@@ -2,7 +2,7 @@
 
 # Year 2021, Day 09
 
-https://adventofcode.com/2021/day/9
+<https://adventofcode.com/2021/day/9>
 
 ```elixir
 alias AdventOfCode.Year2021.Day09

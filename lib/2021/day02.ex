@@ -70,14 +70,14 @@ defmodule AdventOfCode.Year2021.Day02 do
   def count_reducer1(<<"down ", val::8>>, {h, d}), do: {h, d + (val - ?0)}
   def count_reducer1(<<"up ", val::8>>, {h, d}), do: {h, d - (val - ?0)}
 
-  def count_reducer2(<<"f", _::56, val::8>>, {h, d}), do: {h + (val - ?0), d}
-  def count_reducer2(<<"d", _::32, val::8>>, {h, d}), do: {h, d + (val - ?0)}
-  def count_reducer2(<<"u", _::16, val::8>>, {h, d}), do: {h, d - (val - ?0)}
+  def count_reducer2(<<"f", _rest::56, val::8>>, {h, d}), do: {h + (val - ?0), d}
+  def count_reducer2(<<"d", _rest::32, val::8>>, {h, d}), do: {h, d + (val - ?0)}
+  def count_reducer2(<<"u", _rest::16, val::8>>, {h, d}), do: {h, d - (val - ?0)}
 
   # this seems to be the quickest one (but just by few μs)
-  def count_reducer3(<<_::64, val::8>>, {h, d}), do: {h + (val - ?0), d}
-  def count_reducer3(<<_::40, val::8>>, {h, d}), do: {h, d + (val - ?0)}
-  def count_reducer3(<<_::24, val::8>>, {h, d}), do: {h, d - (val - ?0)}
+  def count_reducer3(<<_rest::64, val::8>>, {h, d}), do: {h + (val - ?0), d}
+  def count_reducer3(<<_rest::40, val::8>>, {h, d}), do: {h, d + (val - ?0)}
+  def count_reducer3(<<_rest::24, val::8>>, {h, d}), do: {h, d - (val - ?0)}
 
   # ===============================================================================================
   # Benchmarks

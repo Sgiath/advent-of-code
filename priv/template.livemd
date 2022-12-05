@@ -2,7 +2,7 @@
 
 # Year <%= year %>, Day <%= day %>
 
-https://adventofcode.com/<%= year %>/day/<%= String.to_integer(day) %>
+<https://adventofcode.com/<%= year %>/day/<%= String.to_integer(day) %>>
 
 ```elixir
 alias AdventOfCode.Year<%= year %>.Day<%= day %>

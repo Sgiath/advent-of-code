@@ -1,6 +1,6 @@
 defmodule Mix.Tasks.AdventOfCode.Bench do
-  @shortdoc "Run Benchmark for Advent of Code excercise"
-  @moduledoc """
+  @shortdoc "Run Benchmark for Advent of Code exercise"
+  @moduledoc ~S"""
   Runs solution for particular day of Advent of Code challenge
 
   ## Command line options
@@ -12,6 +12,8 @@ defmodule Mix.Tasks.AdventOfCode.Bench do
 
   @strict [year: :integer, day: :integer]
   @aliases [y: :year, d: :day]
+
+  @default_year 2022
 
   @impl Mix.Task
   def run(args) do
@@ -32,7 +34,7 @@ defmodule Mix.Tasks.AdventOfCode.Bench do
   def parse_args(args) do
     opts = args |> OptionParser.parse(strict: @strict, aliases: @aliases) |> elem(0)
 
-    year = Keyword.get(opts, :year, 2021)
+    year = Keyword.get(opts, :year, @default_year)
     day = opts |> Keyword.get(:day) |> Integer.to_string() |> String.pad_leading(2, "0")
 
     {year, day, String.to_existing_atom("Elixir.AdventOfCode.Year#{year}.Day#{day}")}

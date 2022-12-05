@@ -19,13 +19,13 @@ defmodule AdventOfCode.MixProject do
 
   defp deps do
     [
-      {:flow, "~> 1.1"},
-      {:typed_struct, "~> 0.2"},
+      {:flow, "~> 1.2"},
+      {:typed_struct, "~> 0.3"},
       {:libgraph, github: "bitwalker/libgraph"},
       {:statistics, "~> 0.6"},
       {:nx, github: "elixir-nx/nx", sparse: "nx", override: true},
       {:exla, github: "elixir-nx/nx", sparse: "exla"},
-      {:benchee, "~> 1.0", only: [:dev, :test]},
+      {:benchee, "~> 1.1", only: [:dev, :test]},
       {:credo, "~> 1.6", only: :dev, runtime: false}
     ]
   end

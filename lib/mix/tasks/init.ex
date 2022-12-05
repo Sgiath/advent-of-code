@@ -1,6 +1,6 @@
 defmodule Mix.Tasks.AdventOfCode.Init do
-  @shortdoc "Initialise Advent of Code excercise"
-  @moduledoc """
+  @shortdoc "Initialize Advent of Code exercise"
+  @moduledoc ~S"""
   Runs solution for particular day of Advent of Code challenge
 
   This script requires correct session cookie in `priv/COOKIE` file. You can obtain it by going to
@@ -24,7 +24,7 @@ defmodule Mix.Tasks.AdventOfCode.Init do
   @strict [year: :integer, day: :integer]
   @aliases [y: :year, d: :day]
 
-  @default_year 2021
+  @default_year 2022
   @template_path Path.join([File.cwd!(), "priv", "template.eex"])
   @test_path Path.join([File.cwd!(), "priv", "template_test.eex"])
   @livebook_path Path.join([File.cwd!(), "priv", "template.livemd"])

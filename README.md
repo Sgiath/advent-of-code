@@ -18,7 +18,7 @@ Than you can run
 mix advent_of_code.refresh_inputs
 ```
 
-which will redownloads all input files for previous years for your account. Be
+which will re-download all input files for previous years for your account. Be
 aware that tests won't work because the results are hardcoded for my inputs.
 
 You can run any task you want with this command:
@@ -45,7 +45,7 @@ mix advent_of_code --year <year> --day <day> --part1 --part2 --test
 ```
 
 If you would like to see how fast the solutions are you can run the included
-benchmarks. Byt default it will just run the solutions side by side but if you
+benchmarks. By default it will just run the solutions side by side but if you
 develop different solutions you can override the `benchmark/0` function for any
 day and run different solutions side by side (see `/lib/2021/day06.ex:156` for
 example)

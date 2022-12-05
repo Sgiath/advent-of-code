@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.AdventOfCode.RefreshInputs do
-  @shortdoc "Refresh all Advent of Code excercise inputs"
-  @moduledoc """
-  Redownloads all input files from previous years with you COOKIE file
+  @shortdoc "Refresh all Advent of Code exercise inputs"
+  @moduledoc ~S"""
+  Re-downloads all input files from previous years with you COOKIE file
   """
   use Mix.Task
 

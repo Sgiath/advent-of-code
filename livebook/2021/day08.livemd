@@ -4,7 +4,7 @@
 
 ## Section
 
-https://adventofcode.com/2021/day/8
+<https://adventofcode.com/2021/day/8>
 
 ## Input
 
@@ -78,7 +78,7 @@ Parse signal to determine mapping of digits. These are the rules:
 
 Produces map with shape:
 
-```
+```elixir
 %{
   1 => 'ab',
   2 => '...',
@@ -127,7 +127,7 @@ defmodule Display do
 end
 ```
 
-Split input to singnals and outputs
+Split input to signals and outputs
 
 ```elixir
 [signals, outputs] =

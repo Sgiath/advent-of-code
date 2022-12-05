@@ -96,7 +96,6 @@
           {Credo.Check.Readability.SeparateAliasRequire, []},
           {Credo.Check.Readability.SingleFunctionToBlockPipe, []},
           {Credo.Check.Readability.WithCustomTaggedTuple, []},
-          {Credo.Check.Refactor.ABCSize, []},
           {Credo.Check.Refactor.AppendSingleItem, []},
           {Credo.Check.Refactor.DoubleBooleanNegation, []},
           {Credo.Check.Refactor.FilterReject, []},
@@ -116,6 +115,7 @@
           {Credo.Check.Readability.BlockPipe, []},
           {Credo.Check.Readability.SinglePipe, []},
           {Credo.Check.Readability.Specs, []},
+          {Credo.Check.Refactor.ABCSize, []},
           {Credo.Check.Refactor.IoPuts, []},
           {Credo.Check.Refactor.PipeChainStart, []},
           {Credo.Check.Refactor.ModuleDependencies, []}
