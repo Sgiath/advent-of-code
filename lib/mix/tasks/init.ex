@@ -24,7 +24,6 @@ defmodule Mix.Tasks.AdventOfCode.Init do
   @strict [year: :integer, day: :integer]
   @aliases [y: :year, d: :day]
 
-  @default_year 2022
   @template_path Path.join([File.cwd!(), "priv", "template.eex"])
   @test_path Path.join([File.cwd!(), "priv", "template_test.eex"])
   @livebook_path Path.join([File.cwd!(), "priv", "template.livemd"])
@@ -52,7 +51,7 @@ defmodule Mix.Tasks.AdventOfCode.Init do
   end
 
   defp parse_args(args) do
-    year = args |> Keyword.get(:year, @default_year) |> Integer.to_string()
+    year = args |> Keyword.get(:year, Date.utc_today().year) |> Integer.to_string()
     day = args |> Keyword.get(:day) |> Integer.to_string() |> String.pad_leading(2, "0")
 
     {year, day}

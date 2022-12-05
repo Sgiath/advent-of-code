@@ -15,12 +15,11 @@ defmodule Mix.Tasks.AdventOfCode do
   @strict [year: :integer, day: :integer, part1: :boolean, part2: :boolean, test: :boolean]
   @aliases [y: :year, d: :day, t: :test]
 
-  @default_year 2022
-
   @impl Mix.Task
   def run(args) do
+    Date.year_of_era(Date.utc_today())
     {opts, [], []} = OptionParser.parse(args, strict: @strict, aliases: @aliases)
-    {year, opts} = Keyword.pop(opts, :year, @default_year)
+    {year, opts} = Keyword.pop(opts, :year, Date.utc_today().year)
     {day, opts} = Keyword.pop!(opts, :day)
     day = day |> Integer.to_string() |> String.pad_leading(2, "0")
 

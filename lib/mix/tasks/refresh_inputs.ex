@@ -9,7 +9,7 @@ defmodule Mix.Tasks.AdventOfCode.RefreshInputs do
 
   @impl Mix.Task
   def run(_args) do
-    for year <- 2015..2020,
+    for year <- 2015..2021,
         day <- 1..25 do
       Utils.save_input(
         Integer.to_string(year),
