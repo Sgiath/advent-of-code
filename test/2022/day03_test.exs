@@ -10,7 +10,6 @@ defmodule AdventOfCode.Year2022.Day03.Test do
     assert Day03.part1(Day03.input()) == 7903
   end
 
-  @tag :skip
   test "part 2" do
     assert Day03.part2(Day03.test_input()) == 70
     assert Day03.part2(Day03.input()) == 2548

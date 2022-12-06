@@ -10,7 +10,7 @@ defmodule AdventOfCode.Year<%= year %>.Day<%= day %>.Test do
     assert Day<%= day %>.part1(Day<%= day %>.input()) == 0
   end
 
-  @tag :skip
+  @tag skip: "not implemented"
   test "part 2" do
     assert Day<%= day %>.part2(Day<%= day %>.test_input()) == 0
     assert Day<%= day %>.part2(Day<%= day %>.input()) == 0

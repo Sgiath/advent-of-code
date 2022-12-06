@@ -24,7 +24,7 @@ defmodule AdventOfCode.Utils do
     request = {input_url(year, day), [{'Cookie', String.to_charlist("session=#{@session_id}")}]}
 
     {:ok, {_status, _headers, input_data}} =
-      :httpc.request(:get, request, [], verify: :verify_none)
+      :httpc.request(:get, request, [ssl: [verify: :verify_none]], [])
 
     input_data
   end

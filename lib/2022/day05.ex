@@ -71,8 +71,7 @@ defmodule AdventOfCode.Year2022.Day05 do
 
     moves
     |> Enum.reduce(config, &execute_9000/2)
-    |> Enum.map(&List.first/1)
-    |> Enum.join()
+    |> Enum.map_join(&List.first/1)
   end
 
   defp execute_9000({0, _from, _to}, config), do: config
@@ -98,8 +97,7 @@ defmodule AdventOfCode.Year2022.Day05 do
 
     moves
     |> Enum.reduce(config, &execute_9001/2)
-    |> Enum.map(&List.first/1)
-    |> Enum.join()
+    |> Enum.map_join(&List.first/1)
   end
 
   defp execute_9001({count, from, to}, config) do

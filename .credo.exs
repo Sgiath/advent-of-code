@@ -99,7 +99,6 @@
           {Credo.Check.Refactor.AppendSingleItem, []},
           {Credo.Check.Refactor.DoubleBooleanNegation, []},
           {Credo.Check.Refactor.FilterReject, []},
-          {Credo.Check.Refactor.MapMap, []},
           {Credo.Check.Refactor.NegatedIsNil, []},
           {Credo.Check.Refactor.RejectFilter, []},
           {Credo.Check.Warning.LeakyEnvironment, []},
@@ -117,6 +116,7 @@
           {Credo.Check.Readability.Specs, []},
           {Credo.Check.Refactor.ABCSize, []},
           {Credo.Check.Refactor.IoPuts, []},
+          {Credo.Check.Refactor.MapMap, []},
           {Credo.Check.Refactor.PipeChainStart, []},
           {Credo.Check.Refactor.ModuleDependencies, []}
         ]
