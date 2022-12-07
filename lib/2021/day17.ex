@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2021.Day17 do
   @moduledoc """
   https://adventofcode.com/2021/day/17
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2021, day: 17
 
   # ===============================================================================================
   # Input
@@ -13,13 +13,6 @@ defmodule AdventOfCode.Year2021.Day17 do
     """
     target area: x=20..30, y=-10..-5
     """
-  end
-
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2021", "day17.in"])
-    |> File.read!()
   end
 
   def parse(input) do

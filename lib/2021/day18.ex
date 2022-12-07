@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2021.Day18 do
   @moduledoc """
   https://adventofcode.com/2021/day/18
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2021, day: 18
 
   # ===============================================================================================
   # Input
@@ -22,13 +22,6 @@ defmodule AdventOfCode.Year2021.Day18 do
     [[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
     [[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]
     """
-  end
-
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2021", "day18.in"])
-    |> File.read!()
   end
 
   def parse(input) do

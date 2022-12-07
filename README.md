@@ -9,7 +9,7 @@ Advent of Code website like this:
 ```elixir
 import Config
 
-config :advent_of_code, :session_id, "<your-session-here>"
+config :advent_of_code, session_id: "<your-session-here>"
 ```
 
 Than you can run
@@ -53,3 +53,7 @@ example)
 ```bash
 mix advent_of_code.bench --year <year> --day <day>
 ```
+
+All commands have default values for year and day set to current year (if current month is
+December otherwise it is last year) and day so if you are solving the tasks same day they are
+published you can ommit those arguments.

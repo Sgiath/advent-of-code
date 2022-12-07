@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2019.Day10 do
   @moduledoc """
   https://adventofcode.com/2019/day/10
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2019, day: 10
 
   alias AdventOfCode.Parser
 
@@ -33,13 +33,6 @@ defmodule AdventOfCode.Year2019.Day10 do
     #.#.#.#####.####.###
     ###.##.####.##.#..##
     """
-  end
-
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2019", "day10.in"])
-    |> File.read!()
   end
 
   @impl AdventOfCode

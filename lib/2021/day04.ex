@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2021.Day04 do
   @moduledoc """
   https://adventofcode.com/2021/day/4
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2021, day: 4
 
   # ===============================================================================================
   # Input
@@ -33,11 +33,10 @@ defmodule AdventOfCode.Year2021.Day04 do
     """
   end
 
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2021", "day04.in"])
-    |> File.read!()
+  def parse(input) do
+    [draw | boards] = String.split(input, ["\n", " "], trim: true)
+
+    {parse_draw_nums(draw), parse_boards(boards)}
   end
 
   def parse_draw_nums(draw) do
@@ -58,10 +57,7 @@ defmodule AdventOfCode.Year2021.Day04 do
 
   @impl AdventOfCode
   def part1(input) do
-    [draw | boards] = String.split(input, ["\n", " "], trim: true)
-
-    draw = parse_draw_nums(draw)
-    boards = parse_boards(boards)
+    {draw, boards} = parse(input)
 
     Enum.reduce_while(draw, boards, &draw_reducer_first/2)
   end
@@ -85,10 +81,8 @@ defmodule AdventOfCode.Year2021.Day04 do
 
   @impl AdventOfCode
   def part2(input) do
-    [draw | boards] = String.split(input, ["\n", " "], trim: true)
+    {draw, boards} = parse(input)
 
-    draw = parse_draw_nums(draw)
-    boards = parse_boards(boards)
     Enum.reduce_while(draw, boards, &draw_reducer_last/2)
   end
 

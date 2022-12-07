@@ -5,25 +5,26 @@ defmodule Mix.Tasks.AdventOfCode do
 
   ## Command line options
 
-    * `--year / -y <NUM>` - which year to run (default 2021)
-    * `--day / -d <NUM>` - which day to run (required)
+    * `--year / -y <NUM>` - which year to run (default current year)
+    * `--day / -d <NUM>` - which day to run (default current day of month)
     * `--part1` - execute first part of the solution
     * `--part2` - execute second part of the solution
   """
   use Mix.Task
+
+  alias AdventOfCode.Utils
 
   @strict [year: :integer, day: :integer, part1: :boolean, part2: :boolean, test: :boolean]
   @aliases [y: :year, d: :day, t: :test]
 
   @impl Mix.Task
   def run(args) do
-    Date.year_of_era(Date.utc_today())
     {opts, [], []} = OptionParser.parse(args, strict: @strict, aliases: @aliases)
-    {year, opts} = Keyword.pop(opts, :year, Date.utc_today().year)
-    {day, opts} = Keyword.pop!(opts, :day)
+    {year, opts} = Keyword.pop(opts, :year, Utils.default_year())
+    {day, opts} = Keyword.pop(opts, :day, Date.utc_today().day)
     day = day |> Integer.to_string() |> String.pad_leading(2, "0")
 
-    module = String.to_existing_atom("Elixir.AdventOfCode.Year#{year}.Day#{day}")
+    module = String.to_atom("Elixir.AdventOfCode.Year#{year}.Day#{day}")
 
     case Code.ensure_compiled(module) do
       {:module, _} ->

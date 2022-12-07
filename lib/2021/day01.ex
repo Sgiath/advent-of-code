@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2021.Day01 do
   @moduledoc """
   https://adventofcode.com/2021/day/1
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2021, day: 01
 
   # ===============================================================================================
   # Input
@@ -24,11 +24,8 @@ defmodule AdventOfCode.Year2021.Day01 do
     """
   end
 
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2021", "day01.in"])
-    |> File.read!()
+  def parse(input) do
+    AdventOfCode.Parser.lines(input)
   end
 
   # ===============================================================================================
@@ -38,8 +35,7 @@ defmodule AdventOfCode.Year2021.Day01 do
   @impl AdventOfCode
   def part1(input) do
     input
-    |> String.split(["\n"], trim: true)
-    |> Enum.map(&String.to_integer/1)
+    |> parse()
     |> part1(0)
   end
 
@@ -54,8 +50,7 @@ defmodule AdventOfCode.Year2021.Day01 do
   @impl AdventOfCode
   def part2(input) do
     input
-    |> String.split(["\n"], trim: true)
-    |> Enum.map(&String.to_integer/1)
+    |> parse()
     |> part2(0)
   end
 
@@ -71,16 +66,14 @@ defmodule AdventOfCode.Year2021.Day01 do
   # 150 μs)
   def part1_chunk(input) do
     input
-    |> String.split(["\n"], trim: true)
-    |> Enum.map(&String.to_integer/1)
+    |> parse()
     |> Enum.chunk_every(2, 1, :discard)
     |> Enum.count(fn [a, b] -> a < b end)
   end
 
   def part2_chunk(input) do
     input
-    |> String.split(["\n"], trim: true)
-    |> Enum.map(&String.to_integer/1)
+    |> parse()
     |> Enum.chunk_every(3, 1, :discard)
     |> Enum.map(&Enum.sum/1)
     |> Enum.chunk_every(2, 1, :discard)

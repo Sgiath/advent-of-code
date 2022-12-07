@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2021.Day09 do
   @moduledoc """
   https://adventofcode.com/2021/day/9
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2021, day: 9
 
   # ===============================================================================================
   # Input
@@ -19,11 +19,10 @@ defmodule AdventOfCode.Year2021.Day09 do
     """
   end
 
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2021", "day09.in"])
-    |> File.read!()
+  def parse(input) do
+    input
+    |> String.split(["\n"], trim: true)
+    |> grid()
   end
 
   # ===============================================================================================
@@ -32,10 +31,7 @@ defmodule AdventOfCode.Year2021.Day09 do
 
   @impl AdventOfCode
   def part1(input) do
-    grid =
-      input
-      |> String.split(["\n"], trim: true)
-      |> grid()
+    grid = parse(input)
 
     grid
     |> Enum.filter(&lowpoint?(grid, &1))
@@ -48,10 +44,7 @@ defmodule AdventOfCode.Year2021.Day09 do
 
   @impl AdventOfCode
   def part2(input) do
-    grid =
-      input
-      |> String.split(["\n"], trim: true)
-      |> grid()
+    grid = parse(input)
 
     grid
     |> Enum.filter(&lowpoint?(grid, &1))

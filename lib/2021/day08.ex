@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2021.Day08 do
   @moduledoc """
   https://adventofcode.com/2021/day/8
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2021, day: 8
 
   # ===============================================================================================
   # Input
@@ -11,7 +11,7 @@ defmodule AdventOfCode.Year2021.Day08 do
   @impl AdventOfCode
   def test_input do
     """
-    be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb |  fdgacbe cefdb cefbgd gcbe
+    be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
     edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc
     fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg
     fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega | efabcd cedba gadfec cb
@@ -24,11 +24,11 @@ defmodule AdventOfCode.Year2021.Day08 do
     """
   end
 
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2021", "day08.in"])
-    |> File.read!()
+  def parse(input) do
+    input
+    |> String.split([" ", " | ", "\n"], trim: true)
+    |> Enum.map(&(&1 |> String.graphemes() |> Enum.sort()))
+    |> Enum.chunk_every(14)
   end
 
   def parse_line(data) do
@@ -46,9 +46,7 @@ defmodule AdventOfCode.Year2021.Day08 do
   @impl AdventOfCode
   def part1(input) do
     input
-    |> String.split([" ", " | ", "\n"], trim: true)
-    |> Enum.map(&(&1 |> String.graphemes() |> Enum.sort()))
-    |> Enum.chunk_every(14)
+    |> parse()
     |> Enum.map(&parse_line/1)
     |> Enum.flat_map(&elem(&1, 1))
     |> Enum.count(&(length(&1) in [2, 3, 4, 7]))
@@ -61,9 +59,7 @@ defmodule AdventOfCode.Year2021.Day08 do
   @impl AdventOfCode
   def part2(input) do
     input
-    |> String.split([" ", " | ", "\n"], trim: true)
-    |> Enum.map(&(&1 |> String.graphemes() |> Enum.sort()))
-    |> Enum.chunk_every(14)
+    |> parse()
     |> Enum.map(fn input ->
       {signal, output} = parse_line(input)
 

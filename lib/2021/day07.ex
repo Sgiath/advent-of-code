@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2021.Day07 do
   @moduledoc """
   https://adventofcode.com/2021/day/7
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2021, day: 7
 
   # ===============================================================================================
   # Input
@@ -15,11 +15,8 @@ defmodule AdventOfCode.Year2021.Day07 do
     """
   end
 
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2021", "day07.in"])
-    |> File.read!()
+  def parse(input) do
+    AdventOfCode.Parser.line(input)
   end
 
   # ===============================================================================================
@@ -28,10 +25,7 @@ defmodule AdventOfCode.Year2021.Day07 do
 
   @impl AdventOfCode
   def part1(input) do
-    input =
-      input
-      |> String.split([",", "\n"], trim: true)
-      |> Enum.map(&String.to_integer/1)
+    input = parse(input)
 
     fuel_linear(input, round(Statistics.median(input)))
   end
@@ -46,11 +40,7 @@ defmodule AdventOfCode.Year2021.Day07 do
 
   @impl AdventOfCode
   def part2(input) do
-    input =
-      input
-      |> String.split([",", "\n"], trim: true)
-      |> Enum.map(&String.to_integer/1)
-
+    input = parse(input)
     mean = Statistics.mean(input)
 
     Enum.min([fuel_quadratic(input, floor(mean)), fuel_quadratic(input, ceil(mean))])

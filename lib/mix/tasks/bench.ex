@@ -5,10 +5,12 @@ defmodule Mix.Tasks.AdventOfCode.Bench do
 
   ## Command line options
 
-    * `--year / -y <NUM>` - which year to run (default 2021)
-    * `--day / -d <NUM>` - which day to run (required)
+    * `--year / -y <NUM>` - which year to run (default current year)
+    * `--day / -d <NUM>` - which day to run (default current day of month)
   """
   use Mix.Task
+
+  alias AdventOfCode.Utils
 
   @strict [year: :integer, day: :integer]
   @aliases [y: :year, d: :day]
@@ -32,10 +34,15 @@ defmodule Mix.Tasks.AdventOfCode.Bench do
   def parse_args(args) do
     opts = args |> OptionParser.parse(strict: @strict, aliases: @aliases) |> elem(0)
 
-    year = Keyword.get(opts, :year, Date.utc_today().year)
-    day = opts |> Keyword.get(:day) |> Integer.to_string() |> String.pad_leading(2, "0")
+    year = Keyword.get(opts, :year, Utils.default_year())
 
-    {year, day, String.to_existing_atom("Elixir.AdventOfCode.Year#{year}.Day#{day}")}
+    day =
+      opts
+      |> Keyword.get(:day, Date.utc_today().day)
+      |> Integer.to_string()
+      |> String.pad_leading(2, "0")
+
+    {year, day, String.to_atom("Elixir.AdventOfCode.Year#{year}.Day#{day}")}
   end
 
   defp do_bench(config, module) do

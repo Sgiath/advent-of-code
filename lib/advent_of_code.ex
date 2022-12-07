@@ -3,9 +3,18 @@ defmodule AdventOfCode do
   Behaviour and helper functions for Advent of Code day solutions
   """
 
-  defmacro __using__(_opts) do
+  defmacro __using__(opts) do
+    year = Keyword.fetch!(opts, :year) |> Integer.to_string()
+    day = Keyword.fetch!(opts, :day) |> Integer.to_string() |> String.pad_leading(2, "0")
+    path = Application.app_dir(:advent_of_code, ["priv", year, "day#{day}.in"])
+
     quote do
       @behaviour AdventOfCode
+
+      @impl AdventOfCode
+      def input do
+        File.read!(unquote(path))
+      end
 
       @impl AdventOfCode
       def bench, do: %{part1: &part1/1, part2: &part2/1}

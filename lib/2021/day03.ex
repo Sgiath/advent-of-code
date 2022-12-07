@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2021.Day03 do
   @moduledoc """
   https://adventofcode.com/2021/day/3
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2021, day: 3
 
   import Bitwise
 
@@ -28,11 +28,8 @@ defmodule AdventOfCode.Year2021.Day03 do
     """
   end
 
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2021", "day03.in"])
-    |> File.read!()
+  def parse(input) do
+    AdventOfCode.Parser.lines(input, "\n", &parse_line/1)
   end
 
   def parse_line(line) do
@@ -47,19 +44,14 @@ defmodule AdventOfCode.Year2021.Day03 do
 
   @impl AdventOfCode
   def part1(input) do
-    [sample | _rest] =
-      input =
-      input
-      |> String.split(["\n"], trim: true)
-      |> Enum.map(&parse_line/1)
-
+    input = parse(input)
     h = half(input)
 
     input
     |> Enum.zip()
     |> Enum.map(&if(Tuple.sum(&1) > h, do: 1, else: 0))
     |> list_to_integer()
-    |> then(&(&1 * bxor(&1, 2 ** length(sample) - 1)))
+    |> then(&(&1 * bxor(&1, 2 ** length(Enum.at(input, 0)) - 1)))
   end
 
   # ===============================================================================================
@@ -68,10 +60,7 @@ defmodule AdventOfCode.Year2021.Day03 do
 
   @impl AdventOfCode
   def part2(input) do
-    input =
-      input
-      |> String.split(["\n"], trim: true)
-      |> Enum.map(&parse_line/1)
+    input = parse(input)
 
     rating(input, &Kernel.==/2) * rating(input, &Kernel.!=/2)
   end

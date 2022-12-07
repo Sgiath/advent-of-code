@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2019.Day06 do
   @moduledoc """
   https://adventofcode.com/2019/day/6
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2019, day: 6
 
   @impl AdventOfCode
   def test_input do
@@ -19,13 +19,6 @@ defmodule AdventOfCode.Year2019.Day06 do
     J)K
     K)L
     """
-  end
-
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2019", "day06.in"])
-    |> File.read!()
   end
 
   @impl AdventOfCode

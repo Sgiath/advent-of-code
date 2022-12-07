@@ -2,9 +2,7 @@ defmodule AdventOfCode.Year2019.Day03 do
   @moduledoc """
   https://adventofcode.com/2019/day/3
   """
-  use AdventOfCode
-
-  require Logger
+  use AdventOfCode, year: 2019, day: 3
 
   @type direction() :: {:up | :left | :down | :right, integer()}
   @type path() :: list(direction())
@@ -20,13 +18,6 @@ defmodule AdventOfCode.Year2019.Day03 do
     R75,D30,R83,U83,L12,D49,R71,U7,L72
     U62,R66,U55,R34,D71,R55,D58,R83
     """
-  end
-
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2019", "day03.in"])
-    |> File.read!()
   end
 
   def parse_line(line) do

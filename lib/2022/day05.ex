@@ -2,11 +2,11 @@ defmodule AdventOfCode.Year2022.Day05 do
   @moduledoc ~S"""
   https://adventofcode.com/2022/day/5
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2022, day: 5
 
-  # ===============================================================================================
+  # =============================================================================================
   # Input
-  # ===============================================================================================
+  # =============================================================================================
 
   @impl AdventOfCode
   def test_input do
@@ -20,27 +20,14 @@ defmodule AdventOfCode.Year2022.Day05 do
     """
   end
 
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2022", "day05.in"])
-    |> File.read!()
-  end
-
   def parse(input) do
     [config, moves] = String.split(input, ["\n\n"], trim: true)
 
-    [_stacks | config] =
-      config
-      |> String.split(["\n"], trim: true)
-      |> Enum.reverse()
-
     config =
       config
-      |> Enum.reverse()
-      |> Enum.map(&String.split(&1, "", trim: true))
-      |> Enum.map(fn [_first | line] -> line end)
-      |> Enum.map(&Enum.take_every(&1, 4))
+      |> String.split(["\n"], trim: true)
+      |> List.delete_at(-1)
+      |> Enum.map(&parse_config_line/1)
       |> Enum.zip()
       |> Enum.map(fn stack ->
         stack
@@ -48,22 +35,26 @@ defmodule AdventOfCode.Year2022.Day05 do
         |> Enum.reject(&(&1 == " "))
       end)
 
-    moves =
-      moves
-      |> String.split(["\n"], trim: true)
-      |> Enum.map(fn line ->
-        %{"c" => c, "f" => f, "t" => t} =
-          Regex.named_captures(~r/move (?<c>\d+) from (?<f>\d+) to (?<t>\d+)/, line)
-
-        {String.to_integer(c), String.to_integer(f) - 1, String.to_integer(t) - 1}
-      end)
-
-    {config, moves}
+    {config, AdventOfCode.Parser.lines(moves, "\n", &parse_move_line/1)}
   end
 
-  # ===============================================================================================
+  def parse_config_line(line) do
+    line
+    |> String.split("", trim: true)
+    |> List.delete_at(0)
+    |> Enum.take_every(4)
+  end
+
+  def parse_move_line(line) do
+    %{"c" => c, "f" => f, "t" => t} =
+      Regex.named_captures(~r/move (?<c>\d+) from (?<f>\d+) to (?<t>\d+)/, line)
+
+    {String.to_integer(c), String.to_integer(f) - 1, String.to_integer(t) - 1}
+  end
+
+  # =============================================================================================
   # Part 1
-  # ===============================================================================================
+  # =============================================================================================
 
   @impl AdventOfCode
   def part1(input) do
@@ -87,9 +78,9 @@ defmodule AdventOfCode.Year2022.Day05 do
     execute_9000({count - 1, from, to}, config)
   end
 
-  # ===============================================================================================
+  # =============================================================================================
   # Part 2
-  # ===============================================================================================
+  # =============================================================================================
 
   @impl AdventOfCode
   def part2(input) do

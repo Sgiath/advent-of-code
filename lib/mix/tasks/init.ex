@@ -3,10 +3,13 @@ defmodule Mix.Tasks.AdventOfCode.Init do
   @moduledoc ~S"""
   Runs solution for particular day of Advent of Code challenge
 
-  This script requires correct session cookie in `priv/COOKIE` file. You can obtain it by going to
-  https://aventofcode.com, logging in and than press F12 to open devtools. Than go to "Application"
-  tab, expand "Cookies" menu on the left and click on "https://adventofcode.com". Here you should
-  see cookie with name "session", copy the value and paste it to the `priv/COOKIE` file.
+  This script requires correct session cookie in your config. You can obtain it by going to
+  https://aventofcode.com, logging in and than press F12 to open devtools. Than go to
+  "Application" tab, expand "Cookies" menu on the left and click on "https://adventofcode.com".
+  Here you should see cookie with name "session", copy the value and paste it to the
+  `config/secret.exs` file:
+
+      config :advent_of_code, session_id: "<your-session-cookie-here>"
 
   The cookie should be valid for about a month so you have to do this just once in a year. Do not
   commit the cookie since it basically acts as your login information for the site (much safer but
@@ -14,8 +17,8 @@ defmodule Mix.Tasks.AdventOfCode.Init do
 
   ## Command line options
 
-    * `--year / -y <NUM>` - which year to run (default 2021)
-    * `--day / -d <NUM>` - which day to run (required)
+    * `--year / -y <NUM>` - which year to run (default current year)
+    * `--day / -d <NUM>` - which day to run (default current day of month)
   """
   use Mix.Task
 
@@ -51,8 +54,13 @@ defmodule Mix.Tasks.AdventOfCode.Init do
   end
 
   defp parse_args(args) do
-    year = args |> Keyword.get(:year, Date.utc_today().year) |> Integer.to_string()
-    day = args |> Keyword.get(:day) |> Integer.to_string() |> String.pad_leading(2, "0")
+    year = args |> Keyword.get(:year, Utils.default_year()) |> Integer.to_string()
+
+    day =
+      args
+      |> Keyword.get(:day, Date.utc_today().day)
+      |> Integer.to_string()
+      |> String.pad_leading(2, "0")
 
     {year, day}
   end

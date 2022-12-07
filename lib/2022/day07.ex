@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2022.Day07 do
   @moduledoc ~S"""
   https://adventofcode.com/2022/day/7
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2022, day: 7
   use TypedStruct
 
   typedstruct module: Directory do
@@ -47,13 +47,6 @@ defmodule AdventOfCode.Year2022.Day07 do
     5626152 d.ext
     7214296 k
     """
-  end
-
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2022", "day07.in"])
-    |> File.read!()
   end
 
   def parse(input) do

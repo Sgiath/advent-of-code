@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2021.Day05 do
   @moduledoc """
   https://adventofcode.com/2021/day/5
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2021, day: 5
 
   # ===============================================================================================
   # Input
@@ -24,11 +24,10 @@ defmodule AdventOfCode.Year2021.Day05 do
     """
   end
 
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2021", "day05.in"])
-    |> File.read!()
+  def parse(input) do
+    input
+    |> AdventOfCode.Parser.lines([",", " -> ", "\n"])
+    |> Enum.chunk_every(4)
   end
 
   # ===============================================================================================
@@ -38,9 +37,7 @@ defmodule AdventOfCode.Year2021.Day05 do
   @impl AdventOfCode
   def part1(input) do
     input
-    |> String.split([",", " -> ", "\n"], trim: true)
-    |> Enum.map(&String.to_integer/1)
-    |> Enum.chunk_every(4)
+    |> parse()
     |> get_straight_lines()
     |> Enum.flat_map(&get_points/1)
     |> get_intersections()
@@ -53,9 +50,7 @@ defmodule AdventOfCode.Year2021.Day05 do
   @impl AdventOfCode
   def part2(input) do
     input
-    |> String.split([",", " -> ", "\n"], trim: true)
-    |> Enum.map(&String.to_integer/1)
-    |> Enum.chunk_every(4)
+    |> parse()
     |> Enum.flat_map(&get_points/1)
     |> get_intersections()
   end

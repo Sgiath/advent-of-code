@@ -8,6 +8,13 @@ defmodule AdventOfCode.Utils do
   @doc ~S"""
   Download input file and save it as file
   """
+  def save_input(year, day) when is_integer(year) or is_integer(day) do
+    year = Integer.to_string(year)
+    day = day |> Integer.to_string() |> String.pad_leading(2, "0")
+
+    save_input(year, day)
+  end
+
   def save_input(year, day) do
     dir = Path.join([File.cwd!(), "priv", year])
     File.mkdir_p!(dir)
@@ -34,5 +41,13 @@ defmodule AdventOfCode.Utils do
   """
   def input_url(year, day) do
     "http://adventofcode.com/#{year}/day/#{String.to_integer(day)}/input"
+  end
+
+  def default_year do
+    if Date.utc_today().month < 12 do
+      Date.utc_today().year - 1
+    else
+      Date.utc_today().year
+    end
   end
 end

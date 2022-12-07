@@ -2,7 +2,7 @@ defmodule AdventOfCode.Year2021.Day06 do
   @moduledoc """
   https://adventofcode.com/2021/day/6
   """
-  use AdventOfCode
+  use AdventOfCode, year: 2021, day: 6
 
   # ===============================================================================================
   # Input
@@ -15,11 +15,10 @@ defmodule AdventOfCode.Year2021.Day06 do
     """
   end
 
-  @impl AdventOfCode
-  def input do
-    :advent_of_code
-    |> Application.app_dir(["priv", "2021", "day06.in"])
-    |> File.read!()
+  def parse(input) do
+    input
+    |> AdventOfCode.Parser.line()
+    |> Enum.frequencies()
   end
 
   # ===============================================================================================
@@ -29,9 +28,7 @@ defmodule AdventOfCode.Year2021.Day06 do
   @impl AdventOfCode
   def part1(input) do
     input
-    |> String.split([",", "\n"], trim: true)
-    |> Enum.map(&String.to_integer/1)
-    |> Enum.frequencies()
+    |> parse()
     |> simulate(80)
     |> count_fish()
   end
@@ -43,9 +40,7 @@ defmodule AdventOfCode.Year2021.Day06 do
   @impl AdventOfCode
   def part2(input) do
     input
-    |> String.split([",", "\n"], trim: true)
-    |> Enum.map(&String.to_integer/1)
-    |> Enum.frequencies()
+    |> parse()
     |> simulate(256)
     |> count_fish()
   end
