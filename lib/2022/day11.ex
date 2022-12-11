@@ -45,26 +45,28 @@ defmodule AdventOfCode.Year2022.Day11 do
     input
     |> String.split(["\n\n"], trim: true)
     |> Enum.map(&parse_monkey/1)
+    |> List.to_tuple()
   end
 
   def parse_monkey(monkey) do
-    ["Monkey " <> i, "  Starting items: " <> items, "  Operation: " <> operation | test] =
+    ["Monkey " <> i, "  Starting items: " <> items, "  Operation: new = " <> operation | test] =
       String.split(monkey, "\n", trim: true)
 
     {items, _bindings} = Code.eval_string("[#{items}]")
 
     %{
       i: String.to_integer(String.trim_trailing(i, ":")),
-      items: items,
+      items: Enum.reverse(items),
       operation: parse_operation(operation),
       test: parse_test(test),
       processed: 0
     }
   end
 
-  def parse_operation(operation) do
-    Code.string_to_quoted!(operation)
-  end
+  def parse_operation("old + old"), do: &(&1 + &1)
+  def parse_operation("old * old"), do: &(&1 * &1)
+  def parse_operation("old + " <> arg), do: &(&1 + String.to_integer(arg))
+  def parse_operation("old * " <> arg), do: &(&1 * String.to_integer(arg))
 
   def parse_test([
         "  Test: divisible by " <> divisor,
@@ -81,10 +83,10 @@ defmodule AdventOfCode.Year2022.Day11 do
   @impl AdventOfCode
   def part1(input) do
     monkeys = parse(input)
-    l = length(monkeys)
 
     1..20
-    |> Enum.reduce(monkeys, fn _i, monkeys -> step(monkeys, &div(&1, 3), l) end)
+    |> Enum.reduce(monkeys, fn _i, monkeys -> step(monkeys, &div(&1, 3)) end)
+    |> Tuple.to_list()
     |> Enum.map(&Map.get(&1, :processed))
     |> Enum.sort(:desc)
     |> Enum.take(2)
@@ -98,15 +100,16 @@ defmodule AdventOfCode.Year2022.Day11 do
   @impl AdventOfCode
   def part2(input) do
     monkeys = parse(input)
-    l = length(monkeys)
 
     lcm =
       monkeys
+      |> Tuple.to_list()
       |> Enum.map(fn %{test: {x, _t, _f}} -> x end)
       |> Enum.product()
 
     1..10_000
-    |> Enum.reduce(monkeys, fn _i, monkeys -> step(monkeys, &rem(&1, lcm), l) end)
+    |> Enum.reduce(monkeys, fn _i, monkeys -> step(monkeys, &rem(&1, lcm)) end)
+    |> Tuple.to_list()
     |> Enum.map(&Map.get(&1, :processed))
     |> Enum.sort(:desc)
     |> Enum.take(2)
@@ -117,24 +120,29 @@ defmodule AdventOfCode.Year2022.Day11 do
   # Utils
   # =============================================================================================
 
-  def step(monkeys, mod, len, i \\ 0)
-
-  def step(monkeys, mod, len, i) when i < len do
-    %{items: items, operation: operation, test: {d, t, f}} = Enum.at(monkeys, i)
-
-    items
-    |> Enum.reduce(monkeys, fn worry, monkeys ->
-      x = operation |> Code.eval_quoted(old: worry) |> elem(0) |> mod.()
-      i_t = if rem(x, d) == 0, do: t, else: f
-
-      update_in(monkeys, [Access.at(i_t), :items], fn items ->
-        Enum.reverse([x | Enum.reverse(items)])
-      end)
-    end)
-    |> put_in([Access.at(i), :items], [])
-    |> update_in([Access.at(i), :processed], fn x -> x + length(items) end)
-    |> step(mod, len, i + 1)
+  def step(monkeys, mod) do
+    Enum.reduce(0..(tuple_size(monkeys) - 1), monkeys, &step_monkey(&2, &1, mod))
   end
 
-  def step(monkeys, _mod, _len, _i), do: monkeys
+  def step_monkey(monkeys, i, mod) do
+    %{items: items, operation: operation, test: {d, t, f}} = elem(monkeys, i)
+
+    items
+    |> Enum.reverse()
+    |> Enum.reduce(monkeys, fn worry, monkeys ->
+      x = mod.(operation.(worry))
+      monkey_catch(monkeys, if(rem(x, d) == 0, do: t, else: f), x)
+    end)
+    |> finish_monkey(i)
+  end
+
+  def monkey_catch(monkeys, i, worry) do
+    m = elem(monkeys, i)
+    put_elem(monkeys, i, %{m | items: [worry | m.items]})
+  end
+
+  def finish_monkey(monkeys, i) do
+    m = elem(monkeys, i)
+    put_elem(monkeys, i, %{m | items: [], processed: m.processed + length(m.items)})
+  end
 end
