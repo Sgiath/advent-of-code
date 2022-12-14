@@ -1,0 +1,31 @@
+<!-- vim: syntax=markdown -->
+
+# Year 2022, Day 14
+
+<https://adventofcode.com/2022/day/14>
+
+```elixir
+alias AdventOfCode.Year2022.Day14
+```
+
+## Input
+
+```elixir
+input = Day14.test_input()
+```
+
+## Part 1
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day14.part1(input)
+```
+
+## Part 2
+
+<!-- livebook:{"reevaluate_automatically":true} -->
+
+```elixir
+Day14.part2(input)
+```
