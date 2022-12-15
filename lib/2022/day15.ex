@@ -54,43 +54,69 @@ defmodule AdventOfCode.Year2022.Day15 do
   def part1(input, row \\ 2_000_000) do
     sensors = parse(input)
 
+    # number of beacons on desired row
     b =
       sensors
       |> Enum.uniq_by(fn {_s, b} -> b end)
       |> Enum.count(fn {_s, {_x, y}} -> y == row end)
 
-    s =
-      sensors
-      |> Enum.reduce([], fn {{xs, ys}, {xb, yb}}, map ->
-        d = distance({xs, ys}, {xb, yb})
+    sensors
+    |> Enum.reduce([], fn {{xs, ys}, {xb, yb}}, map ->
+      d = distance({xs, ys}, {xb, yb})
 
-        if row in (ys - d)..(ys + d) do
-          [(xs - d + abs(ys - row))..(xs + d - abs(ys - row)) | map]
-        else
-          map
-        end
-      end)
-      |> Enum.map(&Enum.into(&1, MapSet.new()))
-      |> Enum.reduce(&MapSet.union/2)
-      |> MapSet.size()
-
-    s - b
+      if row in (ys - d)..(ys + d) do
+        [{xs - d + abs(ys - row), xs + d - abs(ys - row)} | map]
+      else
+        map
+      end
+    end)
+    |> Enum.sort_by(&elem(&1, 0))
+    |> Enum.reduce([], fn
+      x, [] -> [x]
+      {x1, x2}, [{f1, f2} | acc] when x1 <= f2 and x2 >= f2 -> [{f1, x2} | acc]
+      {x1, x2}, [{f1, f2} | acc] when x1 <= f2 and x2 <= f2 -> [{f1, f2} | acc]
+      x, acc -> [x | acc]
+    end)
+    |> Enum.map(fn {x1, x2} -> x2 - x1 end)
+    |> Enum.sum()
+    |> Kernel.-(b)
   end
-
-  def distance({x1, y1}, {x2, y2}), do: abs(x1 - x2) + abs(y1 - y2)
 
   # =============================================================================================
   # Part 2
   # =============================================================================================
 
   @impl AdventOfCode
-  def part2(input) do
-    input
-    |> parse()
-    |> dbg()
+  def part2(input, limit \\ 20) do
+    sensors = parse(input)
+
+    for row <- 0..limit do
+      sensors
+      |> Enum.reduce([], fn {{xs, ys}, {xb, yb}}, map ->
+        d = distance({xs, ys}, {xb, yb})
+
+        if row in (ys - d)..(ys + d) do
+          [{max(xs - d + abs(ys - row), 0), min(xs + d - abs(ys - row), limit)} | map]
+        else
+          map
+        end
+      end)
+      |> Enum.sort_by(&elem(&1, 0))
+      |> Enum.reduce([], fn
+        x, [] -> [x]
+        {x1, x2}, [{f1, f2} | acc] when x1 <= f2 and x2 >= f2 -> [{f1, x2} | acc]
+        {x1, x2}, [{f1, f2} | acc] when x1 <= f2 and x2 <= f2 -> [{f1, f2} | acc]
+        x, acc -> [x | acc]
+      end)
+    end
+    |> Enum.with_index()
+    |> Enum.reject(&(elem(&1, 0) == [{0, limit}]))
+    |> Enum.map(fn {[{x1, _x2}, {_x3, _x4}], y} -> {x1 - 1, y} end)
   end
 
   # =============================================================================================
   # Utils
   # =============================================================================================
+
+  def distance({x1, y1}, {x2, y2}), do: abs(x1 - x2) + abs(y1 - y2)
 end
