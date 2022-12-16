@@ -54,12 +54,6 @@ defmodule AdventOfCode.Year2022.Day15 do
   def part1(input, row \\ 2_000_000) do
     sensors = parse(input)
 
-    # number of beacons on desired row
-    b =
-      sensors
-      |> Enum.uniq_by(fn {_s, b} -> b end)
-      |> Enum.count(fn {_s, {_x, y}} -> y == row end)
-
     sensors
     |> Enum.reduce([], fn {{xs, ys}, {xb, yb}}, map ->
       d = distance({xs, ys}, {xb, yb})
@@ -79,7 +73,6 @@ defmodule AdventOfCode.Year2022.Day15 do
     end)
     |> Enum.map(fn {x1, x2} -> x2 - x1 end)
     |> Enum.sum()
-    |> Kernel.-(b)
   end
 
   # =============================================================================================
