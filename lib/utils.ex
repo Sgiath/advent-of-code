@@ -28,12 +28,10 @@ defmodule AdventOfCode.Utils do
   Download input file and return it as string
   """
   def get_input(year, day) do
-    request = {input_url(year, day), [{'Cookie', String.to_charlist("session=#{@session_id}")}]}
+    url = input_url(year, day)
+    headers = [cookie: "session=#{@session_id}"]
 
-    {:ok, {_status, _headers, input_data}} =
-      :httpc.request(:get, request, [ssl: [verify: :verify_none]], [])
-
-    input_data
+    Req.request!(url: url, headers: headers).body
   end
 
   @doc ~S"""

@@ -204,8 +204,8 @@ defmodule AdventOfCode.Year2022.Day10 do
       row
       |> Enum.with_index()
       |> Enum.map(fn
-        {x, i} when (x - i) in [-1, 0, 1] -> '██'
-        _i -> '  '
+        {x, i} when (x - i) in [-1, 0, 1] -> ~c"██"
+        _i -> ~c"  "
       end)
     end)
     |> Enum.intersperse("\n")

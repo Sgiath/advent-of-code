@@ -13,7 +13,7 @@ defmodule AdventOfCode.MixProject do
 
   def application do
     [
-      extra_applications: [:logger, :eex, :inets]
+      extra_applications: [:logger, :eex]
     ]
   end
 
@@ -23,10 +23,11 @@ defmodule AdventOfCode.MixProject do
       {:typed_struct, "~> 0.3"},
       {:libgraph, "~> 0.16"},
       {:statistics, "~> 0.6"},
-      {:nx, "~> 0.4"},
-      {:exla, "~> 0.4"},
-      {:benchee, "~> 1.1", only: [:dev, :test]},
-      {:credo, "~> 1.6", only: :dev, runtime: false},
+      {:nx, "~> 0.6"},
+      {:exla, "~> 0.6"},
+      {:req, "~> 0.4"},
+      {:benchee, "~> 1.2", only: [:dev, :test]},
+      {:credo, "~> 1.7", only: :dev, runtime: false},
       {:mix_test_watch, "~> 1.1", only: :dev, runtime: false}
     ]
   end

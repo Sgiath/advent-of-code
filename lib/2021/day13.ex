@@ -97,7 +97,7 @@ defmodule AdventOfCode.Year2021.Day13 do
 
     for y <- 0..max_y do
       for x <- 0..max_x do
-        if MapSet.member?(dots, {x, y}), do: '██', else: '  '
+        if MapSet.member?(dots, {x, y}), do: ~c"██", else: ~c"  "
       end
     end
     |> Enum.intersperse("\n")

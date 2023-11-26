@@ -12,6 +12,6 @@ defmodule AdventOfCode.Year2022.Day13.Test do
 
   test "part 2" do
     assert Day13.part2(Day13.test_input()) == 140
-    assert Day13.part2(Day13.input()) == 27930
+    assert Day13.part2(Day13.input()) == 27_930
   end
 end

@@ -3,8 +3,8 @@
 This are my Elixir solutions for Advent of Code.
 
 If you wanna use them for your inputs (do not recommend it, solve it yourself!)
-you can create file `/config/secret.exs` and save there your session cookie from
-Advent of Code website like this:
+you can save your session cookie from Advent of Code website in the `config/config.exe` or export
+it into your environment (I use direnv to export it automatically):
 
 ```elixir
 import Config
@@ -12,7 +12,7 @@ import Config
 config :advent_of_code, session_id: "<your-session-here>"
 ```
 
-Than you can run
+Then you can run
 
 ```bash
 mix advent_of_code.refresh_inputs
@@ -56,4 +56,4 @@ mix advent_of_code.bench --year <year> --day <day>
 
 All commands have default values for year and day set to current year (if current month is
 December otherwise it is last year) and day so if you are solving the tasks same day they are
-published you can ommit those arguments.
+published you can omit those arguments.

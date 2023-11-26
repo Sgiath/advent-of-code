@@ -33,6 +33,8 @@ defmodule Mix.Tasks.AdventOfCode.Init do
 
   @impl Mix.Task
   def run(args) do
+    Application.ensure_all_started(:advent_of_code)
+
     {year, day} =
       args
       |> OptionParser.parse(strict: @strict, aliases: @aliases)

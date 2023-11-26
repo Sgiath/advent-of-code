@@ -44,8 +44,8 @@ defmodule AdventOfCode.Year2019.Day08 do
   def construct_image(image) do
     image
     |> Enum.map(fn
-      ?0 -> '  '
-      ?1 -> '██'
+      ?0 -> ~c"  "
+      ?1 -> ~c"██"
     end)
     |> Enum.chunk_every(25)
     |> Enum.intersperse("\n")
