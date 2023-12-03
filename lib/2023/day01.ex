@@ -47,15 +47,13 @@ defmodule AdventOfCode.Year2023.Day01 do
     input
     |> parse()
     |> Enum.map(fn line ->
-      data =
-        line
-        |> Enum.reject(fn char -> char > ?9 end)
-        |> Enum.map(&(&1 - ?0))
-
-      List.first(data) * 10 + List.last(data)
+      find_first_digit(line) * 10 + (line |> Enum.reverse() |> find_first_digit())
     end)
     |> Enum.sum()
   end
+
+  def find_first_digit([digit | _rest]) when digit >= ?0 and digit <= ?9, do: digit - ?0
+  def find_first_digit([_first | rest]), do: find_first_digit(rest)
 
   # =============================================================================================
   # Part 2

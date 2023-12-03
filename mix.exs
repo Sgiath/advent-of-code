@@ -23,6 +23,7 @@ defmodule AdventOfCode.MixProject do
       {:typed_struct, "~> 0.3"},
       {:libgraph, "~> 0.16"},
       {:statistics, "~> 0.6"},
+      {:nimble_parsec, "~> 1.4"},
       {:nx, "~> 0.6"},
       {:exla, "~> 0.6"},
       {:req, "~> 0.4"},

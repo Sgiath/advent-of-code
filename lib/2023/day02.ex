@@ -25,7 +25,7 @@ defmodule AdventOfCode.Year2023.Day02 do
     |> Enum.map(fn game ->
       ["Game " <> id, sets] = String.split(game, ": ", trim: true)
 
-      {String.to_integer(id), sets |> String.split("; ") |> Enum.map(&parse_set/1)}
+      {String.to_integer(id), sets |> String.split("; ", trim: true) |> Enum.map(&parse_set/1)}
     end)
   end
 
@@ -71,12 +71,14 @@ defmodule AdventOfCode.Year2023.Day02 do
   def part2(input) do
     input
     |> parse()
-    |> Enum.map(&min_set(&1, {0, 0, 0}))
+    |> Enum.map(&min_set_power/1)
     |> Enum.sum()
   end
 
-  def min_set({_id, []}, {r, g, b}), do: r * g * b
-  def min_set({id, [{r, g, b} | sets]}, {r_fin, g_fin, b_fin}) do
-    min_set({id, sets}, {max(r, r_fin), max(g, g_fin), max(b, b_fin)})
+  def min_set_power(game, final_set \\ {0, 0, 0})
+  def min_set_power({_id, []}, {r, g, b}), do: r * g * b
+
+  def min_set_power({id, [{r, g, b} | sets]}, {r_fin, g_fin, b_fin}) do
+    min_set_power({id, sets}, {max(r, r_fin), max(g, g_fin), max(b, b_fin)})
   end
 end

@@ -11,6 +11,8 @@ defmodule AdventOfCode do
     quote do
       @behaviour AdventOfCode
 
+      import NimbleParsec
+
       @impl AdventOfCode
       def input do
         File.read!(unquote(path))
