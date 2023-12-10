@@ -120,6 +120,7 @@ defmodule AdventOfCode.Year2023.Day05 do
 
   def to_ranges(seeds, acc \\ [])
   def to_ranges([], acc), do: acc
+
   def to_ranges([start, len | rest], acc) do
     to_ranges(rest, [start..(start + len - 1) | acc])
   end
