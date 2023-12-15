@@ -107,7 +107,7 @@ defmodule AdventOfCode.Year2023.Day10 do
       |> put({x, y}, "#")
       |> traverse(start, 1)
 
-    div(len, 2)
+    div(len + 1, 2)
   end
 
   def traverse(schema, {x, y}, at) do
