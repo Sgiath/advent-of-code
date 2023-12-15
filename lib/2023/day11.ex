@@ -54,6 +54,7 @@ defmodule AdventOfCode.Year2023.Day11 do
   end
 
   def expand_rows(map, [], _add), do: map
+
   def expand_rows(map, [row | rest], add) do
     map
     |> List.insert_at(row + add, Enum.at(map, row + add))
@@ -61,6 +62,7 @@ defmodule AdventOfCode.Year2023.Day11 do
   end
 
   def expand_columns(map, []), do: map
+
   def expand_columns(map, [col | rest]) do
     map
     |> Enum.map(fn line -> List.insert_at(line, col, ".") end)
@@ -83,7 +85,9 @@ defmodule AdventOfCode.Year2023.Day11 do
     |> Enum.map(fn {"#", i} -> {div(i, l) + 1, rem(i, l) + 1} end)
     |> Enum.with_index(1)
     |> make_pairs()
-    |> Enum.map(fn [{{x1, y1}, i1}, {{x2, y2}, i2}] -> {i1, i2, abs(x1 - x2) + abs(y1 - y2) - 1} end)
+    |> Enum.map(fn [{{x1, y1}, i1}, {{x2, y2}, i2}] ->
+      {i1, i2, abs(x1 - x2) + abs(y1 - y2) - 1}
+    end)
     |> Enum.map(fn {_i1, _i2, l} -> l end)
     |> Enum.sum()
     |> dbg()
@@ -91,6 +95,7 @@ defmodule AdventOfCode.Year2023.Day11 do
 
   def make_pairs(points, acc \\ [])
   def make_pairs([], acc), do: acc
+
   def make_pairs([first | rest], acc) do
     n = Enum.map(rest, fn v -> [v, first] end)
 
