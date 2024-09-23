@@ -91,7 +91,7 @@ defmodule AdventOfCode.Year2021.Day06 do
   import Nx, only: :sigils
 
   # matrice for 1 day
-  @transform ~M"""
+  @transform ~MAT"""
   0 0 0 0 0 0 1 0 1
   1 0 0 0 0 0 0 0 0
   0 1 0 0 0 0 0 0 0
