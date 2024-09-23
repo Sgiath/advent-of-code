@@ -14,12 +14,6 @@ jobs:
       - name: Nix cache
         uses: DeterminateSystems/magic-nix-cache-action@main
 
-      - name: Nix store cache
-        uses: actions/cache@v4
-        with:
-          key: nix-store
-          path: /nix/store/
-
       - name: Elixir cache
         uses: actions/cache@v4
         with:
