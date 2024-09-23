@@ -1,6 +1,6 @@
 # Advent of Code
 
-This are my Elixir solutions for Advent of Code.
+These are my Elixir solutions for Advent of Code.
 
 If you wanna use them for your inputs (do not recommend it, solve it yourself!)
 you can save your session cookie from Advent of Code website in the `config/config.exe` or export
