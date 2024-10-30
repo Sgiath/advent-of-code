@@ -23,7 +23,6 @@
             develop = pkgs.mkShell {
               packages = [
                 elixir
-                pkgs.zig
               ];
               env = {
                 ERL_AFLAGS = "+pc unicode -kernel shell_history enabled";

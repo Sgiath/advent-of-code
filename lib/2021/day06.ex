@@ -101,7 +101,7 @@ defmodule AdventOfCode.Year2021.Day06 do
   0 0 0 0 0 1 0 0 0
   0 0 0 0 0 0 1 0 0
   0 0 0 0 0 0 0 1 0
-  """
+  """u64
 
   @doc """
   Macro which will precompute the necessary matrice at compile time

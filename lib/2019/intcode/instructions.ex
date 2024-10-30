@@ -18,18 +18,18 @@ defmodule AdventOfCode.Year2019.Intcode.Instructions do
   end
 
   @spec input(State.t()) :: State.t()
-  def input(%State{io_service: {nil, _, _}}), do: raise("Invalid state")
+  def input(%State{io_service: {nil, _output, _secondary}}), do: raise("Invalid state")
 
-  def input(%State{memory: memory, arg1: arg1, io_service: {input, _, _}} = state) do
+  def input(%State{memory: memory, arg1: arg1, io_service: {input, _output, _secondary}} = state) do
     input = IO.get_input(input)
 
     %State{state | memory: Memory.set_value(memory, arg1, input)}
   end
 
   @spec output(State.t()) :: State.t()
-  def output(%State{io_service: {_, nil, _}}), do: raise("Invalid state")
+  def output(%State{io_service: {_input, nil, _secondary}}), do: raise("Invalid state")
 
-  def output(%State{arg1_value: arg1, io_service: {_, output, secondary}} = state) do
+  def output(%State{arg1_value: arg1, io_service: {_input, output, secondary}} = state) do
     IO.set_output(output, arg1, secondary)
 
     state
