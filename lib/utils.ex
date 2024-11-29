@@ -3,8 +3,6 @@ defmodule AdventOfCode.Utils do
   Util functions around interacting with Advent of Code API
   """
 
-  @session_id Application.compile_env(:advent_of_code, :session_id)
-
   @doc ~S"""
   Download input file and save it as file
   """
@@ -28,8 +26,9 @@ defmodule AdventOfCode.Utils do
   Download input file and return it as string
   """
   def get_input(year, day) do
+    session_id = Application.get_env(:advent_of_code, :session_id)
+    headers = [cookie: "session=#{session_id}"]
     url = input_url(year, day)
-    headers = [cookie: "session=#{@session_id}"]
 
     Req.request!(url: url, headers: headers).body
   end
