@@ -29,3 +29,7 @@ advent_of_code-*.tar
 
 # Advent of Code cookie
 /.env
+
+# puzzle inputs should not be redistributed
+/priv/
+!/priv/template*

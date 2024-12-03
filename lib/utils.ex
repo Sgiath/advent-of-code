@@ -37,7 +37,7 @@ defmodule AdventOfCode.Utils do
   Format input URL
   """
   def input_url(year, day) do
-    "http://adventofcode.com/#{year}/day/#{String.to_integer(day)}/input"
+    "https://adventofcode.com/#{year}/day/#{String.to_integer(day)}/input"
   end
 
   def default_year do

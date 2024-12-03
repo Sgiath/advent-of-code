@@ -24,6 +24,11 @@ defmodule Mix.Tasks.AdventOfCode do
     {day, opts} = Keyword.pop(opts, :day, Date.utc_today().day)
     day = day |> Integer.to_string() |> String.pad_leading(2, "0")
 
+    unless File.exists?("priv/#{year}/day#{day}.in") do
+      Application.ensure_all_started(:advent_of_code)
+      Utils.save_input(year, String.to_integer(day))
+    end
+
     module = String.to_atom("Elixir.AdventOfCode.Year#{year}.Day#{day}")
 
     case Code.ensure_compiled(module) do
