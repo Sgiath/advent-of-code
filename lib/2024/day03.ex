@@ -90,7 +90,7 @@ defmodule AdventOfCode.Year2024.Day03 do
   end
 
   @doc """
-  Take into account also do and dont instructions and save the enabled flag
+  Take into account also do and dont instructions and track the enabled flag
   """
   def run2(mem, result \\ 0, enabled \\ true)
   def run2([{:do, _args} | mem], result, _enabled), do: run2(mem, result, true)
@@ -98,4 +98,38 @@ defmodule AdventOfCode.Year2024.Day03 do
   def run2([{:mul, [a, b]} | mem], result, true), do: run2(mem, result + a * b, true)
   def run2([_disabled | mem], result, false), do: run2(mem, result, false)
   def run2([], result, _enabled), do: result
+
+  # ===============================================================================================
+  # Benchmark
+  # ===============================================================================================
+
+  # wow, regex is 2.6x slower on big input and 4.3x slower on small input
+
+  # ##### With big input #####
+  # Name                    ips        average  deviation         median         99th %
+  # nimble_parsec       1422.73      702.87 μs    ±14.71%      670.95 μs     1261.56 μs
+  # regex                550.09     1817.90 μs     ±5.98%     1777.22 μs     2107.25 μs
+  #
+  # Comparison:
+  # nimble_parsec       1422.73
+  # regex                550.09 - 2.59x slower +1115.02 μs
+
+  # ##### With small input #####
+  # Name                    ips        average  deviation         median         99th %
+  # nimble_parsec      373.24 K        2.68 μs  ±1081.19%        2.54 μs        3.52 μs
+  # regex               86.05 K       11.62 μs    ±94.53%       11.52 μs          13 μs
+  #
+  # Comparison:
+  # nimble_parsec      373.24 K
+  # regex               86.05 K - 4.34x slower +8.94 μs
+
+  @impl AdventOfCode
+  def bench do
+    [
+      %{
+        nimble_parsec: &parse/1,
+        regex: &parse_regex/1
+      }
+    ]
+  end
 end
