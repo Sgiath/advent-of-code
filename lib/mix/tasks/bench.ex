@@ -48,10 +48,23 @@ defmodule Mix.Tasks.AdventOfCode.Bench do
   defp do_bench(config, module) do
     IO.puts("\n#{IO.ANSI.yellow()}Running benchmark...#{IO.ANSI.reset()}")
 
+    test_inputs = module.test_input()
+
+    inputs =
+      if is_list(test_inputs) do
+        test_inputs
+        |> Enum.with_index()
+        |> Enum.map(fn {input, index} -> {"small#{index}", input} end)
+        |> Enum.into(%{})
+        |> Map.put("big", module.input())
+      else
+        %{"small" => test_inputs, "big" => module.input()}
+      end
+
     Benchee.run(
       config,
       time: 10,
-      inputs: %{"small" => module.test_input(), "big" => module.input()},
+      inputs: inputs,
       print: %{
         benchmarking: false,
         configuration: false

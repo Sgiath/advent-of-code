@@ -24,7 +24,7 @@ defmodule AdventOfCode do
     end
   end
 
-  @callback test_input :: String.t()
+  @callback test_input :: String.t() | [String.t()]
   @callback input :: String.t()
   @callback part1(input :: String.t()) :: output :: any()
   @callback part2(input :: String.t()) :: output :: any()

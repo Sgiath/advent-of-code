@@ -45,6 +45,16 @@ defmodule Mix.Tasks.AdventOfCode do
     IO.puts("\n#{IO.ANSI.bright()}#{IO.ANSI.blue()}Part #{part}#{IO.ANSI.reset()}")
     input = if Keyword.get(opts, :test, false), do: module.test_input(), else: module.input()
 
+    if is_list(input) do
+      for i <- input do
+        execute(module, part, i)
+      end
+    else
+      execute(module, part, input)
+    end
+  end
+
+  defp execute(module, part, input) do
     {time, solution} = :timer.tc(module, String.to_existing_atom("part#{part}"), [input])
 
     if is_binary(solution),
