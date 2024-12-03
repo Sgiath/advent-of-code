@@ -105,7 +105,7 @@ defmodule AdventOfCode.Year2024.Day03 do
 
   # wow, regex is 2.6x slower on big input and 4.3x slower on small input
 
-  # ##### With big input #####
+  # ##### With input big #####
   # Name                    ips        average  deviation         median         99th %
   # nimble_parsec       1422.73      702.87 μs    ±14.71%      670.95 μs     1261.56 μs
   # regex                550.09     1817.90 μs     ±5.98%     1777.22 μs     2107.25 μs
@@ -114,7 +114,7 @@ defmodule AdventOfCode.Year2024.Day03 do
   # nimble_parsec       1422.73
   # regex                550.09 - 2.59x slower +1115.02 μs
 
-  # ##### With small input #####
+  # ##### With input small #####
   # Name                    ips        average  deviation         median         99th %
   # nimble_parsec      373.24 K        2.68 μs  ±1081.19%        2.54 μs        3.52 μs
   # regex               86.05 K       11.62 μs    ±94.53%       11.52 μs          13 μs

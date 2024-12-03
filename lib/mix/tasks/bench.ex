@@ -51,7 +51,7 @@ defmodule Mix.Tasks.AdventOfCode.Bench do
     Benchee.run(
       config,
       time: 10,
-      inputs: %{"test" => module.test_input(), "task" => module.input()},
+      inputs: %{"small" => module.test_input(), "big" => module.input()},
       print: %{
         benchmarking: false,
         configuration: false
