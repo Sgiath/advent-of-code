@@ -48,7 +48,13 @@ defmodule AdventOfCode.Year2024.Day02 do
   def part2(input) do
     input
     |> parse()
-    |> Enum.count(&safe_damp?/1)
+    |> Enum.count(fn report ->
+      Enum.any?(0..(length(report) - 1), fn i ->
+        report
+        |> List.delete_at(i)
+        |> safe?()
+      end)
+    end)
   end
 
   # =============================================================================================
@@ -65,13 +71,5 @@ defmodule AdventOfCode.Year2024.Day02 do
     (Enum.all?(diff, &(&1 > 0)) or
        Enum.all?(diff, &(&1 < 0))) and
       Enum.all?(diff, &(abs(&1) <= 3))
-  end
-
-  def safe_damp?(report) do
-    Enum.any?(0..(length(report) - 1), fn i ->
-      report
-      |> List.delete_at(i)
-      |> safe?()
-    end)
   end
 end

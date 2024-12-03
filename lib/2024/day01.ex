@@ -21,14 +21,13 @@ defmodule AdventOfCode.Year2024.Day01 do
   end
 
   def parse(input) do
-    [_first | data2] =
-      data1 =
+    data =
       input
       |> String.split(["\n", "   "], trim: true)
       |> Enum.map(&String.to_integer/1)
 
-    list1 = Enum.take_every(data1, 2)
-    list2 = Enum.take_every(data2, 2)
+    list1 = Enum.take_every(data, 2)
+    list2 = Enum.take_every(tl(data), 2)
 
     {list1, list2}
   end

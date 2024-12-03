@@ -4,6 +4,8 @@ defmodule AdventOfCode.Year2024.Day03 do
   """
   use AdventOfCode, year: 2024, day: 03
 
+  import NimbleParsec
+
   # =============================================================================================
   # Input
   # =============================================================================================
@@ -15,12 +17,46 @@ defmodule AdventOfCode.Year2024.Day03 do
     """
   end
 
-  def parse(input) do
+  @doc """
+  Original parsing through regex
+  """
+  def parse_regex(input) do
     ~r/(mul\(\d+\,\d+\))|(do\(\))|(don't\(\))/
     |> Regex.scan(input)
     |> Enum.map(fn [match | _rest] ->
       String.split(match, ["(", ")", ","], trim: true)
     end)
+    |> Enum.map(fn
+      ["mul", a, b] -> {:mul, [String.to_integer(a), String.to_integer(b)]}
+      ["do"] -> {:do, []}
+      ["don't"] -> {:dont, []}
+    end)
+  end
+
+  # new parsing using NimbleParsec
+
+  mul =
+    ignore(string("mul("))
+    |> integer(min: 1, max: 3)
+    |> ignore(string(","))
+    |> integer(min: 1, max: 3)
+    |> ignore(string(")"))
+    |> tag(:mul)
+
+  enable =
+    ignore(string("do()"))
+    |> tag(:do)
+
+  disable =
+    ignore(string("don't()"))
+    |> tag(:dont)
+
+  defparsec :program, choice([mul, enable, disable]) |> eventually() |> repeat()
+
+  def parse(input) do
+    {:ok, instructions, _rest, _context, _line, _offset} = program(input)
+
+    instructions
   end
 
   # =============================================================================================
@@ -31,12 +67,16 @@ defmodule AdventOfCode.Year2024.Day03 do
   def part1(input) do
     input
     |> parse()
-    |> Enum.map(fn
-      ["mul", a, b] -> String.to_integer(a) * String.to_integer(b)
-      _otherwise -> 0
-    end)
-    |> Enum.sum()
+    |> run1()
   end
+
+  @doc """
+  Take into account only mul instruction
+  """
+  def run1(mem, result \\ 0)
+  def run1([{:mul, [a, b]} | mem], result), do: run1(mem, result + a * b)
+  def run1([_ignore | mem], result), do: run1(mem, result)
+  def run1([], result), do: result
 
   # =============================================================================================
   # Part 2
@@ -46,25 +86,16 @@ defmodule AdventOfCode.Year2024.Day03 do
   def part2(input) do
     input
     |> parse()
-    |> run()
+    |> run2()
   end
 
-  def run(mem, result \\ 0, enabled \\ true)
-
-  # do instruction enables flag
-  def run([["do"] | mem], result, _enabled), do: run(mem, result, true)
-
-  # don't instruction disables flag
-  def run([["don't"] | mem], result, _enabled), do: run(mem, result, false)
-
-  # multiplication happens with enabled flag
-  def run([["mul", a, b] | mem], result, true) do
-    run(mem, result + String.to_integer(a) * String.to_integer(b), true)
-  end
-
-  # ignore multiplication with disabled flag
-  def run([_disabled | mem], result, false), do: run(mem, result, false)
-
-  # end of the program
-  def run([], result, _enabled), do: result
+  @doc """
+  Take into account also do and dont instructions and save the enabled flag
+  """
+  def run2(mem, result \\ 0, enabled \\ true)
+  def run2([{:do, _args} | mem], result, _enabled), do: run2(mem, result, true)
+  def run2([{:dont, _args} | mem], result, _enabled), do: run2(mem, result, false)
+  def run2([{:mul, [a, b]} | mem], result, true), do: run2(mem, result + a * b, true)
+  def run2([_disabled | mem], result, false), do: run2(mem, result, false)
+  def run2([], result, _enabled), do: result
 end
