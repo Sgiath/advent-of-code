@@ -102,6 +102,7 @@ defmodule AdventOfCode.Year2024.Day05 do
 
   # this checker assumes there is rule for every combination of pages
   def is_correct([a, b], rules), do: {a, b} in rules
+
   def is_correct([a, b | update], rules) do
     if {a, b} in rules do
       is_correct([b | update], rules)
