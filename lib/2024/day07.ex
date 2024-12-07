@@ -59,7 +59,7 @@ defmodule AdventOfCode.Year2024.Day07 do
   # Part 2
   # =============================================================================================
 
-  @part2_operators [&Kernel.+/2, &Kernel.*/2, &__MODULE__.concat/2]
+  @part2_operators [&Kernel.+/2, &Kernel.*/2, &__MODULE__.concat_mul/2]
 
   @impl AdventOfCode
   def part2(input) do
@@ -68,8 +68,12 @@ defmodule AdventOfCode.Year2024.Day07 do
     |> async_sum_solvable(@part2_operators)
   end
 
-  # concat operation
-  def concat(a, b), do: String.to_integer("#{a}#{b}")
+  # takes about 1100 ms for sync part 2
+  def concat_string(a, b), do: String.to_integer("#{a}#{b}")
+  # takes about 800 ms for sync part 2
+  def concat_digits(a, b), do: Integer.undigits(Integer.digits(a) ++ Integer.digits(b))
+  # takes about 360 ms for sync part 2
+  def concat_mul(a, b), do: a * 10 ** length(Integer.digits(b)) + b
 
   # benchmarks shows that part 2 is faster with async operations
   def async_sum_solvable(equations, operators) do
@@ -79,6 +83,7 @@ defmodule AdventOfCode.Year2024.Day07 do
     end)
     |> Enum.reduce(0, fn {:ok, num}, acc -> num + acc end)
   end
+
   # =============================================================================================
   # Utils
   # =============================================================================================
@@ -98,14 +103,18 @@ defmodule AdventOfCode.Year2024.Day07 do
 
   @impl AdventOfCode
   def bench do
+    string_op = [&Kernel.+/2, &Kernel.*/2, &__MODULE__.concat_string/2]
+    digit_op = [&Kernel.+/2, &Kernel.*/2, &__MODULE__.concat_digits/2]
+
     [
       %{
         part1_sync: &(&1 |> parse() |> sum_solvable(@part1_operators)),
         part1_async: &(&1 |> parse() |> async_sum_solvable(@part1_operators))
       },
       %{
-        part2_sync: &(&1 |> parse() |> sum_solvable(@part2_operators)),
-        part2_async: &(&1 |> parse() |> async_sum_solvable(@part2_operators))
+        part2_string: &(&1 |> parse() |> async_sum_solvable(string_op)),
+        part2_digits: &(&1 |> parse() |> async_sum_solvable(digit_op)),
+        part2_mul: &(&1 |> parse() |> async_sum_solvable(@part2_operators))
       }
     ]
   end
