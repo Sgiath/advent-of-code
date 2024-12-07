@@ -37,47 +37,76 @@ defmodule AdventOfCode.Year2024.Day07 do
   # Part 1
   # =============================================================================================
 
+  @part1_operators [&Kernel.+/2, &Kernel.*/2]
+
   @impl AdventOfCode
   def part1(input) do
     input
     |> parse()
-    |> Enum.map(fn {result, _nums} = equation ->
-      if solvable1?(equation), do: result, else: 0
-    end)
-    |> Enum.sum()
+    |> sum_solvable(@part1_operators)
   end
 
-  def solvable1?({result, [result]}), do: true
-  def solvable1?({_result, [_other]}), do: false
-
-  def solvable1?({result, [a, b | rest]}) do
-    solvable1?({result, [a + b | rest]}) or solvable1?({result, [a * b | rest]})
+  # benchmarks revealed that sync is faster for part 1
+  def sum_solvable(equations, operators) do
+    equations
+    |> Enum.map(fn {result, _nums} = equation ->
+      if solvable?(equation, operators), do: result, else: 0
+    end)
+    |> Enum.sum()
   end
 
   # =============================================================================================
   # Part 2
   # =============================================================================================
 
+  @part2_operators [&Kernel.+/2, &Kernel.*/2, &__MODULE__.concat/2]
+
   @impl AdventOfCode
   def part2(input) do
     input
     |> parse()
-    |> Enum.map(fn {result, _nums} = equation ->
-      if solvable2?(equation), do: result, else: 0
+    |> async_sum_solvable(@part2_operators)
+  end
+
+  # concat operation
+  def concat(a, b), do: String.to_integer("#{a}#{b}")
+
+  # benchmarks shows that part 2 is faster with async operations
+  def async_sum_solvable(equations, operators) do
+    equations
+    |> Task.async_stream(fn {result, _nums} = equation ->
+      if solvable?(equation, operators), do: result, else: 0
     end)
-    |> Enum.sum()
+    |> Enum.reduce(0, fn {:ok, num}, acc -> num + acc end)
   end
-
-  def solvable2?({result, [result]}), do: true
-  def solvable2?({_result, [_other]}), do: false
-
-  def solvable2?({result, [a, b | rest]}) do
-    solvable2?({result, [a + b | rest]}) or
-      solvable2?({result, [a * b | rest]}) or
-      solvable2?({result, [String.to_integer(to_string(a) <> to_string(b)) | rest]})
-  end
-
   # =============================================================================================
   # Utils
   # =============================================================================================
+
+  # down to one numer which is same as result
+  def solvable?({result, [result]}, _operators), do: true
+  # down to one number which is different then result
+  def solvable?({_result, [_other]}, _operators), do: false
+  # check all operations recursively
+  def solvable?({result, [a, b | rest]}, operators) do
+    Enum.any?(operators, &solvable?({result, [&1.(a, b) | rest]}, operators))
+  end
+
+  # ===============================================================================================
+  # Benchmark
+  # ===============================================================================================
+
+  @impl AdventOfCode
+  def bench do
+    [
+      %{
+        part1_sync: &(&1 |> parse() |> sum_solvable(@part1_operators)),
+        part1_async: &(&1 |> parse() |> async_sum_solvable(@part1_operators))
+      },
+      %{
+        part2_sync: &(&1 |> parse() |> sum_solvable(@part2_operators)),
+        part2_async: &(&1 |> parse() |> async_sum_solvable(@part2_operators))
+      }
+    ]
+  end
 end
