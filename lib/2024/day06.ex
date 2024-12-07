@@ -39,59 +39,53 @@ defmodule AdventOfCode.Year2024.Day06 do
     # index in map
     i = Enum.find_index(map, &(&1 in [?^, ?>, ?<, ?v]))
 
-    # intial vector
-    v =
-      case Enum.at(map, i) do
-        ?^ -> {0, -1}
-        ?> -> {1, 0}
-        ?v -> {0, 1}
-        ?< -> {-1, 0}
-      end
-
     # intial position
     y = Integer.floor_div(i, l)
     x = i - y * l
 
-    {{x, y}, v}
+    {{x, y}, Enum.at(map, i)}
   end
 
   # =============================================================================================
   # Part 1
   # =============================================================================================
 
+  @vectors [?^, ?>, ?v, ?<]
+
   @impl AdventOfCode
   def part1(input) do
-    {map, {pos, _vector} = init} = parse(input)
+    {map, head} = parse(input)
 
     map
-    |> set(pos, ?X)
-    |> path(init)
-    |> then(fn {map, _length} -> map end)
-    |> Enum.count(&(&1 == ?X))
+    |> set(head)
+    |> path(head)
+    |> Enum.count(&(&1 in @vectors))
   end
 
   # when out of bounds return
-  def path({map, l}, {{x, y}, {vx, vy}})
-      when x + vx >= l or x + vx < 0 or y + vy >= l or y + vy < 0,
-      do: {map, l}
+  def path({map, _l}, {{_x, y}, ?^}) when y == 0, do: map
+  def path({map, l}, {{x, _y}, ?>}) when x + 1 == l, do: map
+  def path({map, l}, {{_x, y}, ?v}) when y + 1 == l, do: map
+  def path({map, _l}, {{x, _y}, ?<}) when x == 0, do: map
 
-  def path(map, {{x, y}, {vx, vy} = vector}) do
-    next = {x + vx, y + vy}
+  def path(map, head) do
+    # next position by the current vector
+    next = move(head)
 
     case get(map, next) do
       # on unvisited place mark as visited and move to next position
       ?. ->
         map
-        |> set(next, ?X)
-        |> path({next, vector})
+        |> set(next)
+        |> path(next)
 
       # if already visited, just move to next position
-      ?X ->
-        path(map, {next, vector})
+      a when a in @vectors ->
+        path(map, next)
 
       # when next is obstacle, don't move but turn
       ?# ->
-        path(map, {{x, y}, turn(vector)})
+        path(map, turn(head))
     end
   end
 
@@ -101,8 +95,11 @@ defmodule AdventOfCode.Year2024.Day06 do
 
   @impl AdventOfCode
   def part2(input) do
-    input
-    |> parse()
+    {map, head} = parse(input)
+
+    map
+    |> set(head)
+    |> path(head)
     |> dbg()
   end
 
@@ -110,16 +107,25 @@ defmodule AdventOfCode.Year2024.Day06 do
   # Utils
   # =============================================================================================
 
-  def get({map, l}, {x, y}) do
+  # get posion on map
+  def get({map, l}, {{x, y}, _v}) do
     Enum.at(map, y * l + x)
   end
 
-  def set({map, l}, {x, y}, val) do
-    {List.replace_at(map, y * l + x, val), l}
+  # set position on map
+  def set({map, l}, {{x, y}, v}) do
+    {List.replace_at(map, y * l + x, v), l}
   end
 
-  def turn({0, -1}), do: {1, 0}
-  def turn({1, 0}), do: {0, 1}
-  def turn({0, 1}), do: {-1, 0}
-  def turn({-1, 0}), do: {0, -1}
+  # turn 90 degrees in terms of vectors
+  def turn({pos, ?^}), do: {pos, ?>}
+  def turn({pos, ?>}), do: {pos, ?v}
+  def turn({pos, ?v}), do: {pos, ?<}
+  def turn({pos, ?<}), do: {pos, ?^}
+
+  # move along vector
+  def move({{x, y}, ?^}), do: {{x, y - 1}, ?^}
+  def move({{x, y}, ?>}), do: {{x + 1, y}, ?>}
+  def move({{x, y}, ?v}), do: {{x, y + 1}, ?v}
+  def move({{x, y}, ?<}), do: {{x - 1, y}, ?<}
 end
