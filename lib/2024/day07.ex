@@ -59,7 +59,7 @@ defmodule AdventOfCode.Year2024.Day07 do
   # Part 2
   # =============================================================================================
 
-  @part2_operators [&Kernel.+/2, &Kernel.*/2, &__MODULE__.concat_mul/2]
+  @part2_operators [&Kernel.+/2, &Kernel.*/2, &__MODULE__.concat_length/2]
 
   @impl AdventOfCode
   def part2(input) do
@@ -73,7 +73,9 @@ defmodule AdventOfCode.Year2024.Day07 do
   # takes about 800 ms for sync part 2
   def concat_digits(a, b), do: Integer.undigits(Integer.digits(a) ++ Integer.digits(b))
   # takes about 360 ms for sync part 2
-  def concat_mul(a, b), do: a * 10 ** length(Integer.digits(b)) + b
+  def concat_length(a, b), do: a * 10 ** length(Integer.digits(b)) + b
+  # takes about 410 ms for sync part 2
+  def concat_log(a, b), do: a * 10 ** (floor(:math.log10(b)) + 1) + b
 
   # benchmarks shows that part 2 is faster with async operations
   def async_sum_solvable(equations, operators) do
@@ -105,6 +107,8 @@ defmodule AdventOfCode.Year2024.Day07 do
   def bench do
     string_op = [&Kernel.+/2, &Kernel.*/2, &__MODULE__.concat_string/2]
     digit_op = [&Kernel.+/2, &Kernel.*/2, &__MODULE__.concat_digits/2]
+    length_op = [&Kernel.+/2, &Kernel.*/2, &__MODULE__.concat_length/2]
+    log_op = [&Kernel.+/2, &Kernel.*/2, &__MODULE__.concat_log/2]
 
     [
       %{
@@ -114,7 +118,8 @@ defmodule AdventOfCode.Year2024.Day07 do
       %{
         part2_string: &(&1 |> parse() |> async_sum_solvable(string_op)),
         part2_digits: &(&1 |> parse() |> async_sum_solvable(digit_op)),
-        part2_mul: &(&1 |> parse() |> async_sum_solvable(@part2_operators))
+        part2_length: &(&1 |> parse() |> async_sum_solvable(length_op)),
+        part2_log: &(&1 |> parse() |> async_sum_solvable(log_op))
       }
     ]
   end
