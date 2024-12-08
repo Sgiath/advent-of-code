@@ -10,9 +10,10 @@ defmodule AdventOfCode.Year2024.Day06.Test do
     assert Day06.part1(Day06.input()) == 5162
   end
 
-  @tag skip: "not implemented"
   test "part 2" do
     assert Day06.part2(Day06.test_input()) == 6
-    assert Day06.part2(Day06.input()) == 0
+
+    # this is too slow
+    # assert Day06.part2(Day06.input()) == 1909
   end
 end

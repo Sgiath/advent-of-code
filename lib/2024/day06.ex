@@ -68,7 +68,7 @@ defmodule AdventOfCode.Year2024.Day06 do
   def path({map, l}, {{_x, y}, ?v}) when y + 1 == l, do: map
   def path({map, _l}, {{x, _y}, ?<}) when x == 0, do: map
 
-  def path(map, head) do
+  def path(map, {_pos, vec} = head) do
     # next position by the current vector
     next = move(head)
 
@@ -78,6 +78,9 @@ defmodule AdventOfCode.Year2024.Day06 do
         map
         |> set(next)
         |> path(next)
+
+      a when a == vec ->
+        :loop
 
       # if already visited, just move to next position
       a when a in @vectors ->
@@ -91,6 +94,7 @@ defmodule AdventOfCode.Year2024.Day06 do
 
   # =============================================================================================
   # Part 2
+  # this is slow as fuck (3 min) but gets a job done :D
   # =============================================================================================
 
   @impl AdventOfCode
@@ -99,8 +103,47 @@ defmodule AdventOfCode.Year2024.Day06 do
 
     map
     |> set(head)
-    |> path(head)
-    |> dbg()
+    |> path2(head)
+    |> List.flatten()
+    |> Enum.count(fn a -> a == :loop end)
+  end
+
+  # when out of bounds return
+  def path2({map, _l}, {{_x, y}, ?^}) when y == 0, do: map
+  def path2({map, l}, {{x, _y}, ?>}) when x + 1 == l, do: map
+  def path2({map, l}, {{_x, y}, ?v}) when y + 1 == l, do: map
+  def path2({map, _l}, {{x, _y}, ?<}) when x == 0, do: map
+
+  def path2(map, {_pos, vec} = head) do
+    # next position by the current vector
+    {pos, _v} = next = move(head)
+
+    case get(map, next) do
+      # on unvisited place mark as visited and move to next position
+      ?. ->
+        normal =
+          map
+          |> set(next)
+          |> path2(next)
+
+        trap =
+          map
+          |> set({pos, ?#})
+          |> path(head)
+
+        [normal, trap]
+
+      a when a == vec ->
+        :loop
+
+      # if already visited, just move to next position
+      a when a in @vectors ->
+        path2(map, next)
+
+      # when next is obstacle, don't move but turn
+      ?# ->
+        path2(map, turn(head))
+    end
   end
 
   # =============================================================================================
