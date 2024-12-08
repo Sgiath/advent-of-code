@@ -94,7 +94,7 @@ defmodule AdventOfCode.Year2024.Day06 do
 
   # =============================================================================================
   # Part 2
-  # this is slow as fuck (3 min) but gets a job done :D
+  # this is slow as fuck (over 40s) but gets a job done :D
   # =============================================================================================
 
   @impl AdventOfCode
@@ -104,15 +104,15 @@ defmodule AdventOfCode.Year2024.Day06 do
     map
     |> set(head)
     |> path2(head)
-    |> List.flatten()
+    |> Task.await_many(:infinity)
     |> Enum.count(fn a -> a == :loop end)
   end
 
-  # when out of bounds return
-  def path2({map, _l}, {{_x, y}, ?^}) when y == 0, do: map
-  def path2({map, l}, {{x, _y}, ?>}) when x + 1 == l, do: map
-  def path2({map, l}, {{_x, y}, ?v}) when y + 1 == l, do: map
-  def path2({map, _l}, {{x, _y}, ?<}) when x == 0, do: map
+  # when out of bounds return empty (we know the full run without traps is not a loop)
+  def path2({_map, _l}, {{_x, y}, ?^}) when y == 0, do: []
+  def path2({_map, l}, {{x, _y}, ?>}) when x + 1 == l, do: []
+  def path2({_map, l}, {{_x, y}, ?v}) when y + 1 == l, do: []
+  def path2({_map, _l}, {{x, _y}, ?<}) when x == 0, do: []
 
   def path2(map, {_pos, vec} = head) do
     # next position by the current vector
@@ -127,11 +127,13 @@ defmodule AdventOfCode.Year2024.Day06 do
           |> path2(next)
 
         trap =
-          map
-          |> set({pos, ?#})
-          |> path(head)
+          Task.async(fn ->
+            map
+            |> set({pos, ?#})
+            |> path(turn(head))
+          end)
 
-        [normal, trap]
+        [trap | normal]
 
       a when a == vec ->
         :loop
