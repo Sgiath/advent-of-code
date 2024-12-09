@@ -70,8 +70,8 @@ defmodule AdventOfCode.Year2024.Day08 do
     |> Enum.reject(fn {x, y} ->
       x < 0 or y < 0 or x >= size or y >= size
     end)
-    |> Enum.into(MapSet.new())
-    |> MapSet.size()
+    |> Enum.uniq()
+    |> Enum.count()
   end
 
   # extend one antinode since the points are duplicated with the points reversed
@@ -96,8 +96,8 @@ defmodule AdventOfCode.Year2024.Day08 do
       |> pairs(coords, [])
       |> Enum.flat_map(&antinodes_all(&1, size))
     end)
-    |> Enum.into(MapSet.new())
-    |> MapSet.size()
+    |> Enum.uniq()
+    |> Enum.count()
   end
 
   # extend all antinodes at each side of antenas

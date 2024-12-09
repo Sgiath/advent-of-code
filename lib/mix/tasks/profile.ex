@@ -1,0 +1,65 @@
+defmodule Mix.Tasks.AdventOfCode.Profile do
+  @shortdoc "Execute Advent of Code exercise"
+  @moduledoc ~S"""
+  Runs solution for particular day of Advent of Code challenge
+
+  ## Command line options
+
+    * `--year / -y <NUM>` - which year to run (default current year)
+    * `--day / -d <NUM>` - which day to run (default current day of month)
+    * `--part1` - execute first part of the solution
+    * `--part2` - execute second part of the solution
+  """
+  use Mix.Task
+
+  alias AdventOfCode.Utils
+
+  @strict [year: :integer, day: :integer, part1: :boolean, part2: :boolean, test: :boolean]
+  @aliases [y: :year, d: :day, t: :test]
+
+  @impl Mix.Task
+  def run(args) do
+    {opts, [], []} = OptionParser.parse(args, strict: @strict, aliases: @aliases)
+    {year, opts} = Keyword.pop(opts, :year, Utils.default_year())
+    {day, opts} = Keyword.pop(opts, :day, Date.utc_today().day)
+    day = day |> Integer.to_string() |> String.pad_leading(2, "0")
+
+    module = String.to_atom("Elixir.AdventOfCode.Year#{year}.Day#{day}")
+
+    case Code.ensure_compiled(module) do
+      {:module, _} ->
+        if Keyword.get(opts, :part1, false), do: run_part(module, 1, opts)
+        if Keyword.get(opts, :part2, false), do: run_part(module, 2, opts)
+
+      {:error, _} ->
+        IO.puts("\n#{IO.ANSI.red()}Year #{year}, day #{day} not implemented!#{IO.ANSI.reset()}")
+    end
+  end
+
+  defp run_part(module, part, opts) do
+    IO.puts("\n#{IO.ANSI.bright()}#{IO.ANSI.blue()}Part #{part}#{IO.ANSI.reset()}\n")
+    input = if Keyword.get(opts, :test, false), do: module.test_input(), else: module.input()
+
+    if is_list(input) do
+      for i <- input do
+        execute(module, part, i)
+      end
+    else
+      execute(module, part, input)
+    end
+  end
+
+  defp execute(module, part, input) do
+    Application.ensure_all_started(:eprof)
+
+    {:ok, _pid} = :eprof.start()
+
+    {:ok, _solution} =
+      :eprof.profile(fn ->
+        apply(module, String.to_existing_atom("part#{part}"), [input])
+      end)
+
+    :ok = :eprof.analyze(:total)
+    :stopped = :eprof.stop()
+  end
+end

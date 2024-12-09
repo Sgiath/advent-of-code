@@ -54,6 +54,13 @@ example)
 mix advent_of_code.bench --year <year> --day <day>
 ```
 
+If you have a solution but you want find out where is the majority of time spent you can profile
+your solution with this command:
+
+```bash
+mix advent_of_code.profile --year <year> --day <day> --part1 --part2
+```
+
 All commands have default values for year and day set to current year (if current month is
 December otherwise it is last year) and day so if you are solving the tasks same day they are
 published you can omit those arguments.
