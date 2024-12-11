@@ -21,6 +21,7 @@ defmodule AdventOfCode.MixProject do
       {:libgraph, "~> 0.16"},
       {:statistics, "~> 0.6"},
       {:nimble_parsec, "~> 1.4"},
+      {:memoize, "~> 1.4"},
 
       # fast math
       {:nx, "~> 0.9"},
