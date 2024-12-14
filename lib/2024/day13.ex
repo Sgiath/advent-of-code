@@ -59,7 +59,7 @@ defmodule AdventOfCode.Year2024.Day13 do
     input
     |> parse()
     |> Enum.map(&cramer/1)
-    |> cost()
+    |> Enum.sum()
   end
 
   # =============================================================================================
@@ -74,27 +74,61 @@ defmodule AdventOfCode.Year2024.Day13 do
     |> parse()
     |> Enum.map(fn {a, b, {px, py}} -> {a, b, {adj + px, adj + py}} end)
     |> Enum.map(&cramer/1)
-    |> cost()
+    |> Enum.sum()
   end
 
   # =============================================================================================
   # Utils
   # =============================================================================================
 
-  # calculate solution using cramer's method
+  @doc """
+  Calculate solution using Cramer's method
+  """
   def cramer({{ax, ay}, {bx, by}, {px, py}}) do
     a = (px * by - py * bx) / (ax * by - ay * bx)
     b = (ax * py - ay * px) / (ax * by - ay * bx)
 
-    {a, b}
+    fa = floor(a)
+    fb = floor(b)
+
+    if fa == a and fb == b do
+      fa * 3 + fb
+    else
+      0
+    end
   end
 
-  # calculate cost for solutions
-  def cost([]), do: 0
+  @doc """
+  Calsulate solution using Nx.solve/2
 
-  def cost([{a, b} | rest]) when floor(a) == a and floor(b) == b do
-    floor(a) * 3 + floor(b) + cost(rest)
+  The problem is that the solution is not integer even if it is suppose to be. So I need to round,
+  compare if it is close enough to an integer, etc.
+
+  It is also not working for part 2 - it produces too big results. Not sure why. Maybe because the
+  numbers are to big and are overflowing? Or the rounding and comparing throws it off? Not sure
+  """
+  def nx({{ax, ay}, {bx, by}, {px, py}}) do
+    # matrix of params
+    m = Nx.tensor([[ax, bx], [ay, by]], type: :u64)
+    # solution matrix
+    p = Nx.tensor([px, py], type: :u64)
+    # solve matrix
+    s = Nx.LinAlg.solve(m, p)
+    # rounded to integers
+    r = Nx.round(s)
+    # difference between actual result and rounded
+    d = Nx.subtract(s, r) |> Nx.abs()
+    # will [0, 0] if difference is greater then 0.0001
+    c = Nx.greater(0.0001, d)
+
+    r
+    # this will make 0 out of results which are not suppose to be integers
+    |> Nx.multiply(c)
+    # the cost of each button
+    |> Nx.multiply(Nx.tensor([3, 1]))
+    # final cost
+    |> Nx.sum()
+    # to integer
+    |> Nx.to_number()
   end
-
-  def cost([_first | rest]), do: cost(rest)
 end
