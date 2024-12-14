@@ -103,22 +103,18 @@ defmodule AdventOfCode.Year2024.Day14 do
 
   def print(robots) do
     # construct empty map
-    line = Stream.cycle([" "]) |> Enum.take(101)
+    line = Stream.cycle(["  "]) |> Enum.take(101)
     map = Stream.cycle([line]) |> Enum.take(103)
 
-    IO.puts(
-      "+-------------------------------------------------------------------------------------------------------+"
-    )
+    IO.puts("+-" <> String.duplicate("--", 101) <> "-+")
 
     robots
     # insert all robots into map
-    |> Enum.reduce(map, fn {{x, y}, _v}, map -> put_in(map, [Access.at(y), Access.at(x)], "*") end)
+    |> Enum.reduce(map, fn {{x, y}, _v}, map -> put_in(map, [Access.at(y), Access.at(x)], "\u2588\u2588") end)
     # print line by line
     |> Enum.map(fn line -> IO.puts("| " <> Enum.join(line) <> " |") end)
 
-    IO.puts(
-      "+-------------------------------------------------------------------------------------------------------+"
-    )
+    IO.puts("+-" <> String.duplicate("--", 101) <> "-+")
   end
 
   @doc """
