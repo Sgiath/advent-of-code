@@ -31,7 +31,9 @@ defmodule AdventOfCode.Year2024.Day14 do
     |> String.split(["\n"], trim: true)
     |> Enum.map(fn robot ->
       ["p", x, y, "v", vx, vy] = String.split(robot, ["=", ",", " "], trim: true)
-      {{String.to_integer(x), String.to_integer(y)}, {String.to_integer(vx), String.to_integer(vy)}}
+
+      {{String.to_integer(x), String.to_integer(y)},
+       {String.to_integer(vx), String.to_integer(vy)}}
     end)
   end
 
@@ -66,28 +68,36 @@ defmodule AdventOfCode.Year2024.Day14 do
   # =============================================================================================
 
   @impl AdventOfCode
-  def part2(input) do
+  def part2(input, interactive \\ true) do
     input
     |> parse()
-    |> next_state(1)
+    |> next_state(interactive)
   end
 
-  def next_state(robots, i) do
+  def next_state(robots, interactive, i \\ 1)
+
+  def next_state(robots, interactive, i) do
     # simulate next itteration
     robots = Enum.map(robots, &simulate(&1, {101, 103}))
 
     if is_interesting?(robots) do
-      # print robots
-      print(robots)
-      # print what itteration are we on
-      IO.puts("itteration: #{i}")
-      # wait for user intput (press enter)
-      IO.read(:line) |> IO.inspect()
-      # continue itterating
-      next_state(robots, i + 1)
+      if interactive do
+        # print robots
+        print(robots)
+        # print what itteration are we on
+        IO.puts("itteration: #{i}")
+
+        case IO.gets("Search for next? [y/N] ") do
+          "y\n" -> next_state(robots, interactive, i + 1)
+          "Y\n" -> next_state(robots, interactive, i + 1)
+          _otherwise -> :ok
+        end
+      else
+        i
+      end
     else
       # if the state is not intersting continue without printing
-      next_state(robots, i + 1)
+      next_state(robots, interactive, i + 1)
     end
   end
 
@@ -96,7 +106,9 @@ defmodule AdventOfCode.Year2024.Day14 do
     line = Stream.cycle([" "]) |> Enum.take(101)
     map = Stream.cycle([line]) |> Enum.take(103)
 
-    IO.puts("+-------------------------------------------------------------------------------------------------------+")
+    IO.puts(
+      "+-------------------------------------------------------------------------------------------------------+"
+    )
 
     robots
     # insert all robots into map
@@ -104,7 +116,9 @@ defmodule AdventOfCode.Year2024.Day14 do
     # print line by line
     |> Enum.map(fn line -> IO.puts("| " <> Enum.join(line) <> " |") end)
 
-    IO.puts("+-------------------------------------------------------------------------------------------------------+")
+    IO.puts(
+      "+-------------------------------------------------------------------------------------------------------+"
+    )
   end
 
   @doc """
