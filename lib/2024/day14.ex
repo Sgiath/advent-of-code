@@ -110,7 +110,9 @@ defmodule AdventOfCode.Year2024.Day14 do
 
     robots
     # insert all robots into map
-    |> Enum.reduce(map, fn {{x, y}, _v}, map -> put_in(map, [Access.at(y), Access.at(x)], "\u2588\u2588") end)
+    |> Enum.reduce(map, fn {{x, y}, _v}, map ->
+      put_in(map, [Access.at(y), Access.at(x)], "\u2588\u2588")
+    end)
     # print line by line
     |> Enum.map(fn line -> IO.puts("| " <> Enum.join(line) <> " |") end)
 
