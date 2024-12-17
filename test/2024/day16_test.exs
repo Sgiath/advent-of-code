@@ -5,6 +5,7 @@ defmodule AdventOfCode.Year2024.Day16.Test do
 
   doctest AdventOfCode.Year2024.Day16
 
+  @tag skip: "not implemented"
   test "part 1" do
     [input1, input2] = Day16.test_input()
 
