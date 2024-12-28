@@ -70,7 +70,7 @@ defmodule Mix.Tasks.AdventOfCode.Init do
   defp generate_file(path, template, year, day) do
     path = Path.join(path)
 
-    unless File.exists?(path) do
+    if !File.exists?(path) do
       File.open(
         path,
         [:write, :utf8],

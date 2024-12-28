@@ -26,7 +26,7 @@ defmodule Mix.Tasks.AdventOfCode do
     {day, opts} = Keyword.pop(opts, :day, Date.utc_today().day)
     day = day |> Integer.to_string() |> String.pad_leading(2, "0")
 
-    unless File.exists?("priv/#{year}/day#{day}.in") do
+    if !File.exists?("priv/#{year}/day#{day}.in") do
       Utils.save_input(year, String.to_integer(day))
     end
 

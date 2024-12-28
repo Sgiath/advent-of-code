@@ -15,7 +15,7 @@
         { self', pkgs, ... }:
         let
           beamPackages = pkgs.beam_minimal.packages.erlang_27;
-          elixir = beamPackages.elixir_1_17;
+          elixir = beamPackages.elixir_1_18;
         in
         {
           devShells = {
@@ -23,6 +23,7 @@
             develop = pkgs.mkShell {
               packages = [
                 elixir
+                pkgs.elixir_ls
               ];
               env = {
                 ERL_AFLAGS = "+pc unicode -kernel shell_history enabled";
