@@ -4,8 +4,8 @@ defmodule AdventOfCode.MixProject do
   def project do
     [
       app: :advent_of_code,
-      version: "2024.3.2",
-      elixir: "~> 1.17",
+      version: "2025.9.10",
+      elixir: "~> 1.18",
       start_permanent: false,
       deps: deps()
     ]
@@ -24,15 +24,15 @@ defmodule AdventOfCode.MixProject do
       {:memoize, "~> 1.4"},
 
       # fast math
-      {:nx, "~> 0.9"},
-      {:exla, "~> 0.9"},
+      {:nx, "~> 0.10"},
+      {:exla, "~> 0.10"},
 
       # download inputs
       {:req, "~> 0.5"},
 
       # benchmarking and testing
-      {:benchee, "~> 1.3", only: [:dev, :test]},
-      {:mix_test_watch, "~> 1.2", only: :dev, runtime: false}
+      {:benchee, "~> 1.4", only: [:dev, :test]},
+      {:mix_test_watch, "~> 1.3", only: :dev, runtime: false}
     ]
   end
 end

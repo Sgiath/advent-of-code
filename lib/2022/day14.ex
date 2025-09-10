@@ -44,7 +44,7 @@ defmodule AdventOfCode.Year2022.Day14 do
 
   def fill_gaps([{x1, y1}, {x2, y2} | rest], acc) do
     acc =
-      for x <- x1..x2, y <- y1..y2, reduce: acc do
+      for x <- range(x1, x2), y <- range(y1, y2), reduce: acc do
         acc -> [{x, y} | acc]
       end
 

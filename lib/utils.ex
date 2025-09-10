@@ -47,4 +47,10 @@ defmodule AdventOfCode.Utils do
       Date.utc_today().year
     end
   end
+
+  @doc ~S"""
+  Range helper to avoid stupid warnings
+  """
+  def range(start, stop) when start <= stop, do: start..stop
+  def range(start, stop) when start > stop, do: start..stop//-1
 end

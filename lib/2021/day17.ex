@@ -63,7 +63,7 @@ defmodule AdventOfCode.Year2021.Day17 do
   Search whole space of possible solutions
   """
   def search_space({{_x_min, x_max}, {y_min, _y_max}} = target) do
-    for x <- floor(:math.sqrt(x_max))..x_max, y <- -y_min..y_min, reduce: 0 do
+    for x <- range(floor(:math.sqrt(x_max)), x_max), y <- range(-y_min, y_min), reduce: 0 do
       count -> count + hit_or_miss(target, {x, y})
     end
   end
@@ -93,7 +93,7 @@ defmodule AdventOfCode.Year2021.Day17 do
   # ===============================================================================================
 
   def search_space_flow({{_x_min, x_max}, {y_min, _y_max}} = target) do
-    for x <- floor(:math.sqrt(x_max))..x_max, y <- -y_min..y_min do
+    for x <- range(floor(:math.sqrt(x_max)), x_max), y <- range(-y_min, y_min) do
       {x, y}
     end
     |> Flow.from_enumerable()
@@ -105,9 +105,9 @@ defmodule AdventOfCode.Year2021.Day17 do
   end
 
   def search_space_task({{_x_min, x_max}, {y_min, _y_max}} = target) do
-    for x <- floor(:math.sqrt(x_max))..x_max do
+    for x <- range(floor(:math.sqrt(x_max)), x_max) do
       Task.async(fn ->
-        for y <- -y_min..y_min, reduce: 0 do
+        for y <- range(-y_min, y_min), reduce: 0 do
           count -> count + hit_or_miss(target, {x, y})
         end
       end)

@@ -73,9 +73,9 @@ defmodule AdventOfCode.Year2021.Day05 do
   @doc """
   Get individual points from list of coordinates
   """
-  def get_points([x, y1, x, y2]), do: Enum.map(y1..y2, &{x, &1})
-  def get_points([x1, y, x2, y]), do: Enum.map(x1..x2, &{&1, y})
-  def get_points([x1, y1, x2, y2]), do: Enum.zip(x1..x2, y1..y2)
+  def get_points([x, y1, x, y2]), do: Enum.map(range(y1, y2), &{x, &1})
+  def get_points([x1, y, x2, y]), do: Enum.map(range(x1, x2), &{&1, y})
+  def get_points([x1, y1, x2, y2]), do: Enum.zip(range(x1, x2), range(y1, y2))
 
   @doc """
   Get just duplicate elements

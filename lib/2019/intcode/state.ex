@@ -21,12 +21,14 @@ defmodule AdventOfCode.Year2019.Intcode.State do
           | :adjust_rb
           | :halt
 
+  @type io_service :: {input :: pid() | nil, output :: pid() | nil, secondary :: pid() | nil}
+
   typedstruct do
     field :memory, Memory.memory()
     field :opcode, opcode()
     field :instruction_pointer, non_neg_integer(), default: 0
     field :relative_base, non_neg_integer(), default: 0
-    field :io_service, {pid() | nil, pid() | nil, pid() | nil}, default: {nil, nil, nil}
+    field :io_service, io_service(), default: {nil, nil, nil}
     field :arg1, non_neg_integer()
     field :arg1_value, integer()
     field :arg1_mode, mode()

@@ -1,5 +1,5 @@
 {
-  description = "CrazyEgg Auth V2";
+  description = "Advent of Code";
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
@@ -12,23 +12,17 @@
       systems = [ "x86_64-linux" ];
 
       perSystem =
-        { self', pkgs, ... }:
+        { pkgs, ... }:
         let
           beamPackages = pkgs.beam_minimal.packages.erlang_27;
           elixir = beamPackages.elixir_1_18;
         in
         {
-          devShells = {
-            default = self'.devShells.develop;
-            develop = pkgs.mkShell {
-              packages = [
-                elixir
-                pkgs.elixir_ls
-              ];
-              env = {
-                ERL_AFLAGS = "+pc unicode -kernel shell_history enabled";
-                ELIXIR_ERL_OPTIONS = "+fnu +sssdio 128";
-              };
+          devShells.default = pkgs.mkShell {
+            packages = [ elixir ];
+            env = {
+              ERL_AFLAGS = "+pc unicode -kernel shell_history enabled";
+              ELIXIR_ERL_OPTIONS = "+fnu +sssdio 128";
             };
           };
         };
