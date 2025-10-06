@@ -27,6 +27,7 @@ advent_of_code-*.tar
 
 /.elixir_ls/
 /.expert/
+/.elixir-tools/
 
 # Advent of Code cookie
 /.env

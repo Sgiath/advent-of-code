@@ -29,7 +29,6 @@ defmodule Mix.Tasks.AdventOfCode.Init do
 
   @template_path Path.join([File.cwd!(), "priv", "template.eex"])
   @test_path Path.join([File.cwd!(), "priv", "template_test.eex"])
-  @livebook_path Path.join([File.cwd!(), "priv", "template.livemd"])
 
   @impl Mix.Task
   def run(args) do
@@ -44,12 +43,10 @@ defmodule Mix.Tasks.AdventOfCode.Init do
     # create folders
     File.mkdir_p!(Path.join([File.cwd!(), "lib", year]))
     File.mkdir_p!(Path.join([File.cwd!(), "test", year]))
-    File.mkdir_p!(Path.join([File.cwd!(), "livebook", year]))
 
     # write file with script template
     generate_file([File.cwd!(), "lib", year, "day#{day}.ex"], @template_path, year, day)
     generate_file([File.cwd!(), "test", year, "day#{day}_test.exs"], @test_path, year, day)
-    generate_file([File.cwd!(), "livebook", year, "day#{day}.livemd"], @livebook_path, year, day)
 
     # write file with input data
     Utils.save_input(year, day)
