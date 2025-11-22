@@ -31,8 +31,8 @@ defmodule AdventOfCode.MixProject do
       {:req, "~> 0.5"},
 
       # benchmarking and testing
-      {:benchee, "~> 1.4", only: [:dev, :test]},
-      {:mix_test_watch, "~> 1.3", only: :dev, runtime: false}
+      {:benchee, "~> 1.5", only: [:dev, :test]},
+      {:mix_test_watch, "~> 1.4", only: :dev, runtime: false}
     ]
   end
 end
