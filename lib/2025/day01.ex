@@ -27,7 +27,7 @@ defmodule AdventOfCode.Year2025.Day01 do
   def parse(input) do
     input
     |> String.split(["\n"], trim: true)
-    |> Enum.map(fn 
+    |> Enum.map(fn
       "L" <> distance -> {:left, String.to_integer(distance)}
       "R" <> distance -> {:right, String.to_integer(distance)}
     end)
@@ -77,7 +77,7 @@ defmodule AdventOfCode.Year2025.Day01 do
     move({:left, rem(distance, 100)}, pos, count + div(distance, 100))
   end
 
-  # starting at 0 (do not count the click at 0)
+  # starting at 0 (do not count the click at 0 since we counted it when we got there last rotation)
   def move({:left, distance}, 0, count) do
     {100 - distance, count}
   end
