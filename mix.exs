@@ -4,8 +4,8 @@ defmodule AdventOfCode.MixProject do
   def project do
     [
       app: :advent_of_code,
-      version: "2025.9.10",
-      elixir: "~> 1.18",
+      version: "2025.12.1",
+      elixir: "~> 1.19",
       start_permanent: false,
       deps: deps()
     ]
