@@ -38,9 +38,8 @@ defmodule AdventOfCode.Year2021.Day05 do
   def part1(input) do
     input
     |> parse()
-    |> get_straight_lines()
-    |> Enum.flat_map(&get_points/1)
-    |> get_intersections()
+    |> Enum.filter(&straight_line?/1)
+    |> count_intersections()
   end
 
   # ===============================================================================================
@@ -51,38 +50,59 @@ defmodule AdventOfCode.Year2021.Day05 do
   def part2(input) do
     input
     |> parse()
-    |> Enum.flat_map(&get_points/1)
-    |> get_intersections()
+    |> count_intersections()
   end
 
   # ===============================================================================================
   # Utils
   # ===============================================================================================
 
-  @doc """
-  Filter coordinates to get only straight lines
-  """
-  def get_straight_lines(coordinates) do
-    Enum.filter(coordinates, fn
-      [x, _y1, x, _y2] -> true
-      [_x1, y, _x2, y] -> true
-      _diagonal -> false
+  # Check if line is horizontal or vertical (not diagonal)
+  defp straight_line?([x, _, x, _]), do: true
+  defp straight_line?([_, y, _, y]), do: true
+  defp straight_line?(_), do: false
+
+  # Count intersections using ETS for fast mutable counter updates.
+  # Track intersections on-the-fly: when a point goes from count 1 to 2, it's a new intersection.
+  defp count_intersections(lines) do
+    table = :ets.new(:points, [:set, :private])
+
+    try do
+      Enum.reduce(lines, 0, fn line, acc ->
+        acc + add_line_to_ets(line, table)
+      end)
+    after
+      :ets.delete(table)
+    end
+  end
+
+  # Add all points of a vertical line; return count of new intersections
+  defp add_line_to_ets([x, y1, x, y2], table) do
+    Enum.reduce(range(y1, y2), 0, fn y, acc ->
+      # update_counter returns the new value after incrementing
+      if :ets.update_counter(table, {x, y}, 1, {{x, y}, 0}) == 2, do: acc + 1, else: acc
     end)
   end
 
-  @doc """
-  Get individual points from list of coordinates
-  """
-  def get_points([x, y1, x, y2]), do: Enum.map(range(y1, y2), &{x, &1})
-  def get_points([x1, y, x2, y]), do: Enum.map(range(x1, x2), &{&1, y})
-  def get_points([x1, y1, x2, y2]), do: Enum.zip(range(x1, x2), range(y1, y2))
-
-  @doc """
-  Get just duplicate elements
-  """
-  def get_intersections(points) do
-    points
-    |> Enum.frequencies()
-    |> Enum.count(&(elem(&1, 1) > 1))
+  # Add all points of a horizontal line; return count of new intersections
+  defp add_line_to_ets([x1, y, x2, y], table) do
+    Enum.reduce(range(x1, x2), 0, fn x, acc ->
+      if :ets.update_counter(table, {x, y}, 1, {{x, y}, 0}) == 2, do: acc + 1, else: acc
+    end)
   end
+
+  # Add all points of a diagonal line; return count of new intersections
+  defp add_line_to_ets([x1, y1, x2, y2], table) do
+    dx = sign(x2 - x1)
+    dy = sign(y2 - y1)
+    len = abs(x2 - x1)
+
+    Enum.reduce(0..len, 0, fn i, acc ->
+      key = {x1 + i * dx, y1 + i * dy}
+      if :ets.update_counter(table, key, 1, {key, 0}) == 2, do: acc + 1, else: acc
+    end)
+  end
+
+  defp sign(n) when n > 0, do: 1
+  defp sign(n) when n < 0, do: -1
 end
