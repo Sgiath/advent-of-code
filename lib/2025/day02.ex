@@ -20,7 +20,7 @@ defmodule AdventOfCode.Year2025.Day02 do
     |> String.trim_trailing()
     |> String.split(["-", ","], trim: true)
     |> Enum.chunk_every(2)
-    |> Enum.flat_map(fn [a, b] -> String.to_integer(a)..String.to_integer(b) end)
+    |> Enum.map(fn [a, b] -> {String.to_integer(a), String.to_integer(b)} end)
   end
 
   # =============================================================================================
@@ -31,6 +31,7 @@ defmodule AdventOfCode.Year2025.Day02 do
   def part1(input) do
     input
     |> parse()
+    |> Enum.flat_map(fn {a, b} -> a..b end)
     |> Enum.filter(fn number ->
       digits = Integer.digits(number)
       n = length(digits)
@@ -50,6 +51,7 @@ defmodule AdventOfCode.Year2025.Day02 do
   def part2(input) do
     input
     |> parse()
+    |> Enum.flat_map(fn {a, b} -> a..b end)
     |> Enum.filter(fn number ->
       digits = Integer.digits(number)
       n = length(digits)
@@ -76,5 +78,127 @@ defmodule AdventOfCode.Year2025.Day02 do
 
     # Check if every subsequent chunk matches the first one
     Enum.all?(rest, &(&1 == pattern))
+  end
+
+  # =============================================================================================
+  # Generator solution
+  # =============================================================================================
+
+  # Instead of checking every number in the ranges, generate only invalid numbers directly
+  # and check if they fall within any range. Much faster for large ranges.
+
+  def part1_gen(input) do
+    ranges = parse(input)
+    {min_val, max_val} = ranges_bounds(ranges)
+
+    generate_pairs(min_val, max_val)
+    |> Enum.filter(&in_any_range?(&1, ranges))
+    |> Enum.sum()
+  end
+
+  def part2_gen(input) do
+    ranges = parse(input)
+    {min_val, max_val} = ranges_bounds(ranges)
+
+    generate_repeating(min_val, max_val)
+    |> Enum.filter(&in_any_range?(&1, ranges))
+    |> Enum.sum()
+  end
+
+  # Find the overall min and max across all ranges
+  defp ranges_bounds(ranges) do
+    {min_val, _} = Enum.min_by(ranges, &elem(&1, 0))
+    {_, max_val} = Enum.max_by(ranges, &elem(&1, 1))
+    {min_val, max_val}
+  end
+
+  # Check if a number falls within any of the ranges
+  defp in_any_range?(num, ranges) do
+    Enum.any?(ranges, fn {lo, hi} -> num >= lo and num <= hi end)
+  end
+
+  # Generate all "pairs" invalid numbers (pattern repeated exactly twice)
+  # For pattern length L, invalid number = pattern × (10^L + 1)
+  # Example: pattern=12, L=2 → 12 × 101 = 1212
+  defp generate_pairs(min_val, max_val) do
+    Stream.unfold(1, fn len ->
+      multiplier = pow10(len) + 1
+      pattern_min = max(if(len == 1, do: 1, else: pow10(len - 1)), div_ceil(min_val, multiplier))
+      pattern_max = min(pow10(len) - 1, div(max_val, multiplier))
+
+      if pattern_min > pattern_max do
+        # No valid patterns at this length, check if we should continue
+        if pow10(len) * multiplier > max_val do
+          nil
+        else
+          {[], len + 1}
+        end
+      else
+        numbers = for p <- pattern_min..pattern_max, do: p * multiplier
+        {numbers, len + 1}
+      end
+    end)
+    |> Stream.concat()
+  end
+
+  # Generate all repeating invalid numbers (pattern repeated 2+ times)
+  # Generates patterns of each length repeated k times (k >= 2)
+  defp generate_repeating(min_val, max_val) do
+    max_digits = Integer.digits(max_val) |> length()
+
+    # For each total digit count from 2 to max_digits
+    for total_digits <- 2..max_digits,
+        # For each pattern length that divides total_digits and allows 2+ repetitions
+        pattern_len <- 1..div(total_digits, 2),
+        rem(total_digits, pattern_len) == 0,
+        # Generate all valid patterns
+        pattern <- pattern_range(pattern_len),
+        # Build the repeated number
+        num = repeat_pattern(pattern, div(total_digits, pattern_len)),
+        # Filter to valid range
+        num >= min_val and num <= max_val do
+      num
+    end
+    |> Enum.uniq()
+  end
+
+  # Range of valid patterns for a given length (no leading zeros)
+  defp pattern_range(1), do: 1..9
+  defp pattern_range(len), do: pow10(len - 1)..(pow10(len) - 1)
+
+  # Repeat a pattern k times to form a number
+  # Example: repeat_pattern(12, 3) = 121212
+  defp repeat_pattern(pattern, times) do
+    digits = Integer.digits(pattern)
+    len = length(digits)
+
+    Enum.reduce(1..(times - 1), pattern, fn _, acc ->
+      acc * pow10(len) + pattern
+    end)
+  end
+
+  # Fast power of 10
+  defp pow10(0), do: 1
+  defp pow10(n), do: Integer.pow(10, n)
+
+  # Ceiling division
+  defp div_ceil(a, b), do: div(a + b - 1, b)
+
+  # =============================================================================================
+  # Benchmarks
+  # =============================================================================================
+
+  @impl AdventOfCode
+  def bench do
+    [
+      %{
+        part1_brute: &part1/1,
+        part1_gen: &part1_gen/1
+      },
+      %{
+        part2_brute: &part2/1,
+        part2_gen: &part2_gen/1
+      }
+    ]
   end
 end
