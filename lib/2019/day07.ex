@@ -16,22 +16,26 @@ defmodule AdventOfCode.Year2019.Day07 do
 
   @impl AdventOfCode
   def part1(input) do
+    memory = Parser.intcode(input)
+
     0..4
     |> Enum.to_list()
     |> permutations()
-    |> Enum.map(&run_config(Parser.intcode(input), &1))
+    |> Enum.map(&run_amplifier_chain(memory, &1))
     |> Enum.max()
   end
 
   @doc """
-  question
+  Part 2 uses feedback loop mode where amplifiers run concurrently
   """
   @impl AdventOfCode
   def part2(input) do
+    memory = Parser.intcode(input)
+
     5..9
     |> Enum.to_list()
     |> permutations()
-    |> Enum.map(&run_config_recursive(Parser.intcode(input), &1))
+    |> Enum.map(&run_feedback_loop(memory, &1))
     |> Enum.max()
   end
 
@@ -41,36 +45,16 @@ defmodule AdventOfCode.Year2019.Day07 do
     for(elem <- list, rest <- permutations(list -- [elem]), do: [elem | rest])
   end
 
-  def start(memory, num, acc \\ [])
-
-  def start(_memory, 0, acc), do: acc
-
-  def start(memory, num, []) do
-    start(memory, num - 1, [Intcode.start_link(memory, self(), self())])
-  end
-
-  def start(memory, num, [pid | _rest] = acc) do
-    start(memory, num - 1, [Intcode.start_link(memory, self(), pid) | acc])
-  end
-
-  defp run_config(memory, p) do
-    [pid1 | _rest] = pids = start(memory, 5)
-
-    pids
-    |> Enum.zip(p)
-    |> Enum.each(fn {pid, p} ->
-      Intcode.run_program_async(pid)
-      send(pid, p)
+  # Part 1: Simple chain using functional API - each amplifier runs to completion
+  defp run_amplifier_chain(memory, phases) do
+    Enum.reduce(phases, 0, fn phase, signal ->
+      [output] = Intcode.run_collecting(memory, inputs: [phase, signal])
+      output
     end)
-
-    send(pid1, 0)
-
-    receive do
-      {:output, val} -> val
-    end
   end
 
-  defp run_config_recursive(memory, [p1, p2, p3, p4, p5]) do
+  # Part 2: Feedback loop requires process-based I/O for concurrent execution
+  defp run_feedback_loop(memory, [p1, p2, p3, p4, p5]) do
     pid5 = Intcode.start_link(memory, self(), self())
     pid4 = Intcode.start_link(memory, self(), pid5)
     pid3 = Intcode.start_link(memory, self(), pid4)

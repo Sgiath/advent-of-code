@@ -6,10 +6,6 @@ defmodule AdventOfCode.Year2019.Day02 do
 
   alias AdventOfCode.Parser
   alias AdventOfCode.Year2019.Intcode
-  alias AdventOfCode.Year2019.Intcode.Memory
-  alias AdventOfCode.Year2019.Intcode.State
-
-  require Logger
 
   @impl AdventOfCode
   def test_input do
@@ -37,17 +33,13 @@ defmodule AdventOfCode.Year2019.Day02 do
   end
 
   @doc """
-  Run program with two arguments
+  Run program with two arguments using the functional API
   """
   def run_program(memory, arg1, arg2) do
-    %State{memory: memory} =
-      memory
-      |> List.replace_at(1, arg1)
-      |> List.replace_at(2, arg2)
-      |> Intcode.start_link()
-      |> Intcode.run_program()
-
-    Memory.get_value(memory, 0)
+    memory
+    |> List.replace_at(1, arg1)
+    |> List.replace_at(2, arg2)
+    |> Intcode.run_and_get_result()
   end
 
   @doc """

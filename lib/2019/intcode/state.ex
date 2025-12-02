@@ -5,8 +5,6 @@ defmodule AdventOfCode.Year2019.Intcode.State do
   alias __MODULE__
   alias AdventOfCode.Year2019.Intcode.Memory
 
-  require Logger
-
   @type mode() :: :position | :immediate | :relative
 
   @type opcode() ::
@@ -45,110 +43,120 @@ defmodule AdventOfCode.Year2019.Intcode.State do
     %State{state | opcode: nil, arg1: nil, arg2: nil, arg3: nil}
   end
 
-  @spec next_instruction(t()) :: t()
-  def next_instruction(%State{instruction_pointer: ip} = state) do
-    %State{state | instruction_pointer: ip + 1}
-  end
-
-  @spec load_opcode(t()) :: t()
-  def load_opcode(%State{memory: memory, instruction_pointer: ip} = state) do
-    %State{state | opcode: get_opcode(memory, ip)}
-  end
-
-  @spec load_modes(t()) :: t()
-  def load_modes(%State{memory: memory, instruction_pointer: ip} = state) do
-    [mode1, mode2, mode3] = get_modes(memory, ip)
-
-    %State{state | arg1_mode: mode1, arg2_mode: mode2, arg3_mode: mode3}
-  end
-
-  @spec load_arg1(t()) :: t()
-  def load_arg1(%State{} = state) do
-    state
-    |> load_arg1_addr()
-    |> load_arg1_value()
-  end
-
-  defp load_arg1_addr(%State{memory: memory, instruction_pointer: ip} = state) do
-    %State{state | arg1: Memory.get_value(memory, ip)}
-  end
-
-  defp load_arg1_value(%State{memory: memory, arg1: arg1, arg1_mode: :position} = state) do
-    %State{state | arg1_value: Memory.get_value(memory, arg1)}
-  end
-
-  defp load_arg1_value(%State{arg1: arg1, arg1_mode: :immediate} = state) do
-    %State{state | arg1_value: arg1}
-  end
-
-  defp load_arg1_value(
-         %State{memory: memory, relative_base: rb, arg1: arg1, arg1_mode: :relative} = state
-       ) do
-    %State{state | arg1: arg1 + rb, arg1_value: Memory.get_value(memory, rb + arg1)}
-  end
-
-  @spec load_arg2(t()) :: t()
-  def load_arg2(%State{} = state) do
-    state
-    |> load_arg2_addr()
-    |> load_arg2_value()
-  end
-
-  defp load_arg2_addr(%State{memory: memory, instruction_pointer: ip} = state) do
-    %State{state | arg2: Memory.get_value(memory, ip)}
-  end
-
-  defp load_arg2_value(%State{memory: memory, arg2: arg2, arg2_mode: :position} = state) do
-    %State{state | arg2_value: Memory.get_value(memory, arg2)}
-  end
-
-  defp load_arg2_value(%State{arg2: arg2, arg2_mode: :immediate} = state) do
-    %State{state | arg2_value: arg2}
-  end
-
-  defp load_arg2_value(
-         %State{memory: memory, relative_base: rb, arg2: arg2, arg2_mode: :relative} = state
-       ) do
-    %State{state | arg2: arg2 + rb, arg2_value: Memory.get_value(memory, rb + arg2)}
-  end
-
-  @spec load_arg3(t()) :: t()
-  def load_arg3(%State{} = state) do
-    state
-    |> load_arg3_addr()
-    |> load_arg3_value()
-  end
-
-  defp load_arg3_addr(%State{memory: memory, instruction_pointer: ip} = state) do
-    %State{state | arg3: Memory.get_value(memory, ip)}
-  end
-
-  defp load_arg3_value(%State{memory: memory, arg3: arg3, arg3_mode: :position} = state) do
-    %State{state | arg3_value: Memory.get_value(memory, arg3)}
-  end
-
-  defp load_arg3_value(%State{arg3: arg3, arg3_mode: :immediate} = state) do
-    %State{state | arg3_value: arg3}
-  end
-
-  defp load_arg3_value(
-         %State{memory: memory, relative_base: rb, arg3: arg3, arg3_mode: :relative} = state
-       ) do
-    %State{state | arg3: arg3 + rb, arg3_value: Memory.get_value(memory, rb + arg3)}
-  end
-
   @doc """
-  iex> AdventOfCode.Intcode3.State.get_opcode(:array.from_list([203]), 0)
-  :input
+  Fetch a complete instruction: decode opcode, modes, and all arguments at once.
+  This is more efficient than loading arguments one by one.
   """
-  @spec get_opcode(Memory.memory(), non_neg_integer()) :: opcode()
-  def get_opcode(memory, ip) do
-    memory
-    |> Memory.get_value(ip)
-    |> rem(100)
-    |> opcode_decode()
+  @spec fetch_instruction(t()) :: t()
+  def fetch_instruction(
+        %State{memory: memory, instruction_pointer: ip, relative_base: rb} = state
+      ) do
+    raw = Memory.get_value(memory, ip)
+    opcode = opcode_decode(rem(raw, 100))
+    [mode1, mode2, mode3] = decode_modes(raw)
+
+    case instruction_arity(opcode) do
+      0 ->
+        # halt - no arguments
+        %State{state | opcode: opcode, instruction_pointer: ip + 1}
+
+      1 ->
+        # input, output, adjust_rb - one argument
+        {arg1, arg1_value} = fetch_arg(memory, ip + 1, mode1, rb)
+
+        %State{
+          state
+          | opcode: opcode,
+            instruction_pointer: ip + 2,
+            arg1: arg1,
+            arg1_value: arg1_value,
+            arg1_mode: mode1
+        }
+
+      2 ->
+        # jump_true, jump_false - two arguments
+        {arg1, arg1_value} = fetch_arg(memory, ip + 1, mode1, rb)
+        {arg2, arg2_value} = fetch_arg(memory, ip + 2, mode2, rb)
+
+        %State{
+          state
+          | opcode: opcode,
+            instruction_pointer: ip + 3,
+            arg1: arg1,
+            arg1_value: arg1_value,
+            arg1_mode: mode1,
+            arg2: arg2,
+            arg2_value: arg2_value,
+            arg2_mode: mode2
+        }
+
+      3 ->
+        # add, multiply, less_then, equals - three arguments
+        {arg1, arg1_value} = fetch_arg(memory, ip + 1, mode1, rb)
+        {arg2, arg2_value} = fetch_arg(memory, ip + 2, mode2, rb)
+        {arg3, arg3_value} = fetch_arg(memory, ip + 3, mode3, rb)
+
+        %State{
+          state
+          | opcode: opcode,
+            instruction_pointer: ip + 4,
+            arg1: arg1,
+            arg1_value: arg1_value,
+            arg1_mode: mode1,
+            arg2: arg2,
+            arg2_value: arg2_value,
+            arg2_mode: mode2,
+            arg3: arg3,
+            arg3_value: arg3_value,
+            arg3_mode: mode3
+        }
+    end
   end
 
+  # Returns the number of arguments for each opcode
+  defp instruction_arity(:halt), do: 0
+  defp instruction_arity(:input), do: 1
+  defp instruction_arity(:output), do: 1
+  defp instruction_arity(:adjust_rb), do: 1
+  defp instruction_arity(:jump_true), do: 2
+  defp instruction_arity(:jump_false), do: 2
+  defp instruction_arity(:add), do: 3
+  defp instruction_arity(:multiply), do: 3
+  defp instruction_arity(:less_then), do: 3
+  defp instruction_arity(:equals), do: 3
+
+  # Fetch a single argument, returning both address and value
+  defp fetch_arg(memory, addr, :position, _rb) do
+    raw = Memory.get_value(memory, addr)
+    {raw, Memory.get_value(memory, raw)}
+  end
+
+  defp fetch_arg(memory, addr, :immediate, _rb) do
+    raw = Memory.get_value(memory, addr)
+    {raw, raw}
+  end
+
+  defp fetch_arg(memory, addr, :relative, rb) do
+    raw = Memory.get_value(memory, addr)
+    {raw + rb, Memory.get_value(memory, rb + raw)}
+  end
+
+  # Decode modes from raw instruction value using integer math (faster than string manipulation)
+  defp decode_modes(raw) do
+    mode_bits = div(raw, 100)
+
+    [
+      decode_mode(rem(mode_bits, 10)),
+      decode_mode(rem(div(mode_bits, 10), 10)),
+      decode_mode(div(mode_bits, 100))
+    ]
+  end
+
+  defp decode_mode(0), do: :position
+  defp decode_mode(1), do: :immediate
+  defp decode_mode(2), do: :relative
+
+  # Opcode decoding
   defp opcode_decode(1), do: :add
   defp opcode_decode(2), do: :multiply
   defp opcode_decode(3), do: :input
@@ -159,19 +167,4 @@ defmodule AdventOfCode.Year2019.Intcode.State do
   defp opcode_decode(8), do: :equals
   defp opcode_decode(9), do: :adjust_rb
   defp opcode_decode(99), do: :halt
-
-  defp get_modes(memory, ip) do
-    memory
-    |> Memory.get_value(ip)
-    |> div(100)
-    |> Integer.to_string()
-    |> String.pad_leading(3, "0")
-    |> String.graphemes()
-    |> Enum.map(fn
-      "0" -> :position
-      "1" -> :immediate
-      "2" -> :relative
-    end)
-    |> Enum.reverse()
-  end
 end

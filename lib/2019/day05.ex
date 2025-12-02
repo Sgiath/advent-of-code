@@ -14,11 +14,12 @@ defmodule AdventOfCode.Year2019.Day05 do
 
   @impl AdventOfCode
   def part1(input) do
-    pid = input |> Parser.intcode() |> Intcode.start_link(self(), self())
-
-    Intcode.run_program_async(pid)
-
-    [code | rest] = handle_io(pid, 1)
+    # Run with input 1 and collect outputs using functional API
+    [code | rest] =
+      input
+      |> Parser.intcode()
+      |> Intcode.run_collecting(inputs: [1])
+      |> Enum.reverse()
 
     if Enum.all?(rest, &(&1 == 0)), do: code, else: raise("tests didn't pass")
   end
@@ -32,26 +33,10 @@ defmodule AdventOfCode.Year2019.Day05 do
   """
   @impl AdventOfCode
   def part2(input) do
-    pid = input |> Parser.intcode() |> Intcode.start_link(self(), self())
-
-    Intcode.run_program_async(pid)
-
-    pid
-    |> handle_io(5)
+    # Run with input 5 and get the single diagnostic code
+    input
+    |> Parser.intcode()
+    |> Intcode.run_collecting(inputs: [5])
     |> List.first()
-  end
-
-  defp handle_io(pid, input, outputs \\ []) do
-    receive do
-      :halt ->
-        outputs
-
-      :input ->
-        send(pid, input)
-        handle_io(pid, input, outputs)
-
-      {:output, value} ->
-        handle_io(pid, input, [value | outputs])
-    end
   end
 end

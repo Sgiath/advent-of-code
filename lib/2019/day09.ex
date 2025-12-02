@@ -14,22 +14,13 @@ defmodule AdventOfCode.Year2019.Day09 do
     """
   end
 
-  defp get_output(output \\ []) do
-    receive do
-      :halt -> Enum.reverse(output)
-      {:output, val} -> get_output([val | output])
-    end
-  end
-
   @impl AdventOfCode
   def part1(input) do
-    pid = input |> Parser.intcode() |> Intcode.start_link(self(), self())
-
-    Intcode.run_program_async(pid)
-
-    send(pid, 1)
-
-    output = get_output()
+    # Run BOOST program in test mode (input 1)
+    output =
+      input
+      |> Parser.intcode()
+      |> Intcode.run_collecting(inputs: [1])
 
     if Enum.count(output) > 1 do
       IO.puts("Tests didn't work. Fix your computer")
@@ -41,14 +32,10 @@ defmodule AdventOfCode.Year2019.Day09 do
 
   @impl AdventOfCode
   def part2(input) do
-    pid = input |> Parser.intcode() |> Intcode.start_link(self(), self())
-
-    Intcode.run_program_async(pid)
-
-    send(pid, 2)
-
-    receive do
-      {:output, val} -> val
-    end
+    # Run BOOST program in sensor boost mode (input 2)
+    input
+    |> Parser.intcode()
+    |> Intcode.run_collecting(inputs: [2])
+    |> List.first()
   end
 end

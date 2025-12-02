@@ -1,6 +1,8 @@
 defmodule AdventOfCode.Year2021.Day15 do
   @moduledoc """
   https://adventofcode.com/2021/day/15
+
+  Uses A* algorithm with Manhattan distance heuristic for optimal pathfinding.
   """
   use AdventOfCode, year: 2021, day: 15
 
@@ -49,7 +51,7 @@ defmodule AdventOfCode.Year2021.Day15 do
   @impl AdventOfCode
   def part1(input) do
     {grid, size} = parse(input)
-    find_path(grid, size)
+    astar(grid, size, size)
   end
 
   # ===============================================================================================
@@ -60,97 +62,161 @@ defmodule AdventOfCode.Year2021.Day15 do
   def part2(input) do
     {grid, base_size} = parse(input)
     # For part 2, we expand 5x but compute weights on-the-fly
-    find_path_expanded(grid, base_size)
+    astar_expanded(grid, base_size)
   end
 
   # ===============================================================================================
-  # Utils
+  # A* Algorithm - Uses integer position keys for speed
   # ===============================================================================================
 
   @doc """
-  Get weight at position for part 1 (direct array lookup)
+  A* for part 1 (non-expanded grid)
+  Uses integer position key (y * size + x) instead of {x, y} tuples for faster map ops
   """
-  def get_weight(grid, size, x, y) do
-    :array.get(y * size + x, grid)
+  def astar(grid, size, _grid_size) do
+    # Integer key for destination
+    dest = size * size - 1
+    # Manhattan from (0,0) to (size-1, size-1)
+    h0 = (size - 1) * 2
+    # {f, g, pos_key}
+    queue = :gb_sets.singleton({h0, 0, 0})
+    dist = %{0 => 0}
+
+    astar_loop(queue, dist, grid, size, dest)
   end
 
-  @doc """
-  Get weight at position for expanded grid (part 2)
-  Computes the weight on-the-fly using the expansion formula
-  """
-  def get_weight_expanded(grid, base_size, x, y) do
-    # Which tile are we in?
-    tile_x = div(x, base_size)
-    tile_y = div(y, base_size)
-    # Position within the base tile
-    base_x = rem(x, base_size)
-    base_y = rem(y, base_size)
-    # Get base weight and apply expansion formula
-    base_weight = :array.get(base_y * base_size + base_x, grid)
-    weight = base_weight + tile_x + tile_y
-    if weight > 9, do: weight - 9, else: weight
-  end
-
-  @doc """
-  Find shortest path for part 1 (non-expanded grid)
-  """
-  def find_path(grid, size) do
-    destination = {size - 1, size - 1}
-    queue = :gb_sets.singleton({0, {0, 0}})
-    # Track best known distance to each node (not just visited)
-    dist = %{{0, 0} => 0}
-
-    dijkstra(queue, dist, grid, size, destination, &get_weight/4)
-  end
-
-  @doc """
-  Find shortest path for part 2 (5x expanded grid, weights computed on-the-fly)
-  """
-  def find_path_expanded(grid, base_size) do
-    expanded_size = base_size * 5
-    destination = {expanded_size - 1, expanded_size - 1}
-    queue = :gb_sets.singleton({0, {0, 0}})
-    dist = %{{0, 0} => 0}
-
-    dijkstra(queue, dist, grid, expanded_size, destination, fn g, _s, x, y ->
-      get_weight_expanded(g, base_size, x, y)
-    end)
-  end
-
-  defp dijkstra(queue, dist, grid, size, destination, weight_fn) do
-    {{cost, {x, y} = pos}, queue} = :gb_sets.take_smallest(queue)
+  defp astar_loop(queue, dist, grid, size, dest) do
+    {{_f, g, pos}, queue} = :gb_sets.take_smallest(queue)
 
     cond do
-      pos == destination ->
-        cost
+      pos == dest ->
+        g
 
-      # Skip if we've already found a better path to this node
-      cost > Map.get(dist, pos, :infinity) ->
-        dijkstra(queue, dist, grid, size, destination, weight_fn)
+      g > Map.get(dist, pos, 0x7FFFFFFF) ->
+        astar_loop(queue, dist, grid, size, dest)
 
-      :otherwise ->
-        # Check all 4 neighbors with inline bounds checking
-        {queue, dist} =
-          Enum.reduce([{x - 1, y}, {x + 1, y}, {x, y - 1}, {x, y + 1}], {queue, dist}, fn
-            {nx, ny} = neighbor, {q, d} when nx >= 0 and nx < size and ny >= 0 and ny < size ->
-              new_cost = cost + weight_fn.(grid, size, nx, ny)
-              current_best = Map.get(d, neighbor, :infinity)
-
-              if new_cost < current_best do
-                # Found a better path - update distance and add to queue
-                {
-                  :gb_sets.add({new_cost, neighbor}, q),
-                  Map.put(d, neighbor, new_cost)
-                }
-              else
-                {q, d}
-              end
-
-            _neighbor, {q, d} ->
-              {q, d}
-          end)
-
-        dijkstra(queue, dist, grid, size, destination, weight_fn)
+      true ->
+        x = rem(pos, size)
+        y = div(pos, size)
+        {queue, dist} = expand_neighbors(x, y, g, queue, dist, grid, size, dest)
+        astar_loop(queue, dist, grid, size, dest)
     end
+  end
+
+  defp expand_neighbors(x, y, g, queue, dist, grid, size, dest) do
+    {queue, dist} = try_neighbor(x - 1, y, g, queue, dist, grid, size, dest)
+    {queue, dist} = try_neighbor(x + 1, y, g, queue, dist, grid, size, dest)
+    {queue, dist} = try_neighbor(x, y - 1, g, queue, dist, grid, size, dest)
+    try_neighbor(x, y + 1, g, queue, dist, grid, size, dest)
+  end
+
+  defp try_neighbor(nx, ny, g, queue, dist, grid, size, _dest)
+       when nx >= 0 and nx < size and ny >= 0 and ny < size do
+    weight = :array.get(ny * size + nx, grid)
+    new_g = g + weight
+    pos_key = ny * size + nx
+
+    case dist do
+      %{^pos_key => current} when new_g >= current ->
+        {queue, dist}
+
+      _ ->
+        # Heuristic: Manhattan distance to bottom-right corner
+        dest_x = size - 1
+        dest_y = size - 1
+        h = abs(dest_x - nx) + abs(dest_y - ny)
+        new_f = new_g + h
+
+        {
+          :gb_sets.add({new_f, new_g, pos_key}, queue),
+          Map.put(dist, pos_key, new_g)
+        }
+    end
+  end
+
+  defp try_neighbor(_nx, _ny, _g, queue, dist, _grid, _size, _dest) do
+    {queue, dist}
+  end
+
+  # ===============================================================================================
+  # A* for Expanded Grid (Part 2) - Uses integer position keys for speed
+  # ===============================================================================================
+
+  @doc """
+  A* for part 2 - 5x expanded grid with on-the-fly weight computation
+  Uses integer position key (y * size + x) instead of {x, y} tuples for faster map ops
+  """
+  def astar_expanded(grid, base_size) do
+    size = base_size * 5
+    # Integer key for destination
+    dest = size * size - 1
+    # Manhattan from (0,0) to (size-1, size-1)
+    h0 = (size - 1) * 2
+    # {f, g, pos_key}
+    queue = :gb_sets.singleton({h0, 0, 0})
+    dist = %{0 => 0}
+
+    astar_expanded_loop(queue, dist, grid, base_size, size, dest)
+  end
+
+  defp astar_expanded_loop(queue, dist, grid, base_size, size, dest) do
+    {{_f, g, pos}, queue} = :gb_sets.take_smallest(queue)
+
+    cond do
+      pos == dest ->
+        g
+
+      g > Map.get(dist, pos, 0x7FFFFFFF) ->
+        astar_expanded_loop(queue, dist, grid, base_size, size, dest)
+
+      true ->
+        x = rem(pos, size)
+        y = div(pos, size)
+        {queue, dist} = expand_neighbors_exp(x, y, g, queue, dist, grid, base_size, size, dest)
+        astar_expanded_loop(queue, dist, grid, base_size, size, dest)
+    end
+  end
+
+  defp expand_neighbors_exp(x, y, g, queue, dist, grid, base_size, size, dest) do
+    {queue, dist} = try_exp(x - 1, y, g, queue, dist, grid, base_size, size, dest)
+    {queue, dist} = try_exp(x + 1, y, g, queue, dist, grid, base_size, size, dest)
+    {queue, dist} = try_exp(x, y - 1, g, queue, dist, grid, base_size, size, dest)
+    try_exp(x, y + 1, g, queue, dist, grid, base_size, size, dest)
+  end
+
+  defp try_exp(nx, ny, g, queue, dist, grid, base_size, size, _dest)
+       when nx >= 0 and nx < size and ny >= 0 and ny < size do
+    # Compute weight on-the-fly for expanded grid
+    tile_x = div(nx, base_size)
+    tile_y = div(ny, base_size)
+    base_x = rem(nx, base_size)
+    base_y = rem(ny, base_size)
+    base_weight = :array.get(base_y * base_size + base_x, grid)
+    raw_weight = base_weight + tile_x + tile_y
+    weight = if raw_weight > 9, do: raw_weight - 9, else: raw_weight
+
+    new_g = g + weight
+    pos_key = ny * size + nx
+
+    case dist do
+      %{^pos_key => current} when new_g >= current ->
+        {queue, dist}
+
+      _ ->
+        # Heuristic: Manhattan distance to bottom-right corner
+        dest_x = size - 1
+        dest_y = size - 1
+        h = abs(dest_x - nx) + abs(dest_y - ny)
+        new_f = new_g + h
+
+        {
+          :gb_sets.add({new_f, new_g, pos_key}, queue),
+          Map.put(dist, pos_key, new_g)
+        }
+    end
+  end
+
+  defp try_exp(_nx, _ny, _g, queue, dist, _grid, _base_size, _size, _dest) do
+    {queue, dist}
   end
 end

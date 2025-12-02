@@ -5,8 +5,6 @@ defmodule AdventOfCode.Year2019.Intcode.Instructions do
   alias AdventOfCode.Year2019.Intcode.Memory
   alias AdventOfCode.Year2019.Intcode.State
 
-  require Logger
-
   @spec add(State.t()) :: State.t()
   def add(%State{memory: memory, arg1_value: arg1, arg2_value: arg2, arg3: arg3} = state) do
     %State{state | memory: Memory.set_value(memory, arg3, arg1 + arg2)}
