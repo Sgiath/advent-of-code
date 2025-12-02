@@ -1,6 +1,14 @@
 defmodule AdventOfCode.Year2022.Day14 do
   @moduledoc ~S"""
   https://adventofcode.com/2022/day/14
+
+  ## Optimization Notes
+
+  The key optimization is **path backtracking**. Instead of restarting each sand grain
+  from (500, 0), we track the falling path in a stack. When sand settles, we backtrack
+  to the previous position (which will now try alternate directions since the one
+  we just came from is blocked). This transforms the algorithm from O(n * h) to O(n + h)
+  where n = number of grains and h = depth.
   """
   use AdventOfCode, year: 2022, day: 14
 
@@ -60,34 +68,39 @@ defmodule AdventOfCode.Year2022.Day14 do
   @impl AdventOfCode
   def part1(input) do
     {rocks, lowest} = parse(input)
-    sand = simulate1({rocks, lowest})
+    rock_count = MapSet.size(rocks)
 
-    MapSet.size(sand) - MapSet.size(rocks)
+    # Path-based simulation: track path as stack, backtrack when sand settles
+    final_size = simulate1(rocks, lowest, [{500, 0}])
+    final_size - rock_count
   end
 
-  def simulate1(world, sand \\ {500, 0})
+  # Sand fell into abyss - simulation complete
+  defp simulate1(world, lowest, [{_x, y} | _path]) when y > lowest do
+    MapSet.size(world)
+  end
 
-  def simulate1({world, lowest}, {x, y}) do
+  defp simulate1(world, lowest, [{x, y} | rest] = path) do
+    down = {x, y + 1}
+    down_left = {x - 1, y + 1}
+    down_right = {x + 1, y + 1}
+
     cond do
-      # if sand is lower then lowest rock it falls into abbys and we are done
-      y > lowest ->
-        world
+      # Try to move down
+      not MapSet.member?(world, down) ->
+        simulate1(world, lowest, [down | path])
 
-      # first try to move down
-      {x, y + 1} not in world ->
-        simulate1({world, lowest}, {x, y + 1})
+      # Try to move down-left
+      not MapSet.member?(world, down_left) ->
+        simulate1(world, lowest, [down_left | path])
 
-      # try to move down and left
-      {x - 1, y + 1} not in world ->
-        simulate1({world, lowest}, {x - 1, y + 1})
+      # Try to move down-right
+      not MapSet.member?(world, down_right) ->
+        simulate1(world, lowest, [down_right | path])
 
-      # try to move down and right
-      {x + 1, y + 1} not in world ->
-        simulate1({world, lowest}, {x + 1, y + 1})
-
-      # sand is still, simulate next sand
-      :otherwise ->
-        simulate1({MapSet.put(world, {x, y}), lowest})
+      # Sand settles at current position - add to world and backtrack
+      true ->
+        simulate1(MapSet.put(world, {x, y}), lowest, rest)
     end
   end
 
@@ -98,38 +111,43 @@ defmodule AdventOfCode.Year2022.Day14 do
   @impl AdventOfCode
   def part2(input) do
     {rocks, lowest} = parse(input)
-    sand = simulate2({rocks, lowest})
+    rock_count = MapSet.size(rocks)
+    floor = lowest + 2
 
-    MapSet.size(sand) - MapSet.size(rocks)
+    final_size = simulate2(rocks, floor, [{500, 0}])
+    final_size - rock_count
   end
 
-  def simulate2(world, sand \\ {500, 0})
+  # Path is empty - source is blocked, simulation complete
+  defp simulate2(world, _floor, []) do
+    MapSet.size(world)
+  end
 
-  def simulate2({world, lowest}, {x, y}) do
+  defp simulate2(world, floor, [{x, y} | rest] = path) do
+    down = {x, y + 1}
+    down_left = {x - 1, y + 1}
+    down_right = {x + 1, y + 1}
+
     cond do
-      # sand is on the floor, simulate next sand
-      y == lowest + 1 ->
-        simulate2({MapSet.put(world, {x, y}), lowest})
+      # Sand is at floor level - settles immediately
+      y + 1 == floor ->
+        simulate2(MapSet.put(world, {x, y}), floor, rest)
 
-      # first try to move down
-      {x, y + 1} not in world ->
-        simulate2({world, lowest}, {x, y + 1})
+      # Try to move down
+      not MapSet.member?(world, down) ->
+        simulate2(world, floor, [down | path])
 
-      # try to move down and left
-      {x - 1, y + 1} not in world ->
-        simulate2({world, lowest}, {x - 1, y + 1})
+      # Try to move down-left
+      not MapSet.member?(world, down_left) ->
+        simulate2(world, floor, [down_left | path])
 
-      # try to move down and right
-      {x + 1, y + 1} not in world ->
-        simulate2({world, lowest}, {x + 1, y + 1})
+      # Try to move down-right
+      not MapSet.member?(world, down_right) ->
+        simulate2(world, floor, [down_right | path])
 
-      # sand is still and is at the starting point, finish simulation
-      x == 500 and y == 0 ->
-        MapSet.put(world, {x, y})
-
-      # sand is still, continue simulation with next sand
-      :otherwise ->
-        simulate2({MapSet.put(world, {x, y}), lowest})
+      # Sand settles at current position - add to world and backtrack
+      true ->
+        simulate2(MapSet.put(world, {x, y}), floor, rest)
     end
   end
 end
