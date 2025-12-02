@@ -10,7 +10,6 @@ defmodule AdventOfCode.Year2021.Day18.Test do
     assert Day18.part1(Day18.input()) == 3806
   end
 
-  @tag skip: "too slow"
   test "part 2" do
     assert Day18.part2(Day18.test_input()) == 3993
     assert Day18.part2(Day18.input()) == 4727

@@ -24,24 +24,22 @@ defmodule AdventOfCode.Year2021.Day15 do
     """
   end
 
+  @doc """
+  Parse input into a tuple-based grid for O(1) access
+  Returns {grid_array, size} where grid_array is an :array
+  """
   def parse(input) do
-    input
-    |> String.split(["\n"], trim: true)
-    |> Enum.map(&parse_line/1)
-    |> Enum.with_index()
-  end
+    lines = String.split(input, "\n", trim: true)
+    size = length(lines)
 
-  def parse_line(line) do
-    line
-    |> String.to_charlist()
-    |> Enum.map(&(&1 - ?0))
-    |> Enum.with_index()
-  end
+    grid =
+      lines
+      |> Enum.flat_map(fn line ->
+        line |> String.to_charlist() |> Enum.map(&(&1 - ?0))
+      end)
+      |> :array.from_list()
 
-  def points(input) do
-    for {row, x} <- parse(input), {w, y} <- row, into: %{} do
-      {{x, y}, w}
-    end
+    {grid, size}
   end
 
   # ===============================================================================================
@@ -50,9 +48,8 @@ defmodule AdventOfCode.Year2021.Day15 do
 
   @impl AdventOfCode
   def part1(input) do
-    input
-    |> points()
-    |> find_path()
+    {grid, size} = parse(input)
+    find_path(grid, size)
   end
 
   # ===============================================================================================
@@ -61,26 +58,9 @@ defmodule AdventOfCode.Year2021.Day15 do
 
   @impl AdventOfCode
   def part2(input) do
-    input
-    |> points()
-    |> expand()
-    |> find_path()
-  end
-
-  @doc """
-  Expand the map according to the task description
-  """
-  def expand(points) do
-    {max, _max_y} = end_point(points)
-
-    for i <- 0..4, j <- 0..4, reduce: %{} do
-      acc ->
-        Enum.reduce(points, acc, fn {{x, y}, w}, acc ->
-          new_weight = if rem(w + i + j, 9) == 0, do: 9, else: rem(w + i + j, 9)
-
-          Map.put(acc, {x + max * i + i, y + max * j + j}, new_weight)
-        end)
-    end
+    {grid, base_size} = parse(input)
+    # For part 2, we expand 5x but compute weights on-the-fly
+    find_path_expanded(grid, base_size)
   end
 
   # ===============================================================================================
@@ -88,44 +68,89 @@ defmodule AdventOfCode.Year2021.Day15 do
   # ===============================================================================================
 
   @doc """
-  Get neighbors of the point
+  Get weight at position for part 1 (direct array lookup)
   """
-  def neighbors({x, y}, graph) do
-    Enum.reject([{x - 1, y}, {x + 1, y}, {x, y - 1}, {x, y + 1}], &is_nil(graph[&1]))
+  def get_weight(grid, size, x, y) do
+    :array.get(y * size + x, grid)
   end
 
   @doc """
-  Return the final destination point
+  Get weight at position for expanded grid (part 2)
+  Computes the weight on-the-fly using the expansion formula
   """
-  def end_point(points) do
-    points
-    |> Enum.max_by(fn {{x, y}, _w} -> x + y end)
-    |> elem(0)
+  def get_weight_expanded(grid, base_size, x, y) do
+    # Which tile are we in?
+    tile_x = div(x, base_size)
+    tile_y = div(y, base_size)
+    # Position within the base tile
+    base_x = rem(x, base_size)
+    base_y = rem(y, base_size)
+    # Get base weight and apply expansion formula
+    base_weight = :array.get(base_y * base_size + base_x, grid)
+    weight = base_weight + tile_x + tile_y
+    if weight > 9, do: weight - 9, else: weight
   end
 
   @doc """
-  List of edges from the points
+  Find shortest path for part 1 (non-expanded grid)
   """
-  def edges(points) do
-    Enum.reduce(points, [], fn {point, _w}, acc ->
-      point
-      |> neighbors(points)
-      |> Enum.reduce(acc, fn neigh, acc ->
-        [Graph.Edge.new(point, neigh, weight: points[neigh]) | acc]
-      end)
+  def find_path(grid, size) do
+    destination = {size - 1, size - 1}
+    queue = :gb_sets.singleton({0, {0, 0}})
+    # Track best known distance to each node (not just visited)
+    dist = %{{0, 0} => 0}
+
+    dijkstra(queue, dist, grid, size, destination, &get_weight/4)
+  end
+
+  @doc """
+  Find shortest path for part 2 (5x expanded grid, weights computed on-the-fly)
+  """
+  def find_path_expanded(grid, base_size) do
+    expanded_size = base_size * 5
+    destination = {expanded_size - 1, expanded_size - 1}
+    queue = :gb_sets.singleton({0, {0, 0}})
+    dist = %{{0, 0} => 0}
+
+    dijkstra(queue, dist, grid, expanded_size, destination, fn g, _s, x, y ->
+      get_weight_expanded(g, base_size, x, y)
     end)
   end
 
-  @doc """
-  Find the shortest path for the points
-  """
-  def find_path(points) do
-    Graph.new(vertex_identifier: & &1)
-    |> Graph.add_edges(edges(points))
-    |> Graph.get_shortest_path({0, 0}, end_point(points))
-    # compute the danger score from the path
-    |> Enum.reduce(0, &(points[&1] + &2))
-    # substract the starting point
-    |> Kernel.-(points[{0, 0}])
+  defp dijkstra(queue, dist, grid, size, destination, weight_fn) do
+    {{cost, {x, y} = pos}, queue} = :gb_sets.take_smallest(queue)
+
+    cond do
+      pos == destination ->
+        cost
+
+      # Skip if we've already found a better path to this node
+      cost > Map.get(dist, pos, :infinity) ->
+        dijkstra(queue, dist, grid, size, destination, weight_fn)
+
+      :otherwise ->
+        # Check all 4 neighbors with inline bounds checking
+        {queue, dist} =
+          Enum.reduce([{x - 1, y}, {x + 1, y}, {x, y - 1}, {x, y + 1}], {queue, dist}, fn
+            {nx, ny} = neighbor, {q, d} when nx >= 0 and nx < size and ny >= 0 and ny < size ->
+              new_cost = cost + weight_fn.(grid, size, nx, ny)
+              current_best = Map.get(d, neighbor, :infinity)
+
+              if new_cost < current_best do
+                # Found a better path - update distance and add to queue
+                {
+                  :gb_sets.add({new_cost, neighbor}, q),
+                  Map.put(d, neighbor, new_cost)
+                }
+              else
+                {q, d}
+              end
+
+            _neighbor, {q, d} ->
+              {q, d}
+          end)
+
+        dijkstra(queue, dist, grid, size, destination, weight_fn)
+    end
   end
 end

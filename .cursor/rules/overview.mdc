@@ -1,0 +1,53 @@
+---
+alwaysApply: true
+---
+
+# Advent of Code — Agent Rules
+
+This project contains Elixir solutions for Advent of Code. Your task is to produce correct, efficient implementations for each day.
+
+## Core Requirements
+
+* Every solution **must pass its tests**. Treat failing tests as invalid output.
+* Prefer **clean, logically clear code** with comments describing the reasoning.
+  Only sacrifice clarity when performance demands it.
+
+## Running Tests
+
+Use Elixir’s test runner.
+
+* Run a single day:
+  `mix test test/<year>/day<day>_test.exs`
+* Run the full suite:
+  `mix test`
+
+All outputs you generate must satisfy these tests.
+
+## Performance Expectations
+
+Later puzzles (especially Part 2) may require optimized code.
+To inspect hotspots, you can run:
+
+```sh
+mix advent_of_code.profile -y <year> -d <day> --part2
+```
+
+Use the results to refine algorithms and data structures, not just micro-optimize.
+
+To see which solutions have the worst performance, you can run this command:
+
+```sh
+mix test --slowest 10 | tail -15  
+```
+
+## Input Data
+
+You will usually find the example input embedded in the solution file for the day.
+
+The real puzzle input is available here:
+
+```
+priv/<year>/day<day>.in
+```
+
+Always make sure your code handles both example and real inputs.
