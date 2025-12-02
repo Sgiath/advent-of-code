@@ -38,7 +38,7 @@ defmodule AdventOfCode.Year2021.Day20 do
     # Build padded grid - add 1 pixel border of 0s for initial bounds safety
     height = length(image_lines)
     width = length(hd(image_lines))
-    
+
     # Pad with 1 pixel border (will expand during enhance)
     grid = build_padded_grid(image_lines, height, width, 0)
 
@@ -53,7 +53,7 @@ defmodule AdventOfCode.Year2021.Day20 do
   defp build_padded_grid(rows, _h, w, default) do
     # Top padding row
     pad_row = List.to_tuple(List.duplicate(default, w + 2))
-    
+
     # Build grid with padding
     middle_rows =
       for row <- rows do
@@ -98,6 +98,7 @@ defmodule AdventOfCode.Year2021.Day20 do
     # Don't count padding rows/cols
     Enum.reduce(1..(h - 2), 0, fn row, acc ->
       row_tuple = elem(grid, row)
+
       Enum.reduce(1..(w - 2), acc, fn col, acc2 ->
         acc2 + elem(row_tuple, col)
       end)
@@ -139,14 +140,14 @@ defmodule AdventOfCode.Year2021.Day20 do
   Uses direct elem access with bounds checking.
   """
   def index9(grid, h, w, r, c, default) do
-    (px(grid, h, w, r - 1, c - 1, default) <<< 8) |||
-      (px(grid, h, w, r - 1, c, default) <<< 7) |||
-      (px(grid, h, w, r - 1, c + 1, default) <<< 6) |||
-      (px(grid, h, w, r, c - 1, default) <<< 5) |||
-      (px(grid, h, w, r, c, default) <<< 4) |||
-      (px(grid, h, w, r, c + 1, default) <<< 3) |||
-      (px(grid, h, w, r + 1, c - 1, default) <<< 2) |||
-      (px(grid, h, w, r + 1, c, default) <<< 1) |||
+    px(grid, h, w, r - 1, c - 1, default) <<< 8 |||
+      px(grid, h, w, r - 1, c, default) <<< 7 |||
+      px(grid, h, w, r - 1, c + 1, default) <<< 6 |||
+      px(grid, h, w, r, c - 1, default) <<< 5 |||
+      px(grid, h, w, r, c, default) <<< 4 |||
+      px(grid, h, w, r, c + 1, default) <<< 3 |||
+      px(grid, h, w, r + 1, c - 1, default) <<< 2 |||
+      px(grid, h, w, r + 1, c, default) <<< 1 |||
       px(grid, h, w, r + 1, c + 1, default)
   end
 
@@ -155,5 +156,6 @@ defmodule AdventOfCode.Year2021.Day20 do
   defp px(grid, h, w, r, c, _default) when r >= 0 and r < h and c >= 0 and c < w do
     elem(elem(grid, r), c)
   end
+
   defp px(_grid, _h, _w, _r, _c, default), do: default
 end

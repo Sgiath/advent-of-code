@@ -94,37 +94,44 @@ defmodule AdventOfCode.Year2023.Day08 do
   def part2(input) do
     {instructions, network} = parse(input)
 
-    start =
+    # Find all starting nodes (those ending with 'A')
+    starts =
       network
       |> Map.keys()
-      |> Enum.filter(&String.contains?(&1, "A"))
+      |> Enum.filter(&String.ends_with?(&1, "A"))
 
+    # For each starting node, find the cycle length (steps to reach a 'Z' node)
+    # Then compute the LCM of all cycle lengths
+    starts
+    |> Enum.map(&find_cycle_length(&1, instructions, network))
+    |> Enum.reduce(&lcm/2)
+  end
+
+  # Find how many steps it takes from a starting node to reach any node ending with 'Z'
+  defp find_cycle_length(start, instructions, network) do
     instructions
     |> Stream.cycle()
-    |> Enum.reduce_while({0, start}, fn
-      ?L, {steps, current} ->
-        current =
-          Enum.map(current, fn id ->
-            [left, _right] = network[id]
-            left
-          end)
+    |> Enum.reduce_while({0, start}, fn direction, {steps, current} ->
+      next =
+        case direction do
+          ?L -> hd(network[current])
+          ?R -> hd(tl(network[current]))
+        end
 
-        if Enum.all?(current, &String.contains?(&1, "Z")),
-          do: {:halt, steps + 1},
-          else: {:cont, {steps + 1, current}}
-
-      ?R, {steps, current} ->
-        current =
-          Enum.map(current, fn id ->
-            [_left, right] = network[id]
-            right
-          end)
-
-        if Enum.all?(current, &String.contains?(&1, "Z")),
-          do: {:halt, steps + 1},
-          else: {:cont, {steps + 1, current}}
+      if String.ends_with?(next, "Z") do
+        {:halt, steps + 1}
+      else
+        {:cont, {steps + 1, next}}
+      end
     end)
   end
+
+  # Greatest Common Divisor using Euclidean algorithm
+  defp gcd(a, 0), do: a
+  defp gcd(a, b), do: gcd(b, rem(a, b))
+
+  # Least Common Multiple
+  defp lcm(a, b), do: div(a * b, gcd(a, b))
 
   # =============================================================================================
   # Utils

@@ -102,7 +102,9 @@ defmodule AdventOfCode.Year2021.Day18 do
   """
   def reduce(number) do
     case explode(number) do
-      {:exploded, new} -> reduce(new)
+      {:exploded, new} ->
+        reduce(new)
+
       :no_explode ->
         case split(number) do
           {:split, new} -> reduce(new)
