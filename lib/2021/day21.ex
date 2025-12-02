@@ -1,6 +1,16 @@
 defmodule AdventOfCode.Year2021.Day21 do
   @moduledoc """
   https://adventofcode.com/2021/day/21
+
+  Part 2 uses memoized recursion to count winning universes efficiently.
+  The key insight is that the state space is finite:
+  - positions: 1-10 (10 values each)
+  - scores: 0-20 (21 values each, game ends at 21)
+  - whose turn: 2 values
+  Total: 10 * 21 * 10 * 21 * 2 = 88,200 possible states
+
+  We recursively compute {wins_p1, wins_p2} from any state, using a memo map
+  to avoid recomputing the same states.
   """
   use AdventOfCode, year: 2021, day: 21
 
@@ -42,16 +52,17 @@ defmodule AdventOfCode.Year2021.Day21 do
 
       rolls, {{pos1, score1}, {pos2, score2}, step} ->
         if rem(step, 2) == 0 do
-          pos1 = pos(pos1, Enum.sum(rolls))
+          pos1 = move(pos1, Enum.sum(rolls))
           {:cont, {{pos1, score1 + pos1}, {pos2, score2}, step + 1}}
         else
-          pos2 = pos(pos2, Enum.sum(rolls))
+          pos2 = move(pos2, Enum.sum(rolls))
           {:cont, {{pos1, score1}, {pos2, score2 + pos2}, step + 1}}
         end
     end)
   end
 
-  def pos(pos, rolls) do
+  # Calculate new position after moving (positions are 1-10, wrapping)
+  defp move(pos, rolls) do
     case rem(pos + rolls, 10) do
       0 -> 10
       val -> val
@@ -62,81 +73,68 @@ defmodule AdventOfCode.Year2021.Day21 do
   # Part 2
   # ===============================================================================================
 
-  @base %{
-    3 => 1,
-    4 => 3,
-    5 => 6,
-    6 => 7,
-    7 => 6,
-    8 => 3,
-    9 => 1
-  }
+  # Distribution of sums when rolling 3d3 (three 3-sided dice)
+  # Each roll is 1, 2, or 3, so sum ranges from 3 to 9
+  # The frequencies represent how many of the 27 universes produce each sum
+  @dice_outcomes [{3, 1}, {4, 3}, {5, 6}, {6, 7}, {7, 6}, {8, 3}, {9, 1}]
 
   @impl AdventOfCode
   def part2(input) do
     [pos1, pos2] = parse(input)
 
-    find_winners({%{{{pos1, 0}, {pos2, 0}, true, false} => 1}, 0, 0})
+    {wins1, wins2, _memo} = count_wins(pos1, 0, pos2, 0, true, %{})
+    max(wins1, wins2)
   end
 
   @doc """
-  Run the steps until all universes reach win
+  Count the number of universes where each player wins from the given state.
+  Returns {wins_player1, wins_player2, updated_memo}.
+
+  State is defined by:
+  - pos1, score1: player 1's position and score
+  - pos2, score2: player 2's position and score
+  - player1_turn: true if it's player 1's turn (represented as 1 or 0 in key)
+
+  Uses a memo map to avoid recomputing the same states.
   """
-  def find_winners({state, win1, win2}) do
-    state
-    |> Enum.reduce({%{}, win1, win2}, &update_state/2)
-    |> check_wins()
+  def count_wins(pos1, score1, pos2, score2, player1_turn, memo) do
+    # Use a compact key for memoization
+    key = {pos1, score1, pos2, score2, player1_turn}
+
+    case Map.fetch(memo, key) do
+      {:ok, {w1, w2}} ->
+        {w1, w2, memo}
+
+      :error ->
+        {w1, w2, memo} = compute_wins(pos1, score1, pos2, score2, player1_turn, memo)
+        {w1, w2, Map.put(memo, key, {w1, w2})}
+    end
   end
 
-  @doc """
-  Check if any undecided universe is left and return the winner, otherwise run the next step
-  """
-  def check_wins({state, w1, w2}) do
-    if Enum.empty?(state), do: max(w1, w2), else: find_winners({state, w1, w2})
+  # Base cases: someone has won
+  defp compute_wins(_pos1, score1, _pos2, _score2, _turn, memo) when score1 >= 21,
+    do: {1, 0, memo}
+
+  defp compute_wins(_pos1, _score1, _pos2, score2, _turn, memo) when score2 >= 21,
+    do: {0, 1, memo}
+
+  # Player 1's turn
+  defp compute_wins(pos1, score1, pos2, score2, true, memo) do
+    Enum.reduce(@dice_outcomes, {0, 0, memo}, fn {roll, freq}, {total_w1, total_w2, memo} ->
+      new_pos1 = move(pos1, roll)
+      new_score1 = score1 + new_pos1
+      {w1, w2, memo} = count_wins(new_pos1, new_score1, pos2, score2, false, memo)
+      {total_w1 + freq * w1, total_w2 + freq * w2, memo}
+    end)
   end
 
-  @doc """
-  Update the state of the multiverse
-  """
-
-  # universe is decided
-  def update_state({{{_p1, s1}, _p2, _step, true}, universes}, {new_state, w1, w2}) do
-    if s1 >= 21, do: {new_state, w1 + universes, w2}, else: {new_state, w1, w2 + universes}
-  end
-
-  # undecided, player 1 turn
-  def update_state({{{pos1, score1}, p2, true, false}, universes}, {state, w1, w2}) do
-    new_state =
-      Enum.reduce(@base, state, fn {roll, freq}, new_state ->
-        pos1 = pos(pos1, roll)
-        score1 = score1 + pos1
-
-        Map.update(
-          new_state,
-          {{pos1, score1}, p2, false, score1 >= 21},
-          freq * universes,
-          &(&1 + freq * universes)
-        )
-      end)
-
-    {new_state, w1, w2}
-  end
-
-  # undecided, player 2 turn
-  def update_state({{p1, {pos2, score2}, false, false}, universes}, {state, w1, w2}) do
-    new_state =
-      Enum.reduce(@base, state, fn {roll, freq}, new_state ->
-        pos2 = pos(pos2, roll)
-        score2 = score2 + pos2
-
-        Map.update(
-          new_state,
-          {p1, {pos2, score2}, true, score2 >= 21},
-          freq * universes,
-          &(&1 + freq * universes)
-        )
-      end)
-
-    {new_state, w1, w2}
+  # Player 2's turn
+  defp compute_wins(pos1, score1, pos2, score2, false, memo) do
+    Enum.reduce(@dice_outcomes, {0, 0, memo}, fn {roll, freq}, {total_w1, total_w2, memo} ->
+      new_pos2 = move(pos2, roll)
+      new_score2 = score2 + new_pos2
+      {w1, w2, memo} = count_wins(pos1, score1, new_pos2, new_score2, true, memo)
+      {total_w1 + freq * w1, total_w2 + freq * w2, memo}
+    end)
   end
 end

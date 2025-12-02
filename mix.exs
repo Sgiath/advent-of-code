@@ -7,8 +7,13 @@ defmodule AdventOfCode.MixProject do
       version: "2025.12.1",
       elixir: "~> 1.19",
       start_permanent: false,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
+  end
+
+  def cli do
+    [preferred_envs: [precommit: :test]]
   end
 
   def application, do: [extra_applications: [:logger, :eex, :tools]]
@@ -32,6 +37,12 @@ defmodule AdventOfCode.MixProject do
       # benchmarking and testing
       {:benchee, "~> 1.5", only: [:dev, :test]},
       {:mix_test_watch, "~> 1.4", only: :dev, runtime: false}
+    ]
+  end
+
+  defp aliases do
+    [
+      precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test"]
     ]
   end
 end

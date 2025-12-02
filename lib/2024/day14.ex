@@ -130,10 +130,17 @@ defmodule AdventOfCode.Year2024.Day14 do
       immediately
   """
   def is_interesting?(robots) do
-    x = Enum.map(robots, fn {{x, _y}, _v} -> x end)
-    y = Enum.map(robots, fn {{_x, y}, _v} -> y end)
+    # Single-pass variance calculation for both x and y
+    # Using: Var(X) = E[X²] - E[X]² = (sum_sq / n) - (sum / n)²
+    {sum_x, sum_x_sq, sum_y, sum_y_sq, n} =
+      Enum.reduce(robots, {0, 0, 0, 0, 0}, fn {{x, y}, _v}, {sx, sxsq, sy, sysq, count} ->
+        {sx + x, sxsq + x * x, sy + y, sysq + y * y, count + 1}
+      end)
 
-    Statistics.variance(x) < 500 and Statistics.variance(y) < 500
+    var_x = sum_x_sq / n - sum_x / n * (sum_x / n)
+    var_y = sum_y_sq / n - sum_y / n * (sum_y / n)
+
+    var_x < 500 and var_y < 500
   end
 
   # =============================================================================================
