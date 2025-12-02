@@ -1,6 +1,9 @@
 defmodule AdventOfCode.Year2024.Day06 do
   @moduledoc ~S"""
   https://adventofcode.com/2024/day/6
+
+  Optimized with ray casting and inline obstacle checking. Instead of rebuilding
+  the obstacle structure for each test, we check the new obstacle position inline.
   """
   use AdventOfCode, year: 2024, day: 06
 
@@ -25,152 +28,240 @@ defmodule AdventOfCode.Year2024.Day06 do
   end
 
   def parse(input) do
-    map =
-      input
-      |> String.split(["\n"], trim: true)
-      |> Enum.map(&String.to_charlist/1)
+    lines = String.split(input, "\n", trim: true)
+    height = length(lines)
+    width = String.length(hd(lines))
 
-    map = {List.flatten(map), length(map)}
+    # Parse obstacles and find guard position
+    {obstacles, guard} =
+      lines
+      |> Enum.with_index()
+      |> Enum.reduce({MapSet.new(), nil}, fn {line, y}, acc ->
+        line
+        |> String.to_charlist()
+        |> Enum.with_index()
+        |> Enum.reduce(acc, fn {char, x}, {obs, g} ->
+          case char do
+            ?# -> {MapSet.put(obs, {x, y}), g}
+            ?^ -> {obs, {{x, y}, :up}}
+            ?> -> {obs, {{x, y}, :right}}
+            ?v -> {obs, {{x, y}, :down}}
+            ?< -> {obs, {{x, y}, :left}}
+            _ -> {obs, g}
+          end
+        end)
+      end)
 
-    {map, find_initial(map)}
+    # Organize obstacles as sorted tuples for binary search
+    organized = organize_obstacles(obstacles)
+
+    {obstacles, organized, guard, width, height}
   end
 
-  def find_initial({map, l}) do
-    # index in map
-    i = Enum.find_index(map, &(&1 in [?^, ?>, ?<, ?v]))
+  # Group obstacles by row and column as sorted tuples
+  defp organize_obstacles(obstacles) do
+    by_row =
+      obstacles
+      |> Enum.group_by(fn {_x, y} -> y end)
+      |> Map.new(fn {y, obs} ->
+        {y, obs |> Enum.map(fn {x, _} -> x end) |> Enum.sort() |> List.to_tuple()}
+      end)
 
-    # intial position
-    y = Integer.floor_div(i, l)
-    x = i - y * l
+    by_col =
+      obstacles
+      |> Enum.group_by(fn {x, _y} -> x end)
+      |> Map.new(fn {x, obs} ->
+        {x, obs |> Enum.map(fn {_, y} -> y end) |> Enum.sort() |> List.to_tuple()}
+      end)
 
-    {{x, y}, Enum.at(map, i)}
+    {by_row, by_col}
   end
 
   # =============================================================================================
   # Part 1
   # =============================================================================================
 
-  @vectors [?^, ?>, ?v, ?<]
-
   @impl AdventOfCode
   def part1(input) do
-    {map, head} = parse(input)
+    {_obstacles, organized, guard, width, height} = parse(input)
 
-    map
-    |> set(head)
-    |> path(head)
-    |> Enum.count(&(&1 in @vectors))
+    walk_collecting(organized, guard, width, height, MapSet.new())
+    |> MapSet.size()
   end
 
-  # when out of bounds return
-  def path({map, _l}, {{_x, y}, ?^}) when y == 0, do: map
-  def path({map, l}, {{x, _y}, ?>}) when x + 1 == l, do: map
-  def path({map, l}, {{_x, y}, ?v}) when y + 1 == l, do: map
-  def path({map, _l}, {{x, _y}, ?<}) when x == 0, do: map
+  defp walk_collecting({by_row, by_col}, {{x, y}, dir}, width, height, visited) do
+    case find_ray_stop({by_row, by_col}, {x, y}, dir, width, height, nil) do
+      {:out, end_pos} ->
+        add_path(visited, {x, y}, end_pos)
 
-  def path(map, {_pos, vec} = head) do
-    # next position by the current vector
-    next = move(head)
-
-    case get(map, next) do
-      # on unvisited place mark as visited and move to next position
-      ?. ->
-        map
-        |> set(next)
-        |> path(next)
-
-      a when a == vec ->
-        :loop
-
-      # if already visited, just move to next position
-      a when a in @vectors ->
-        path(map, next)
-
-      # when next is obstacle, don't move but turn
-      ?# ->
-        path(map, turn(head))
+      {:stop, stop_pos} ->
+        visited = add_path(visited, {x, y}, stop_pos)
+        walk_collecting({by_row, by_col}, {stop_pos, turn_right(dir)}, width, height, visited)
     end
   end
 
+  defp add_path(visited, {x1, y1}, {x2, y2}) do
+    cond do
+      x1 == x2 ->
+        Enum.reduce(min(y1, y2)..max(y1, y2), visited, &MapSet.put(&2, {x1, &1}))
+
+      y1 == y2 ->
+        Enum.reduce(min(x1, x2)..max(x1, x2), visited, &MapSet.put(&2, {&1, y1}))
+    end
+  end
+
+  # Find where a ray stops, optionally considering an extra obstacle
+  defp find_ray_stop({by_row, by_col}, {x, y}, dir, width, height, extra_obstacle) do
+    case dir do
+      :up ->
+        col_obs = Map.get(by_col, x, {})
+        base_obs_y = bsearch_prev(col_obs, y)
+
+        # Check if extra obstacle blocks before the normal obstacle
+        obs_y =
+          case extra_obstacle do
+            {^x, ey} when ey < y and (base_obs_y == nil or ey > base_obs_y) -> ey
+            _ -> base_obs_y
+          end
+
+        case obs_y do
+          nil -> {:out, {x, 0}}
+          oy -> {:stop, {x, oy + 1}}
+        end
+
+      :down ->
+        col_obs = Map.get(by_col, x, {})
+        base_obs_y = bsearch_next(col_obs, y)
+
+        obs_y =
+          case extra_obstacle do
+            {^x, ey} when ey > y and (base_obs_y == nil or ey < base_obs_y) -> ey
+            _ -> base_obs_y
+          end
+
+        case obs_y do
+          nil -> {:out, {x, height - 1}}
+          oy -> {:stop, {x, oy - 1}}
+        end
+
+      :left ->
+        row_obs = Map.get(by_row, y, {})
+        base_obs_x = bsearch_prev(row_obs, x)
+
+        obs_x =
+          case extra_obstacle do
+            {ex, ^y} when ex < x and (base_obs_x == nil or ex > base_obs_x) -> ex
+            _ -> base_obs_x
+          end
+
+        case obs_x do
+          nil -> {:out, {0, y}}
+          ox -> {:stop, {ox + 1, y}}
+        end
+
+      :right ->
+        row_obs = Map.get(by_row, y, {})
+        base_obs_x = bsearch_next(row_obs, x)
+
+        obs_x =
+          case extra_obstacle do
+            {ex, ^y} when ex > x and (base_obs_x == nil or ex < base_obs_x) -> ex
+            _ -> base_obs_x
+          end
+
+        case obs_x do
+          nil -> {:out, {width - 1, y}}
+          ox -> {:stop, {ox - 1, y}}
+        end
+    end
+  end
+
+  # Binary search: find largest value < target
+  defp bsearch_prev(tuple, _target) when tuple_size(tuple) == 0, do: nil
+
+  defp bsearch_prev(tuple, target) do
+    idx = bsearch_prev_idx(tuple, target, 0, tuple_size(tuple) - 1)
+    if idx < 0, do: nil, else: elem(tuple, idx)
+  end
+
+  defp bsearch_prev_idx(_tuple, _target, low, high) when low > high, do: high
+
+  defp bsearch_prev_idx(tuple, target, low, high) do
+    mid = div(low + high, 2)
+
+    if elem(tuple, mid) >= target do
+      bsearch_prev_idx(tuple, target, low, mid - 1)
+    else
+      bsearch_prev_idx(tuple, target, mid + 1, high)
+    end
+  end
+
+  # Binary search: find smallest value > target
+  defp bsearch_next(tuple, _target) when tuple_size(tuple) == 0, do: nil
+
+  defp bsearch_next(tuple, target) do
+    size = tuple_size(tuple)
+    idx = bsearch_next_idx(tuple, target, 0, size - 1)
+    if idx >= size, do: nil, else: elem(tuple, idx)
+  end
+
+  defp bsearch_next_idx(_tuple, _target, low, high) when low > high, do: low
+
+  defp bsearch_next_idx(tuple, target, low, high) do
+    mid = div(low + high, 2)
+
+    if elem(tuple, mid) <= target do
+      bsearch_next_idx(tuple, target, mid + 1, high)
+    else
+      bsearch_next_idx(tuple, target, low, mid - 1)
+    end
+  end
+
+  defp turn_right(:up), do: :right
+  defp turn_right(:right), do: :down
+  defp turn_right(:down), do: :left
+  defp turn_right(:left), do: :up
+
   # =============================================================================================
   # Part 2
-  # this is slow as fuck (over 40s) but gets a job done :D
   # =============================================================================================
 
   @impl AdventOfCode
   def part2(input) do
-    {map, head} = parse(input)
+    {_obstacles, organized, guard, width, height} = parse(input)
 
-    map
-    |> set(head)
-    |> path2(head)
-    |> Task.await_many(:infinity)
-    |> Enum.count(fn a -> a == :loop end)
+    {start_pos, _dir} = guard
+    original_path = walk_collecting(organized, guard, width, height, MapSet.new())
+    candidates = MapSet.delete(original_path, start_pos)
+
+    # Test each candidate with inline obstacle checking (no structure rebuild)
+    candidates
+    |> Task.async_stream(
+      fn pos ->
+        causes_loop?(organized, guard, width, height, pos, MapSet.new())
+      end,
+      ordered: false,
+      timeout: :infinity
+    )
+    |> Enum.count(fn {:ok, result} -> result end)
   end
 
-  # when out of bounds return empty (we know the full run without traps is not a loop)
-  def path2({_map, _l}, {{_x, y}, ?^}) when y == 0, do: []
-  def path2({_map, l}, {{x, _y}, ?>}) when x + 1 == l, do: []
-  def path2({_map, l}, {{_x, y}, ?v}) when y + 1 == l, do: []
-  def path2({_map, _l}, {{x, _y}, ?<}) when x == 0, do: []
+  # Check for loop with an extra obstacle at extra_pos
+  defp causes_loop?(organized, {{x, y}, dir}, width, height, extra_pos, visited_turns) do
+    case find_ray_stop(organized, {x, y}, dir, width, height, extra_pos) do
+      {:out, _} ->
+        false
 
-  def path2(map, {_pos, vec} = head) do
-    # next position by the current vector
-    {pos, _v} = next = move(head)
+      {:stop, stop_pos} ->
+        new_dir = turn_right(dir)
+        state = {stop_pos, new_dir}
 
-    case get(map, next) do
-      # on unvisited place mark as visited and move to next position
-      ?. ->
-        normal =
-          map
-          |> set(next)
-          |> path2(next)
-
-        trap =
-          Task.async(fn ->
-            map
-            |> set({pos, ?#})
-            |> path(turn(head))
-          end)
-
-        [trap | normal]
-
-      a when a == vec ->
-        :loop
-
-      # if already visited, just move to next position
-      a when a in @vectors ->
-        path2(map, next)
-
-      # when next is obstacle, don't move but turn
-      ?# ->
-        path2(map, turn(head))
+        if MapSet.member?(visited_turns, state) do
+          true
+        else
+          visited_turns = MapSet.put(visited_turns, state)
+          causes_loop?(organized, {stop_pos, new_dir}, width, height, extra_pos, visited_turns)
+        end
     end
   end
-
-  # =============================================================================================
-  # Utils
-  # =============================================================================================
-
-  # get posion on map
-  def get({map, l}, {{x, y}, _v}) do
-    Enum.at(map, y * l + x)
-  end
-
-  # set position on map
-  def set({map, l}, {{x, y}, v}) do
-    {List.replace_at(map, y * l + x, v), l}
-  end
-
-  # turn 90 degrees in terms of vectors
-  def turn({pos, ?^}), do: {pos, ?>}
-  def turn({pos, ?>}), do: {pos, ?v}
-  def turn({pos, ?v}), do: {pos, ?<}
-  def turn({pos, ?<}), do: {pos, ?^}
-
-  # move along vector
-  def move({{x, y}, ?^}), do: {{x, y - 1}, ?^}
-  def move({{x, y}, ?>}), do: {{x + 1, y}, ?>}
-  def move({{x, y}, ?v}), do: {{x, y + 1}, ?v}
-  def move({{x, y}, ?<}), do: {{x - 1, y}, ?<}
 end

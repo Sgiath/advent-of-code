@@ -2,9 +2,13 @@ defmodule AdventOfCode.Year2021.Day15 do
   @moduledoc """
   https://adventofcode.com/2021/day/15
 
-  Uses A* algorithm with Manhattan distance heuristic for optimal pathfinding.
+  Uses Dijkstra with bucket queue (Dial's algorithm) for O(1) priority queue operations.
+  Weights are bounded 1-9, so we use a circular bucket queue with 10 buckets.
   """
   use AdventOfCode, year: 2021, day: 15
+
+  # Number of buckets for Dial's algorithm (max_weight + 1)
+  @num_buckets 10
 
   # ===============================================================================================
   # Input
@@ -27,19 +31,16 @@ defmodule AdventOfCode.Year2021.Day15 do
   end
 
   @doc """
-  Parse input into a tuple-based grid for O(1) access
-  Returns {grid_array, size} where grid_array is an :array
+  Parse input into a binary for ultra-fast O(1) access (1 byte per cell)
   """
   def parse(input) do
     lines = String.split(input, "\n", trim: true)
     size = length(lines)
 
     grid =
-      lines
-      |> Enum.flat_map(fn line ->
-        line |> String.to_charlist() |> Enum.map(&(&1 - ?0))
-      end)
-      |> :array.from_list()
+      for line <- lines, <<c <- line>>, into: <<>> do
+        <<c - ?0>>
+      end
 
     {grid, size}
   end
@@ -51,7 +52,7 @@ defmodule AdventOfCode.Year2021.Day15 do
   @impl AdventOfCode
   def part1(input) do
     {grid, size} = parse(input)
-    astar(grid, size, size)
+    dijkstra_bucket(grid, size, size)
   end
 
   # ===============================================================================================
@@ -61,162 +62,171 @@ defmodule AdventOfCode.Year2021.Day15 do
   @impl AdventOfCode
   def part2(input) do
     {grid, base_size} = parse(input)
-    # For part 2, we expand 5x but compute weights on-the-fly
-    astar_expanded(grid, base_size)
+    dijkstra_bucket_expanded(grid, base_size)
   end
 
   # ===============================================================================================
-  # A* Algorithm - Uses integer position keys for speed
+  # Dijkstra with Bucket Queue (Dial's Algorithm)
   # ===============================================================================================
 
   @doc """
-  A* for part 1 (non-expanded grid)
-  Uses integer position key (y * size + x) instead of {x, y} tuples for faster map ops
+  Dijkstra for part 1 using bucket queue - O(1) insert and extract-min
   """
-  def astar(grid, size, _grid_size) do
-    # Integer key for destination
+  def dijkstra_bucket(grid, size, _grid_size) do
     dest = size * size - 1
-    # Manhattan from (0,0) to (size-1, size-1)
-    h0 = (size - 1) * 2
-    # {f, g, pos_key}
-    queue = :gb_sets.singleton({h0, 0, 0})
+    # Initialize buckets as a tuple of 10 empty lists
+    buckets = :erlang.make_tuple(@num_buckets, [])
+    # Start position 0 with distance 0 in bucket 0
+    buckets = put_elem(buckets, 0, [0])
     dist = %{0 => 0}
 
-    astar_loop(queue, dist, grid, size, dest)
+    bucket_loop(buckets, 0, dist, grid, size, dest)
   end
 
-  defp astar_loop(queue, dist, grid, size, dest) do
-    {{_f, g, pos}, queue} = :gb_sets.take_smallest(queue)
+  defp bucket_loop(buckets, current_dist, dist, grid, size, dest) do
+    bucket_idx = rem(current_dist, @num_buckets)
 
-    cond do
-      pos == dest ->
-        g
+    case elem(buckets, bucket_idx) do
+      [] ->
+        # Empty bucket, try next distance
+        bucket_loop(buckets, current_dist + 1, dist, grid, size, dest)
 
-      g > Map.get(dist, pos, 0x7FFFFFFF) ->
-        astar_loop(queue, dist, grid, size, dest)
+      [pos | rest] ->
+        buckets = put_elem(buckets, bucket_idx, rest)
 
-      true ->
-        x = rem(pos, size)
-        y = div(pos, size)
-        {queue, dist} = expand_neighbors(x, y, g, queue, dist, grid, size, dest)
-        astar_loop(queue, dist, grid, size, dest)
+        cond do
+          pos == dest ->
+            current_dist
+
+          # Skip if we've found a better path (stale entry)
+          Map.get(dist, pos, 0x7FFFFFFF) < current_dist ->
+            bucket_loop(buckets, current_dist, dist, grid, size, dest)
+
+          true ->
+            x = rem(pos, size)
+            y = div(pos, size)
+            {buckets, dist} = expand_bucket(x, y, current_dist, buckets, dist, grid, size)
+            bucket_loop(buckets, current_dist, dist, grid, size, dest)
+        end
     end
   end
 
-  defp expand_neighbors(x, y, g, queue, dist, grid, size, dest) do
-    {queue, dist} = try_neighbor(x - 1, y, g, queue, dist, grid, size, dest)
-    {queue, dist} = try_neighbor(x + 1, y, g, queue, dist, grid, size, dest)
-    {queue, dist} = try_neighbor(x, y - 1, g, queue, dist, grid, size, dest)
-    try_neighbor(x, y + 1, g, queue, dist, grid, size, dest)
+  defp expand_bucket(x, y, d, buckets, dist, grid, size) do
+    {buckets, dist} = try_bucket(x - 1, y, d, buckets, dist, grid, size)
+    {buckets, dist} = try_bucket(x + 1, y, d, buckets, dist, grid, size)
+    {buckets, dist} = try_bucket(x, y - 1, d, buckets, dist, grid, size)
+    try_bucket(x, y + 1, d, buckets, dist, grid, size)
   end
 
-  defp try_neighbor(nx, ny, g, queue, dist, grid, size, _dest)
+  defp try_bucket(nx, ny, d, buckets, dist, grid, size)
        when nx >= 0 and nx < size and ny >= 0 and ny < size do
-    weight = :array.get(ny * size + nx, grid)
-    new_g = g + weight
     pos_key = ny * size + nx
+    weight = :binary.at(grid, pos_key)
+    new_d = d + weight
 
     case dist do
-      %{^pos_key => current} when new_g >= current ->
-        {queue, dist}
+      %{^pos_key => current} when new_d >= current ->
+        {buckets, dist}
 
       _ ->
-        # Heuristic: Manhattan distance to bottom-right corner
-        dest_x = size - 1
-        dest_y = size - 1
-        h = abs(dest_x - nx) + abs(dest_y - ny)
-        new_f = new_g + h
-
-        {
-          :gb_sets.add({new_f, new_g, pos_key}, queue),
-          Map.put(dist, pos_key, new_g)
-        }
+        bucket_idx = rem(new_d, @num_buckets)
+        bucket = elem(buckets, bucket_idx)
+        {put_elem(buckets, bucket_idx, [pos_key | bucket]), Map.put(dist, pos_key, new_d)}
     end
   end
 
-  defp try_neighbor(_nx, _ny, _g, queue, dist, _grid, _size, _dest) do
-    {queue, dist}
+  defp try_bucket(_nx, _ny, _d, buckets, dist, _grid, _size) do
+    {buckets, dist}
   end
 
   # ===============================================================================================
-  # A* for Expanded Grid (Part 2) - Uses integer position keys for speed
+  # Part 2 - Expanded Grid with Bucket Queue
   # ===============================================================================================
 
   @doc """
-  A* for part 2 - 5x expanded grid with on-the-fly weight computation
-  Uses integer position key (y * size + x) instead of {x, y} tuples for faster map ops
+  Dijkstra for part 2 - precomputes expanded grid as binary for O(1) access
   """
-  def astar_expanded(grid, base_size) do
+  def dijkstra_bucket_expanded(grid, base_size) do
     size = base_size * 5
-    # Integer key for destination
+    expanded = expand_grid(grid, base_size)
     dest = size * size - 1
-    # Manhattan from (0,0) to (size-1, size-1)
-    h0 = (size - 1) * 2
-    # {f, g, pos_key}
-    queue = :gb_sets.singleton({h0, 0, 0})
+
+    buckets = :erlang.make_tuple(@num_buckets, [])
+    buckets = put_elem(buckets, 0, [0])
     dist = %{0 => 0}
 
-    astar_expanded_loop(queue, dist, grid, base_size, size, dest)
+    bucket_loop_exp(buckets, 0, dist, expanded, size, dest)
   end
 
-  defp astar_expanded_loop(queue, dist, grid, base_size, size, dest) do
-    {{_f, g, pos}, queue} = :gb_sets.take_smallest(queue)
+  @doc """
+  Precompute the 5x5 expanded grid as a binary
+  """
+  def expand_grid(grid, base_size) do
+    size = base_size * 5
 
-    cond do
-      pos == dest ->
-        g
-
-      g > Map.get(dist, pos, 0x7FFFFFFF) ->
-        astar_expanded_loop(queue, dist, grid, base_size, size, dest)
-
-      true ->
-        x = rem(pos, size)
-        y = div(pos, size)
-        {queue, dist} = expand_neighbors_exp(x, y, g, queue, dist, grid, base_size, size, dest)
-        astar_expanded_loop(queue, dist, grid, base_size, size, dest)
+    for y <- 0..(size - 1), x <- 0..(size - 1), into: <<>> do
+      tile_x = div(x, base_size)
+      tile_y = div(y, base_size)
+      base_x = rem(x, base_size)
+      base_y = rem(y, base_size)
+      base_weight = :binary.at(grid, base_y * base_size + base_x)
+      raw = base_weight + tile_x + tile_y
+      weight = if raw > 9, do: raw - 9, else: raw
+      <<weight>>
     end
   end
 
-  defp expand_neighbors_exp(x, y, g, queue, dist, grid, base_size, size, dest) do
-    {queue, dist} = try_exp(x - 1, y, g, queue, dist, grid, base_size, size, dest)
-    {queue, dist} = try_exp(x + 1, y, g, queue, dist, grid, base_size, size, dest)
-    {queue, dist} = try_exp(x, y - 1, g, queue, dist, grid, base_size, size, dest)
-    try_exp(x, y + 1, g, queue, dist, grid, base_size, size, dest)
+  defp bucket_loop_exp(buckets, current_dist, dist, grid, size, dest) do
+    bucket_idx = rem(current_dist, @num_buckets)
+
+    case elem(buckets, bucket_idx) do
+      [] ->
+        bucket_loop_exp(buckets, current_dist + 1, dist, grid, size, dest)
+
+      [pos | rest] ->
+        buckets = put_elem(buckets, bucket_idx, rest)
+
+        cond do
+          pos == dest ->
+            current_dist
+
+          Map.get(dist, pos, 0x7FFFFFFF) < current_dist ->
+            bucket_loop_exp(buckets, current_dist, dist, grid, size, dest)
+
+          true ->
+            x = rem(pos, size)
+            y = div(pos, size)
+            {buckets, dist} = expand_bucket_exp(x, y, current_dist, buckets, dist, grid, size)
+            bucket_loop_exp(buckets, current_dist, dist, grid, size, dest)
+        end
+    end
   end
 
-  defp try_exp(nx, ny, g, queue, dist, grid, base_size, size, _dest)
-       when nx >= 0 and nx < size and ny >= 0 and ny < size do
-    # Compute weight on-the-fly for expanded grid
-    tile_x = div(nx, base_size)
-    tile_y = div(ny, base_size)
-    base_x = rem(nx, base_size)
-    base_y = rem(ny, base_size)
-    base_weight = :array.get(base_y * base_size + base_x, grid)
-    raw_weight = base_weight + tile_x + tile_y
-    weight = if raw_weight > 9, do: raw_weight - 9, else: raw_weight
+  defp expand_bucket_exp(x, y, d, buckets, dist, grid, size) do
+    {buckets, dist} = try_bucket_exp(x - 1, y, d, buckets, dist, grid, size)
+    {buckets, dist} = try_bucket_exp(x + 1, y, d, buckets, dist, grid, size)
+    {buckets, dist} = try_bucket_exp(x, y - 1, d, buckets, dist, grid, size)
+    try_bucket_exp(x, y + 1, d, buckets, dist, grid, size)
+  end
 
-    new_g = g + weight
+  defp try_bucket_exp(nx, ny, d, buckets, dist, grid, size)
+       when nx >= 0 and nx < size and ny >= 0 and ny < size do
     pos_key = ny * size + nx
+    weight = :binary.at(grid, pos_key)
+    new_d = d + weight
 
     case dist do
-      %{^pos_key => current} when new_g >= current ->
-        {queue, dist}
+      %{^pos_key => current} when new_d >= current ->
+        {buckets, dist}
 
       _ ->
-        # Heuristic: Manhattan distance to bottom-right corner
-        dest_x = size - 1
-        dest_y = size - 1
-        h = abs(dest_x - nx) + abs(dest_y - ny)
-        new_f = new_g + h
-
-        {
-          :gb_sets.add({new_f, new_g, pos_key}, queue),
-          Map.put(dist, pos_key, new_g)
-        }
+        bucket_idx = rem(new_d, @num_buckets)
+        bucket = elem(buckets, bucket_idx)
+        {put_elem(buckets, bucket_idx, [pos_key | bucket]), Map.put(dist, pos_key, new_d)}
     end
   end
 
-  defp try_exp(_nx, _ny, _g, queue, dist, _grid, _base_size, _size, _dest) do
-    {queue, dist}
+  defp try_bucket_exp(_nx, _ny, _d, buckets, dist, _grid, _size) do
+    {buckets, dist}
   end
 end

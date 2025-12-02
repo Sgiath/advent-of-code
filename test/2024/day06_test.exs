@@ -12,8 +12,6 @@ defmodule AdventOfCode.Year2024.Day06.Test do
 
   test "part 2" do
     assert Day06.part2(Day06.test_input()) == 6
-
-    # this is too slow
-    # assert Day06.part2(Day06.input()) == 1909
+    assert Day06.part2(Day06.input()) == 1909
   end
 end
